@@ -9,7 +9,7 @@
         /// <summary>
         /// The ID for the used mesh of the weapon
         /// </summary>
-        private int meshID;
+        private int modelID;
         /// <summary>
         /// The current amount of ammo in the weapon
         /// </summary>
@@ -25,7 +25,7 @@
         /// <summary>
         /// The ID for the used mesh of the weapon
         /// </summary>
-        public int MeshID { get { return meshID; } set { meshID = value; } }
+        public int ModelID { get { return modelID; } set { modelID = value; } }
         /// <summary>
         /// The current amount of ammo in the weapon
         /// </summary>
@@ -40,10 +40,10 @@
         /// <param name="name">Weapon name</param>
         /// <param name="meshID">Weapon meshID</param>
         /// <param name="maxAmmos">Weapon maxAmmos</param>
-        public Weapon(string name, int meshID, int maxAmmos)
+        public Weapon(string name, int modelID, int maxAmmos)
         {
             this.name = name;
-            this.meshID = meshID;
+            this.modelID = modelID;
             this.maxAmmos = maxAmmos;
         }
     }

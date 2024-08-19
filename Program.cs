@@ -31,17 +31,17 @@ namespace Lurkers_revamped
             float yaw = 0.0f;
             float pitch = 0.0f;
 
-            SetTargetFPS(60);
-            DisableCursor();
 
             Model rifle = LoadModel("src/animations/rifle_reload.m3d");
             for (int j = 0; j < rifle.Meshes[0].VertexCount * 4; j++)
                 rifle.Meshes[0].Colors[j] = 255;
             Raylib.UpdateMeshBuffer(rifle.Meshes[0], 3, rifle.Meshes[0].Colors, rifle.Meshes[0].VertexCount * 4, 0);
 
-            List<Animation> rifleAnims = LoadAnimationList("src/animations/rifle_reload.m3d");            
+            List<Animation> rifleAnims = LoadAnimationList("src/animations/rifle_reload.m3d");
 
 
+            SetTargetFPS(60);
+            DisableCursor();            
             while (!WindowShouldClose())
             {
                 // Update the camera rotation
