@@ -60,7 +60,13 @@ namespace Lurkers_revamped
             }
             CloseWindow();
         }
-        // Update camera movement
+        /// <summary>
+        /// Update camera movement
+        /// </summary>
+        /// <param name="camera">The camera to update</param>
+        /// <param name="speed">The camera speed</param>
+        /// <param name="yaw">The camera yaw rotation</param>
+        /// <param name="pitch">The camera pithc rotation</param>
         static void UpdateCamera(ref Camera3D camera, float speed, ref float yaw, ref float pitch)
         {
             // Calculate the camera rotation
