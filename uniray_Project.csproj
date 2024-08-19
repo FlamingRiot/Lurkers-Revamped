@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Reference Include="UnirayEngine">
+      <HintPath>libraries\UnirayEngine\UnirayEngine.dll</HintPath>
+    </Reference>
+	<Reference Include="Raylib_cs">
+      <HintPath>libraries\Raylib\Raylib-cs.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Content Include="assets\**">
+	<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="scenes\**">
+	<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

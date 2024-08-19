@@ -1,0 +1,8 @@
+<Project>
+	<name>lurkers revamped</name>
+	<Scene>
+		<name>new_scene</name>
+		<GameObjects>C:\Users\ComtesseE1\Desktop\projet\scenes\new_scene\locs.json</GameObjects>
+	</Scene>
+</Project>
+
