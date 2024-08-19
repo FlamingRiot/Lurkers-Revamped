@@ -31,14 +31,14 @@ namespace Lurkers_revamped
             float yaw = 0.0f;
             float pitch = 0.0f;
 
+            // Load dictionary of utilities
+            Dictionary<string, Model> utilities = LoadUtilities();
+            // Load rifle animations
+            List<Animation> rifleAnims = LoadAnimationList("src/animations/rifle.m3d");
 
-            Model rifle = LoadModel("src/animations/rifle_reload.m3d");
-            for (int j = 0; j < rifle.Meshes[0].VertexCount * 4; j++)
-                rifle.Meshes[0].Colors[j] = 255;
-            Raylib.UpdateMeshBuffer(rifle.Meshes[0], 3, rifle.Meshes[0].Colors, rifle.Meshes[0].VertexCount * 4, 0);
-
-            List<Animation> rifleAnims = LoadAnimationList("src/animations/rifle_reload.m3d");
-
+            // Create player
+            Player player = new Player("Anonymous254");
+            player.CurrentWeapon = new Weapon("Lambert 1", "rifle", 50);
 
             SetTargetFPS(60);
             DisableCursor();            
@@ -62,9 +62,10 @@ namespace Lurkers_revamped
                 // Draw the gameobjects of the environment
                 DrawScene();
 
-                // Test
-                DrawModel(rifle, new Vector3(camera.Position.X, camera.Position.Y - 2.8f, camera.Position.Z), 3.5f, Color.White);
-                UpdateModelAnimation(rifle, rifleAnims[6].Anim, rifleAnims[6].Frame);
+                // Draw player's current weapon
+                DrawModel(utilities[player.CurrentWeapon.ModelID], new Vector3(camera.Position.X, camera.Position.Y - 2.8f, camera.Position.Z), 3.5f, Color.White);
+                // Update the current animation of the held weapon
+                UpdateModelAnimation(utilities[player.CurrentWeapon.ModelID], rifleAnims[6].Anim, rifleAnims[6].Frame);
 
                 // End 3D mode context
                 EndMode3D();
@@ -142,6 +143,24 @@ namespace Lurkers_revamped
                 list.Add(new Animation(animations[i]));
             }
             return list;
+        }
+        /// <summary>
+        /// Load all the utilities 3D models
+        /// </summary>
+        /// <returns>The dictionary containing all the loaded models</returns>
+        static Dictionary<string, Model> LoadUtilities()
+        {
+            // Initialize the models dictionary 
+            Dictionary<string, Model> models = new Dictionary<string, Model>();
+
+            // Load Rifle Model
+            Model rifle = LoadModel("src/models/rifle.m3d");
+            for (int j = 0; j < rifle.Meshes[0].VertexCount * 4; j++)
+                rifle.Meshes[0].Colors[j] = 255;
+            UpdateMeshBuffer(rifle.Meshes[0], 3, rifle.Meshes[0].Colors, rifle.Meshes[0].VertexCount * 4, 0);
+            models.Add("rifle", rifle);
+
+            return models;
         }
     }
 }
