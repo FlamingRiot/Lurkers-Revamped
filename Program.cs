@@ -110,13 +110,17 @@ namespace Lurkers_revamped
                 DrawScene();
 
                 // Calculate the weapon's rotation
-                Matrix4x4 weaponRotation = MatrixRotateXYZ(new Vector3(0, yaw, 0));
+                Matrix4x4 rotationYaw = MatrixRotateY(yaw);
+                Matrix4x4 rotationPitch = MatrixRotateX(-pitch);
+                Matrix4x4 weaponRotation = MatrixMultiply(rotationPitch, rotationYaw);
+
+                // Assign new rotation matrix to the model
                 Model model = utilities[player.CurrentWeapon.ModelID];
                 model.Transform = weaponRotation;
                 utilities[player.CurrentWeapon.ModelID] = model;
                     
                 // Draw player's current weapon
-                DrawModel(utilities[player.CurrentWeapon.ModelID], new Vector3(camera.Position.X, camera.Position.Y - 2.65f, camera.Position.Z), 3.5f, Color.White);
+                DrawModel(utilities[player.CurrentWeapon.ModelID], new Vector3(camera.Position.X - GetCameraForward(ref camera).X / 3, camera.Position.Y - 0.2f, camera.Position.Z - GetCameraForward(ref camera).Z / 3), 3.5f, Color.White);
 
                 // Draw bullet rays (for debug)s
                 foreach (Bullet bullet in player.CurrentWeapon.bullets)
@@ -129,6 +133,9 @@ namespace Lurkers_revamped
 
                 // End 3D mode context
                 EndMode3D();
+
+                // Draw crosshair
+                DrawText("+", GetScreenWidth() / 2, GetScreenHeight() / 2, 20, Color.White);
 
                 // End drawing context
                 EndDrawing();
