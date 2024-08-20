@@ -1,7 +1,7 @@
 ﻿using Raylib_cs;
 using System.Numerics;
 
-namespace uniray_Project.mechanics
+namespace uniray_Project
 {
     public class Bullet
     {

@@ -1,5 +1,4 @@
-﻿using uniray_Project.mechanics;
-using System.Numerics;
+﻿using System.Numerics;
 namespace uniray_Project
 {
     public class Weapon

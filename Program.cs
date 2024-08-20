@@ -4,7 +4,6 @@ using static Raylib_cs.Raymath;
 using System.Numerics;
 using static UnirayEngine.UnirayEngine;
 using uniray_Project;
-using uniray_Project.mechanics;
 
 namespace Lurkers_revamped
 {
@@ -24,6 +23,9 @@ namespace Lurkers_revamped
 
             // Init the Uniray engine background code 
             InitEngine();
+
+            // Init Audio Center
+            AudioCenter audio = new AudioCenter();
 
             // Define 3D camera
             Camera3D camera = new Camera3D();
@@ -74,7 +76,12 @@ namespace Lurkers_revamped
                         player.CurrentAnimation = rifleAnims[3];
                         // Double the framerate
                         rifleAnims[3].UpdateFrame();
-                        if (rifleAnims[3].Frame == 1) player.CurrentWeapon.ShootBullet(camera.Position, GetCameraForward(ref camera));
+                        if (rifleAnims[3].Frame == 1)
+                        {
+                            player.CurrentWeapon.ShootBullet(camera.Position, GetCameraForward(ref camera));
+                            // Play sound
+                            audio.PlaySound("rifleShoot");
+                        }
                         break;
                     case PlayerState.Reloading:
                         player.CurrentAnimation = rifleAnims[2];
