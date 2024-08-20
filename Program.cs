@@ -4,6 +4,7 @@ using static Raylib_cs.Raymath;
 using System.Numerics;
 using static UnirayEngine.UnirayEngine;
 using uniray_Project;
+using uniray_Project.mechanics;
 
 namespace Lurkers_revamped
 {
@@ -51,23 +52,26 @@ namespace Lurkers_revamped
                 switch (player.State)
                 {
                     case PlayerState.Idle:
-                        UpdateModelAnimation(utilities[player.CurrentWeapon.ModelID], rifleAnims[5].Anim, rifleAnims[5].Frame);
+                        UpdateModelAnimation(utilities[player.CurrentWeapon.ModelID], rifleAnims[5].Anim, rifleAnims[5].UpdateFrame());
                         break;
                     case PlayerState.Running:
-                        UpdateModelAnimation(utilities[player.CurrentWeapon.ModelID], rifleAnims[1].Anim, rifleAnims[1].Frame);
+                        UpdateModelAnimation(utilities[player.CurrentWeapon.ModelID], rifleAnims[1].Anim, rifleAnims[1].UpdateFrame());
                         break;
                     case PlayerState.Shooting:
-                        UpdateModelAnimation(utilities[player.CurrentWeapon.ModelID], rifleAnims[3].Anim, rifleAnims[3].Frame);
+                        UpdateModelAnimation(utilities[player.CurrentWeapon.ModelID], rifleAnims[3].Anim, rifleAnims[3].UpdateFrame());
+                        // Double the framerate
+                        rifleAnims[3].UpdateFrame();
+                        if (rifleAnims[0].Frame == 0) player.CurrentWeapon.ShootBullet(camera.Position, GetCameraForward(ref camera));
                         break;
                     case PlayerState.Reloading:
                         UpdateModelAnimation(utilities[player.CurrentWeapon.ModelID], rifleAnims[2].Anim, rifleAnims[2].UpdateFrame());
-                        if (rifleAnims[2].Frame == 0) player.State = PlayerState.Idle;
+                        if (rifleAnims[2].Frame == 0) player.State = PlayerState.Running;
                         break;
                     case PlayerState.Taking:
-                        UpdateModelAnimation(utilities[player.CurrentWeapon.ModelID], rifleAnims[4].Anim, rifleAnims[4].Frame);
+                        UpdateModelAnimation(utilities[player.CurrentWeapon.ModelID], rifleAnims[4].Anim, rifleAnims[4].UpdateFrame());
                         break;
                     case PlayerState.Hiding:
-                        UpdateModelAnimation(utilities[player.CurrentWeapon.ModelID], rifleAnims[0].Anim, rifleAnims[0].Frame);
+                        UpdateModelAnimation(utilities[player.CurrentWeapon.ModelID], rifleAnims[0].Anim, rifleAnims[0].UpdateFrame());
                         break;
                 }
 
@@ -96,7 +100,13 @@ namespace Lurkers_revamped
                 utilities[player.CurrentWeapon.ModelID] = model;
                 
                 // Draw player's current weapon
-                DrawModel(utilities[player.CurrentWeapon.ModelID], new Vector3(camera.Position.X, camera.Position.Y - 2.8f, camera.Position.Z), 3.5f, Color.White);
+                DrawModel(utilities[player.CurrentWeapon.ModelID], new Vector3(camera.Position.X, camera.Position.Y - 2.65f, camera.Position.Z), 3.5f, Color.White);
+
+                // Draw bullet rays (for debug)
+                foreach (Bullet bullet in player.CurrentWeapon.bullets)
+                {
+                    DrawRay(bullet.Ray, Color.Red);
+                }
 
                 // End 3D mode context
                 EndMode3D();
@@ -125,7 +135,8 @@ namespace Lurkers_revamped
             // Calculate camera direction
             Vector3 direction;
             direction.X = (float)(Math.Cos(pitch) * Math.Sin(yaw));
-            direction.Y = (float)Math.Sin(pitch);
+            //direction.Y = (float)Math.Sin(pitch);
+            direction.Y = 0;
             direction.Z = (float)(Math.Cos(pitch) * Math.Cos(yaw));
 
             // Calculate the camera movement
@@ -203,6 +214,14 @@ namespace Lurkers_revamped
             if (IsKeyPressed(KeyboardKey.R))
             {
                 player.State = PlayerState.Reloading;
+            }
+            if (IsMouseButtonDown(MouseButton.Left))
+            {
+                player.State = PlayerState.Shooting;
+            }
+            else if (IsMouseButtonUp(MouseButton.Left) && player.State == PlayerState.Shooting) 
+            {
+                player.State = PlayerState.Running;
             }
         }
     }
