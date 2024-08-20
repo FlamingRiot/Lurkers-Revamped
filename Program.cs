@@ -48,32 +48,35 @@ namespace Lurkers_revamped
                 // Update the camera rotation
                 UpdateCamera(ref camera, 0.3f, ref yaw, ref pitch);
 
-                // Update the current animation of the held weapon
+                // Update the current animation of the player
                 switch (player.State)
                 {
                     case PlayerState.Idle:
-                        UpdateModelAnimation(utilities[player.CurrentWeapon.ModelID], rifleAnims[5].Anim, rifleAnims[5].UpdateFrame());
+                        player.CurrentAnimation = rifleAnims[5];
                         break;
                     case PlayerState.Running:
-                        UpdateModelAnimation(utilities[player.CurrentWeapon.ModelID], rifleAnims[1].Anim, rifleAnims[1].UpdateFrame());
+                        player.CurrentAnimation = rifleAnims[1];
                         break;
                     case PlayerState.Shooting:
-                        UpdateModelAnimation(utilities[player.CurrentWeapon.ModelID], rifleAnims[3].Anim, rifleAnims[3].UpdateFrame());
+                        player.CurrentAnimation = rifleAnims[3];
                         // Double the framerate
                         rifleAnims[3].UpdateFrame();
                         if (rifleAnims[0].Frame == 0) player.CurrentWeapon.ShootBullet(camera.Position, GetCameraForward(ref camera));
                         break;
                     case PlayerState.Reloading:
-                        UpdateModelAnimation(utilities[player.CurrentWeapon.ModelID], rifleAnims[2].Anim, rifleAnims[2].UpdateFrame());
-                        if (rifleAnims[2].Frame == 0) player.State = PlayerState.Running;
+                        player.CurrentAnimation = rifleAnims[2];
+                        if (rifleAnims[2].Frame == rifleAnims[2].FrameCount()) player.State = PlayerState.Running;
                         break;
                     case PlayerState.Taking:
-                        UpdateModelAnimation(utilities[player.CurrentWeapon.ModelID], rifleAnims[4].Anim, rifleAnims[4].UpdateFrame());
+                        player.CurrentAnimation = rifleAnims[4];
                         break;
                     case PlayerState.Hiding:
-                        UpdateModelAnimation(utilities[player.CurrentWeapon.ModelID], rifleAnims[0].Anim, rifleAnims[0].UpdateFrame());
+                        player.CurrentAnimation = rifleAnims[0];
                         break;
                 }
+
+                // Update model animation
+                UpdateModelAnimation(utilities[player.CurrentWeapon.ModelID], player.CurrentAnimation.Anim, player.CurrentAnimation.UpdateFrame());
 
                 // Update the event handler
                 TickPlayer(ref player);
@@ -135,8 +138,8 @@ namespace Lurkers_revamped
             // Calculate camera direction
             Vector3 direction;
             direction.X = (float)(Math.Cos(pitch) * Math.Sin(yaw));
-            //direction.Y = (float)Math.Sin(pitch);
-            direction.Y = 0;
+            direction.Y = (float)Math.Sin(pitch);
+            //direction.Y = 0;
             direction.Z = (float)(Math.Cos(pitch) * Math.Cos(yaw));
 
             // Calculate the camera movement
@@ -211,6 +214,7 @@ namespace Lurkers_revamped
         /// <param name="player">The player to check</param>
         static void TickPlayer(ref Player player)
         {
+            // Manager input events
             if (IsKeyPressed(KeyboardKey.R))
             {
                 player.State = PlayerState.Reloading;

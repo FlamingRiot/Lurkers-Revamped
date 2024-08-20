@@ -7,10 +7,16 @@
         Shooting,
         Reloading,
         Taking,
-        Hiding
+        Hiding,
+        Crouch,
+        GetUp
     }
     public class Player
     {
+        /// <summary>
+        /// The time delay for the player's actions
+        /// </summary>
+        private double actionDelay;
         /// <summary>
         /// Player name
         /// </summary>
@@ -19,6 +25,10 @@
         /// The currently held weapon of the player
         /// </summary>
         private Weapon? currentWeapon;
+        /// <summary>
+        /// The currently displayed animation
+        /// </summary>
+        private Animation currentAnimation;
         /// <summary>
         /// The amount of life the player
         /// </summary>
@@ -36,9 +46,17 @@
         /// </summary>
         public int Life { get { return life; } set { life = value; } }
         /// <summary>
+        /// The time delay for the player's actions
+        /// </summary>
+        public double ActionDelay { get { return actionDelay; } set { actionDelay = value; } }
+        /// <summary>
         /// The currently held weapon of the player
         /// </summary>
         public Weapon? CurrentWeapon { get { return currentWeapon; } set { currentWeapon = value; } }
+        /// <summary>
+        /// The currently displayed animation
+        /// </summary>
+        public Animation CurrentAnimation { get { return currentAnimation; } set { currentAnimation = value; } }
         /// <summary>
         /// Player name
         /// </summary>
