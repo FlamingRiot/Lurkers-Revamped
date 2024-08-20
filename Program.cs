@@ -3,7 +3,6 @@ using static Raylib_cs.Raylib;
 using static Raylib_cs.Raymath;
 using System.Numerics;
 using static UnirayEngine.UnirayEngine;
-using UnirayEngine;
 using uniray_Project;
 
 namespace Lurkers_revamped
@@ -38,6 +37,7 @@ namespace Lurkers_revamped
 
             // Create player
             Player player = new Player("Anonymous254");
+            // Assign a default weapon to the player
             player.CurrentWeapon = new Weapon("Lambert 1", "rifle", 50);
 
             SetTargetFPS(60);
@@ -53,6 +53,9 @@ namespace Lurkers_revamped
                 // Clear background every frame using white color
                 ClearBackground(Color.Gray);
 
+                DrawText(GetCameraForward(ref camera).ToString(), 200, 200, 20, Color.Red);
+
+
                 // Begin 3D mode with the current scene's camera
                 BeginMode3D(camera);
 
@@ -62,10 +65,16 @@ namespace Lurkers_revamped
                 // Draw the gameobjects of the environment
                 DrawScene();
 
+                // Calculate the weapon's rotation
+                Matrix4x4 weaponRotation = MatrixRotateXYZ(new Vector3(0, yaw, 0));
+                Model model = utilities[player.CurrentWeapon.ModelID];
+                model.Transform = weaponRotation;
+                utilities[player.CurrentWeapon.ModelID] = model;
+                
                 // Draw player's current weapon
                 DrawModel(utilities[player.CurrentWeapon.ModelID], new Vector3(camera.Position.X, camera.Position.Y - 2.8f, camera.Position.Z), 3.5f, Color.White);
                 // Update the current animation of the held weapon
-                UpdateModelAnimation(utilities[player.CurrentWeapon.ModelID], rifleAnims[6].Anim, rifleAnims[6].Frame);
+                UpdateModelAnimation(utilities[player.CurrentWeapon.ModelID], rifleAnims[1].Anim, rifleAnims[1].Frame);
 
                 // End 3D mode context
                 EndMode3D();
@@ -158,6 +167,7 @@ namespace Lurkers_revamped
             for (int j = 0; j < rifle.Meshes[0].VertexCount * 4; j++)
                 rifle.Meshes[0].Colors[j] = 255;
             UpdateMeshBuffer(rifle.Meshes[0], 3, rifle.Meshes[0].Colors, rifle.Meshes[0].VertexCount * 4, 0);
+
             models.Add("rifle", rifle);
 
             return models;

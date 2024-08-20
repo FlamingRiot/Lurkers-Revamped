@@ -1,5 +1,14 @@
 ﻿namespace uniray_Project
 {
+    public enum PlayerState
+    {
+        Idle,
+        Running,
+        Shooting,
+        Reloading,
+        Taking,
+        
+    }
     public class Player
     {
         /// <summary>
@@ -14,6 +23,14 @@
         /// The amount of life the player
         /// </summary>
         private int life;
+        /// <summary>
+        /// The current state of the player
+        /// </summary>
+        private PlayerState state;
+        /// <summary>
+        /// The current state of the player
+        /// </summary>
+        public PlayerState State { get { return state; } set { state = value; } }
         /// <summary>
         /// The current amount of life the player has
         /// </summary>
