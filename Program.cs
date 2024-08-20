@@ -74,7 +74,7 @@ namespace Lurkers_revamped
                         player.CurrentAnimation = rifleAnims[3];
                         // Double the framerate
                         rifleAnims[3].UpdateFrame();
-                        if (rifleAnims[0].Frame == 0) player.CurrentWeapon.ShootBullet(camera.Position, GetCameraForward(ref camera));
+                        if (rifleAnims[3].Frame == 1) player.CurrentWeapon.ShootBullet(camera.Position, GetCameraForward(ref camera));
                         break;
                     case PlayerState.Reloading:
                         player.CurrentAnimation = rifleAnims[2];
@@ -92,7 +92,7 @@ namespace Lurkers_revamped
                 UpdateModelAnimation(utilities[player.CurrentWeapon.ModelID], player.CurrentAnimation.Anim, player.CurrentAnimation.UpdateFrame());
 
                 // Update the event handler
-                TickPlayer(ref player);
+                TickPlayer(ref player, rifleAnims);
 
                 // Begin drawing context
                 BeginDrawing();
@@ -235,7 +235,7 @@ namespace Lurkers_revamped
         /// Tick the player events
         /// </summary>
         /// <param name="player">The player to check</param>
-        static void TickPlayer(ref Player player)
+        static void TickPlayer(ref Player player, List<Animation> anims)
         {
             // Manager input events
             if (IsKeyPressed(KeyboardKey.R))
@@ -249,6 +249,7 @@ namespace Lurkers_revamped
             else if (IsMouseButtonUp(MouseButton.Left) && player.State == PlayerState.Shooting) 
             {
                 player.State = PlayerState.Running;
+                anims[3].Frame = 0;
             }
         }
     }
