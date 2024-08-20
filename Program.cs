@@ -135,7 +135,7 @@ namespace Lurkers_revamped
                 EndMode3D();
 
                 // Draw crosshair
-                DrawText("+", GetScreenWidth() / 2, GetScreenHeight() / 2, 20, Color.White);
+                DrawText("+", GetScreenWidth() / 2 - 4, GetScreenHeight() / 2 - 4, 20, Color.White);
 
                 // End drawing context
                 EndDrawing();
