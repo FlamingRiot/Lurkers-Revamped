@@ -18,13 +18,7 @@ namespace uniray_Project
         { 
             get 
             {
-                // Update the current frame due to frame call
-                if (frame < anim.FrameCount)
-                {
-                    frame++;
-                }
-                else frame = 0;
-                return frame; 
+                return frame;
             } 
             set 
             { 
@@ -42,6 +36,19 @@ namespace uniray_Project
         public Animation(ModelAnimation anim)
         {
             this.anim = anim;
+        }
+        /// <summary>
+        /// Return and update the current frame 
+        /// </summary>
+        /// <returns>The updated frame</returns>
+        public int UpdateFrame()
+        {
+            if (frame < anim.FrameCount)
+            {
+                frame++;
+            }
+            else frame = 0;
+            return frame;
         }
     }
 }

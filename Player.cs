@@ -7,7 +7,7 @@
         Shooting,
         Reloading,
         Taking,
-        
+        Hiding
     }
     public class Player
     {
@@ -53,6 +53,8 @@
             life = 100;
             // Set the weapon to non when the player spawns
             currentWeapon = null;
+            // Set the player state
+            State = PlayerState.Running;
         }
     }
 }

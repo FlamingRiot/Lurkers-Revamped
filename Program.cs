@@ -47,14 +47,38 @@ namespace Lurkers_revamped
                 // Update the camera rotation
                 UpdateCamera(ref camera, 0.3f, ref yaw, ref pitch);
 
+                // Update the current animation of the held weapon
+                switch (player.State)
+                {
+                    case PlayerState.Idle:
+                        UpdateModelAnimation(utilities[player.CurrentWeapon.ModelID], rifleAnims[5].Anim, rifleAnims[5].Frame);
+                        break;
+                    case PlayerState.Running:
+                        UpdateModelAnimation(utilities[player.CurrentWeapon.ModelID], rifleAnims[1].Anim, rifleAnims[1].Frame);
+                        break;
+                    case PlayerState.Shooting:
+                        UpdateModelAnimation(utilities[player.CurrentWeapon.ModelID], rifleAnims[3].Anim, rifleAnims[3].Frame);
+                        break;
+                    case PlayerState.Reloading:
+                        UpdateModelAnimation(utilities[player.CurrentWeapon.ModelID], rifleAnims[2].Anim, rifleAnims[2].UpdateFrame());
+                        if (rifleAnims[2].Frame == 0) player.State = PlayerState.Idle;
+                        break;
+                    case PlayerState.Taking:
+                        UpdateModelAnimation(utilities[player.CurrentWeapon.ModelID], rifleAnims[4].Anim, rifleAnims[4].Frame);
+                        break;
+                    case PlayerState.Hiding:
+                        UpdateModelAnimation(utilities[player.CurrentWeapon.ModelID], rifleAnims[0].Anim, rifleAnims[0].Frame);
+                        break;
+                }
+
+                // Update the event handler
+                TickPlayer(ref player);
+
                 // Begin drawing context
                 BeginDrawing();
 
                 // Clear background every frame using white color
                 ClearBackground(Color.Gray);
-
-                DrawText(GetCameraForward(ref camera).ToString(), 200, 200, 20, Color.Red);
-
 
                 // Begin 3D mode with the current scene's camera
                 BeginMode3D(camera);
@@ -73,8 +97,6 @@ namespace Lurkers_revamped
                 
                 // Draw player's current weapon
                 DrawModel(utilities[player.CurrentWeapon.ModelID], new Vector3(camera.Position.X, camera.Position.Y - 2.8f, camera.Position.Z), 3.5f, Color.White);
-                // Update the current animation of the held weapon
-                UpdateModelAnimation(utilities[player.CurrentWeapon.ModelID], rifleAnims[1].Anim, rifleAnims[1].Frame);
 
                 // End 3D mode context
                 EndMode3D();
@@ -171,6 +193,17 @@ namespace Lurkers_revamped
             models.Add("rifle", rifle);
 
             return models;
+        }
+        /// <summary>
+        /// Tick the player events
+        /// </summary>
+        /// <param name="player">The player to check</param>
+        static void TickPlayer(ref Player player)
+        {
+            if (IsKeyPressed(KeyboardKey.R))
+            {
+                player.State = PlayerState.Reloading;
+            }
         }
     }
 }
