@@ -41,6 +41,10 @@ namespace Lurkers_revamped
             // Assign a default weapon to the player
             player.CurrentWeapon = new Weapon("Lambert 1", "rifle", 50);
 
+            // Test zombie
+            Model cop = LoadModel("src/models/cop.m3d");
+            Model officer = LoadModel("src/models/officer.m3d");
+
             SetTargetFPS(60);
             DisableCursor();            
             while (!WindowShouldClose())
@@ -101,15 +105,18 @@ namespace Lurkers_revamped
                 Model model = utilities[player.CurrentWeapon.ModelID];
                 model.Transform = weaponRotation;
                 utilities[player.CurrentWeapon.ModelID] = model;
-                
+                    
                 // Draw player's current weapon
                 DrawModel(utilities[player.CurrentWeapon.ModelID], new Vector3(camera.Position.X, camera.Position.Y - 2.65f, camera.Position.Z), 3.5f, Color.White);
 
-                // Draw bullet rays (for debug)
+                // Draw bullet rays (for debug)s
                 foreach (Bullet bullet in player.CurrentWeapon.bullets)
                 {
                     DrawRay(bullet.Ray, Color.Red);
                 }
+
+                DrawModel(cop, new Vector3(2, 0, 2), 3.5f, Color.White);
+                DrawModel(officer, new Vector3(2, 0, 0), 3.5f, Color.White);
 
                 // End 3D mode context
                 EndMode3D();
