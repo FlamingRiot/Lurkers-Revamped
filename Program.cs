@@ -15,6 +15,8 @@ namespace Lurkers_revamped
             InitWindow(200, 200, "Lurkers: Revamped");
             // Init splash window
             SetWindowState(ConfigFlags.UndecoratedWindow);
+
+            // Load and draw splash
             Texture2D splash = LoadTexture("src/textures/splash.png");
             BeginDrawing();
             DrawTexture(splash, 0, 0, Color.White);
@@ -51,7 +53,6 @@ namespace Lurkers_revamped
             // Set Window state when loading is done
             SetWindowState(ConfigFlags.ResizableWindow);
             SetWindowState(ConfigFlags.MaximizedWindow);
-
 
             SetTargetFPS(60);
             DisableCursor();            
