@@ -37,6 +37,7 @@ namespace Lurkers_revamped
             // Camera rotation angles
             float yaw = 0.0f;
             float pitch = 0.0f;
+            float sideShake = 0.0f;
 
             // Load dictionary of utilities
             Dictionary<string, Model> utilities = LoadUtilities();
@@ -61,7 +62,7 @@ namespace Lurkers_revamped
             while (!WindowShouldClose())
             {
                 // Update the camera rotation
-                UpdateCamera(ref camera, 0.3f, ref yaw, ref pitch);
+                UpdateCamera(ref camera, 0.3f, ref yaw, ref pitch, ref sideShake);
 
                 // Update the current animation of the player
                 switch (player.State)
@@ -79,7 +80,7 @@ namespace Lurkers_revamped
                         if (rifleAnims[3].Frame == 1)
                         {
                             player.CurrentWeapon.ShootBullet(camera.Position, GetCameraForward(ref camera));
-                            // Play sound
+                            // Play shooting sound
                             audio.PlaySound("rifleShoot");
                         }
                         break;
@@ -119,11 +120,13 @@ namespace Lurkers_revamped
                 // Calculate the weapon's rotation
                 Matrix4x4 rotationYaw = MatrixRotateY(yaw);
                 Matrix4x4 rotationPitch = MatrixRotateX(-pitch);
+                Matrix4x4 rotationRoll = MatrixRotateZ(sideShake);
                 Matrix4x4 weaponRotation = MatrixMultiply(rotationPitch, rotationYaw);
+                Matrix4x4 weaponRotation2 = MatrixMultiply(rotationRoll, weaponRotation);
 
                 // Assign new rotation matrix to the model
                 Model model = utilities[player.CurrentWeapon.ModelID];
-                model.Transform = weaponRotation;
+                model.Transform = weaponRotation2;
                 utilities[player.CurrentWeapon.ModelID] = model;
                     
                 // Draw player's current weapon
@@ -156,7 +159,7 @@ namespace Lurkers_revamped
         /// <param name="speed">The camera speed</param>
         /// <param name="yaw">The camera yaw rotation</param>
         /// <param name="pitch">The camera pithc rotation</param>
-        static void UpdateCamera(ref Camera3D camera, float speed, ref float yaw, ref float pitch)
+        static void UpdateCamera(ref Camera3D camera, float speed, ref float yaw, ref float pitch, ref float sideShake)
         {
             // Calculate the camera rotation
             Vector2 mouse = GetMouseDelta();
@@ -186,10 +189,17 @@ namespace Lurkers_revamped
             if (IsKeyDown(KeyboardKey.D))
             {
                 movement += GetCameraRight(ref camera);
+                if (sideShake < 0.15f) sideShake += 0.01f;
             }
             if (IsKeyDown(KeyboardKey.A))
             {
                 movement -= GetCameraRight(ref camera);
+                if (sideShake > -0.15f) sideShake -= 0.01f;
+            }
+            if (IsKeyUp(KeyboardKey.A) && IsKeyUp(KeyboardKey.D))
+            {
+                if (sideShake < 0.0f) sideShake += 0.01f;
+                else if (sideShake > 0.0f) sideShake -= 0.01f;
             }
             // Normalize the vector if length is higher than 0
             if (Vector3Length(movement) > 0)
