@@ -4,11 +4,13 @@ using static Raylib_cs.Raymath;
 using System.Numerics;
 using static UnirayEngine.UnirayEngine;
 using uniray_Project;
+using System.ComponentModel.Design;
 
 namespace Lurkers_revamped
 {
     public unsafe class Program
     {
+        const float GRAVITY = 9.81f;
         public  static void Main(string[] args)
         {
             InitWindow(200, 200, "Lurkers: Revamped");
@@ -62,7 +64,7 @@ namespace Lurkers_revamped
             while (!WindowShouldClose())
             {
                 // Update the camera rotation
-                UpdateCamera(ref camera, 0.3f, ref yaw, ref pitch, ref sideShake);
+                UpdateCamera(ref camera, 0.3f, ref yaw, ref pitch, ref sideShake, ref player);
 
                 // Update the current animation of the player
                 switch (player.State)
@@ -79,7 +81,7 @@ namespace Lurkers_revamped
                         rifleAnims[3].UpdateFrame();
                         if (rifleAnims[3].Frame == 1)
                         {
-                            player.CurrentWeapon.ShootBullet(camera.Position, GetCameraForward(ref camera));
+                            player.CurrentWeapon.ShootBullet(new Vector3(camera.Position.X, camera.Position.Y - 0.045f, camera.Position.Z) + GetCameraRight(ref camera) / 12, GetCameraForward(ref camera)); ;
                             // Play shooting sound
                             audio.PlaySound("rifleShoot");
                         }
@@ -147,6 +149,8 @@ namespace Lurkers_revamped
                 // Draw crosshair
                 DrawText("+", GetScreenWidth() / 2 - 4, GetScreenHeight() / 2 - 4, 20, Color.White);
 
+                DrawText("Position: " + camera.Position.ToString() + "\nJump Force: " + player.VJump, 200, 200, 20, Color.Red);
+
                 // End drawing context
                 EndDrawing();
             }
@@ -159,7 +163,7 @@ namespace Lurkers_revamped
         /// <param name="speed">The camera speed</param>
         /// <param name="yaw">The camera yaw rotation</param>
         /// <param name="pitch">The camera pithc rotation</param>
-        static void UpdateCamera(ref Camera3D camera, float speed, ref float yaw, ref float pitch, ref float sideShake)
+        static void UpdateCamera(ref Camera3D camera, float speed, ref float yaw, ref float pitch, ref float sideShake, ref Player player)
         {
             // Calculate the camera rotation
             Vector2 mouse = GetMouseDelta();
@@ -210,6 +214,22 @@ namespace Lurkers_revamped
 
             camera.Position += movement;
             camera.Target = Vector3Add(camera.Position, direction);
+
+            // Make the camera jump if needed
+            if (player.State == PlayerState.Jumping)
+            {
+                // Add jump force
+                camera.Position.Y += player.VJump;
+                camera.Target.Y += player.VJump;
+                // Decrease jump force
+                player.VJump -= 0.02f;
+                if (camera.Position.Y <= 3)
+                {
+                    player.State = PlayerState.Running;
+                    // Fix jump offset
+                    camera.Position.Y = (float)Math.Round(camera.Position.Y, 3);
+                }
+            }
         }
         /// <summary>
         /// Load animation list from m3d file
@@ -258,6 +278,14 @@ namespace Lurkers_revamped
             if (IsKeyPressed(KeyboardKey.R))
             {
                 player.State = PlayerState.Reloading;
+            }
+            if (IsKeyPressed(KeyboardKey.Space))
+            {
+                if (player.State != PlayerState.Jumping)
+                {
+                    player.State = PlayerState.Jumping;
+                    player.VJump = Player.JUMP_FORCE;
+                }
             }
             if (IsMouseButtonDown(MouseButton.Left))
             {

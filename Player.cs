@@ -9,10 +9,16 @@
         Taking,
         Hiding,
         Crouch,
-        GetUp
+        GetUp,
+        Jumping
     }
     public class Player
     {
+        /// <summary>
+        /// Player's jump force
+        /// </summary>
+        public const float JUMP_FORCE = 0.5f; 
+
         /// <summary>
         /// The time delay for the player's actions
         /// </summary>
@@ -38,6 +44,10 @@
         /// </summary>
         private PlayerState state;
         /// <summary>
+        /// The velocity of the player's jump
+        /// </summary>
+        private float vJump;
+        /// <summary>
         /// The current state of the player
         /// </summary>
         public PlayerState State { get { return state; } set { state = value; } }
@@ -49,6 +59,10 @@
         /// The time delay for the player's actions
         /// </summary>
         public double ActionDelay { get { return actionDelay; } set { actionDelay = value; } }
+        /// <summary>
+        /// The velocity of the player's jump
+        /// </summary>
+        public float VJump { get { return vJump; } set { vJump = value; } }
         /// <summary>
         /// The currently held weapon of the player
         /// </summary>
