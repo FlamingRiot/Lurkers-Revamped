@@ -1,16 +1,19 @@
 ﻿namespace uniray_Project
 {
-    public enum PlayerState
+    public enum PlayerWeaponState
     {
         Idle,
-        Running,
         Shooting,
         Reloading,
         Taking,
         Hiding,
-        Crouch,
         GetUp,
-        Jumping
+    }
+    public enum PlayerMoveState
+    {
+        Running,
+        Jumping,
+        Crouch
     }
     public class Player
     {
@@ -42,7 +45,11 @@
         /// <summary>
         /// The current state of the player
         /// </summary>
-        private PlayerState state;
+        private PlayerWeaponState weaponState;
+        /// <summary>
+        /// The secondary state of the player
+        /// </summary>
+        private PlayerMoveState moveState;
         /// <summary>
         /// The velocity of the player's jump
         /// </summary>
@@ -50,7 +57,11 @@
         /// <summary>
         /// The current state of the player
         /// </summary>
-        public PlayerState State { get { return state; } set { state = value; } }
+        public PlayerWeaponState WeaponState { get { return weaponState; } set { weaponState = value; } }
+        /// <summary>
+        /// The secondary state of the player
+        /// </summary>
+        public PlayerMoveState MoveState { get { return moveState; } set { moveState = value; } }
         /// <summary>
         /// The current amount of life the player has
         /// </summary>
@@ -86,7 +97,7 @@
             // Set the weapon to non when the player spawns
             currentWeapon = null;
             // Set the player state
-            State = PlayerState.Running;
+            WeaponState = PlayerWeaponState.Idle;
         }
     }
 }

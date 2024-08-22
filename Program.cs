@@ -4,7 +4,6 @@ using static Raylib_cs.Raymath;
 using System.Numerics;
 using static UnirayEngine.UnirayEngine;
 using uniray_Project;
-using System.ComponentModel.Design;
 
 namespace Lurkers_revamped
 {
@@ -41,6 +40,7 @@ namespace Lurkers_revamped
             float pitch = 0.0f;
             float sideShake = 0.0f;
 
+
             // Load dictionary of utilities (weapons, meds, etc.)
             Dictionary<string, Model> utilities = LoadUtilities();
             // Load rifle animations
@@ -68,15 +68,12 @@ namespace Lurkers_revamped
                 UpdateCamera(ref camera, 0.3f, ref yaw, ref pitch, ref sideShake, player);
 
                 // Update the current animation of the player
-                switch (player.State)
+                switch (player.WeaponState)
                 {
-                    case PlayerState.Idle:
-                        player.CurrentAnimation = rifleAnims[5];
-                        break;
-                    case PlayerState.Running:
+                    case PlayerWeaponState.Idle:
                         player.CurrentAnimation = rifleAnims[1];
                         break;
-                    case PlayerState.Shooting:
+                    case PlayerWeaponState.Shooting:
                         player.CurrentAnimation = rifleAnims[3];
                         // Double the framerate
                         rifleAnims[3].UpdateFrame();
@@ -87,14 +84,14 @@ namespace Lurkers_revamped
                             audio.PlaySound("rifleShoot");
                         }
                         break;
-                    case PlayerState.Reloading:
+                    case PlayerWeaponState.Reloading:
                         player.CurrentAnimation = rifleAnims[2];
-                        if (rifleAnims[2].Frame == rifleAnims[2].FrameCount()) player.State = PlayerState.Running;
+                        if (rifleAnims[2].Frame == rifleAnims[2].FrameCount()) player.WeaponState = PlayerWeaponState.Idle;
                         break;
-                    case PlayerState.Taking:
+                    case PlayerWeaponState.Taking:
                         player.CurrentAnimation = rifleAnims[4];
                         break;
-                    case PlayerState.Hiding:
+                    case PlayerWeaponState.Hiding:
                         player.CurrentAnimation = rifleAnims[0];
                         break;
                 }
@@ -152,6 +149,16 @@ namespace Lurkers_revamped
                 EndDrawing();
             }
             CloseWindow();
+
+            // Unload all ressources that ARE NOT from Uniray
+            foreach (KeyValuePair<string, Model> utilitesList in utilities)
+            {
+                for (int i = 0; i < utilitesList.Value.MaterialCount; i++)
+                {
+                    UnloadMaterial(utilitesList.Value.Materials[i]);
+                }
+                UnloadModel(utilitesList.Value);
+            }
         }
         /// <summary>
         /// Update camera movement
@@ -213,7 +220,7 @@ namespace Lurkers_revamped
             camera.Target = Vector3Add(camera.Position, direction);
 
             // Make the camera jump if needed
-            if (player.State == PlayerState.Jumping)
+            if (player.MoveState == PlayerMoveState.Jumping)
             {
                 // Add jump force
                 camera.Position.Y += player.VJump;
@@ -222,7 +229,8 @@ namespace Lurkers_revamped
                 player.VJump -= 0.02f;
                 if (camera.Position.Y <= 3)
                 {
-                    player.State = PlayerState.Running;
+                    player.MoveState = PlayerMoveState.Running;
+                    player.WeaponState = PlayerWeaponState.Idle;
                     // Fix jump offset
                     camera.Position.Y = (float)Math.Round(camera.Position.Y, 3);
                 }
@@ -275,27 +283,27 @@ namespace Lurkers_revamped
             // Reload event
             if (IsKeyPressed(KeyboardKey.R))
             {
-                player.State = PlayerState.Reloading;
+                player.WeaponState = PlayerWeaponState.Reloading;
             }
             // Jump event
             if (IsKeyPressed(KeyboardKey.Space))
             {
                 // Prevent cross-jumping
-                if (player.State != PlayerState.Jumping)
+                if (player.MoveState != PlayerMoveState.Jumping)
                 {
-                    player.State = PlayerState.Jumping;
+                    player.MoveState = PlayerMoveState.Jumping;
                     player.VJump = Player.JUMP_FORCE;
                 }
             }
             // Shooting event
             if (IsMouseButtonDown(MouseButton.Left))
             {
-                player.State = PlayerState.Shooting;
+                player.WeaponState = PlayerWeaponState.Shooting;
             }
             // Stop shooting event
-            else if (IsMouseButtonUp(MouseButton.Left) && player.State == PlayerState.Shooting) 
+            else if (IsMouseButtonUp(MouseButton.Left) && player.WeaponState == PlayerWeaponState.Shooting) 
             {
-                player.State = PlayerState.Running;
+                player.WeaponState = PlayerWeaponState.Idle;
                 anims[3].Frame = 0;
             }
         }
