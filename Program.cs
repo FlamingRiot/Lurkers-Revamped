@@ -13,8 +13,8 @@ namespace Lurkers_revamped
         const float GRAVITY = 9.81f;
         public  static void Main(string[] args)
         {
-            InitWindow(200, 200, "Lurkers: Revamped");
             // Init splash window
+            InitWindow(200, 200, "Lurkers: Revamped");
             SetWindowState(ConfigFlags.UndecoratedWindow);
 
             // Load and draw splash
@@ -36,12 +36,12 @@ namespace Lurkers_revamped
             camera.Up = Vector3.UnitY;
             camera.Projection = CameraProjection.Perspective;
             camera.FovY = 60f;
-            // Camera rotation angles
+            // Camera additional variables
             float yaw = 0.0f;
             float pitch = 0.0f;
             float sideShake = 0.0f;
 
-            // Load dictionary of utilities
+            // Load dictionary of utilities (weapons, meds, etc.)
             Dictionary<string, Model> utilities = LoadUtilities();
             // Load rifle animations
             List<Animation> rifleAnims = LoadAnimationList("src/animations/rifle.m3d");
@@ -51,7 +51,7 @@ namespace Lurkers_revamped
             // Assign a default weapon to the player
             player.CurrentWeapon = new Weapon("Lambert 1", "rifle", 50);
 
-            // Test zombie
+            // Test zombie models
             Model cop = LoadModel("src/models/cop.m3d");
             Model officer = LoadModel("src/models/officer.m3d");
 
@@ -59,12 +59,13 @@ namespace Lurkers_revamped
             SetWindowState(ConfigFlags.ResizableWindow);
             SetWindowState(ConfigFlags.MaximizedWindow);
 
+            // Set target FPS
             SetTargetFPS(60);
             DisableCursor();            
             while (!WindowShouldClose())
             {
-                // Update the camera rotation
-                UpdateCamera(ref camera, 0.3f, ref yaw, ref pitch, ref sideShake, ref player);
+                // Update the camera
+                UpdateCamera(ref camera, 0.3f, ref yaw, ref pitch, ref sideShake, player);
 
                 // Update the current animation of the player
                 switch (player.State)
@@ -101,8 +102,8 @@ namespace Lurkers_revamped
                 // Update model animation
                 UpdateModelAnimation(utilities[player.CurrentWeapon.ModelID], player.CurrentAnimation.Anim, player.CurrentAnimation.UpdateFrame());
 
-                // Update the event handler
-                TickPlayer(ref player, rifleAnims);
+                // Update the player event handler
+                TickPlayer(player, rifleAnims);
 
                 // Begin drawing context
                 BeginDrawing();
@@ -116,22 +117,16 @@ namespace Lurkers_revamped
                 // Draw temporary grid for development
                 DrawGrid(10, 10);
 
-                // Draw the gameobjects of the environment
+                // Draw the gameobjects of the environment (from Uniray)
                 DrawScene();
 
-                // Calculate the weapon's rotation
-                Matrix4x4 rotationYaw = MatrixRotateY(yaw);
-                Matrix4x4 rotationPitch = MatrixRotateX(-pitch);
-                Matrix4x4 rotationRoll = MatrixRotateZ(sideShake);
-                Matrix4x4 weaponRotation = MatrixMultiply(rotationPitch, rotationYaw);
-                Matrix4x4 weaponRotation2 = MatrixMultiply(rotationRoll, weaponRotation);
+                // Transform the player's current model
+                Matrix4x4 mTransform = TransformPlayer(yaw, pitch, sideShake);
 
                 // Assign new rotation matrix to the model
-                Model model = utilities[player.CurrentWeapon.ModelID];
-                model.Transform = weaponRotation2;
-                utilities[player.CurrentWeapon.ModelID] = model;
+                utilities[player.CurrentWeapon.ModelID] = SetModelTransform(utilities[player.CurrentWeapon.ModelID], mTransform);
                     
-                // Draw player's current weapon
+                // Draw player's current model
                 DrawModel(utilities[player.CurrentWeapon.ModelID], new Vector3(camera.Position.X - GetCameraForward(ref camera).X / 3, camera.Position.Y - 0.2f, camera.Position.Z - GetCameraForward(ref camera).Z / 3), 3.5f, Color.White);
 
                 // Draw bullet rays (for debug)s
@@ -140,6 +135,7 @@ namespace Lurkers_revamped
                     DrawRay(bullet.Ray, Color.Red);
                 }
 
+                // Draw debug zombie models
                 DrawModel(cop, new Vector3(2, 0, 2), 3.5f, Color.White);
                 DrawModel(officer, new Vector3(2, 0, 0), 3.5f, Color.White);
 
@@ -149,6 +145,7 @@ namespace Lurkers_revamped
                 // Draw crosshair
                 DrawText("+", GetScreenWidth() / 2 - 4, GetScreenHeight() / 2 - 4, 20, Color.White);
 
+                // Debug positions
                 DrawText("Position: " + camera.Position.ToString() + "\nJump Force: " + player.VJump, 200, 200, 20, Color.Red);
 
                 // End drawing context
@@ -163,7 +160,7 @@ namespace Lurkers_revamped
         /// <param name="speed">The camera speed</param>
         /// <param name="yaw">The camera yaw rotation</param>
         /// <param name="pitch">The camera pithc rotation</param>
-        static void UpdateCamera(ref Camera3D camera, float speed, ref float yaw, ref float pitch, ref float sideShake, ref Player player)
+        static void UpdateCamera(ref Camera3D camera, float speed, ref float yaw, ref float pitch, ref float sideShake, Player player)
         {
             // Calculate the camera rotation
             Vector2 mouse = GetMouseDelta();
@@ -272,30 +269,63 @@ namespace Lurkers_revamped
         /// Tick the player events
         /// </summary>
         /// <param name="player">The player to check</param>
-        static void TickPlayer(ref Player player, List<Animation> anims)
+        static void TickPlayer(Player player, List<Animation> anims)
         {
             // Manager input events
+            // Reload event
             if (IsKeyPressed(KeyboardKey.R))
             {
                 player.State = PlayerState.Reloading;
             }
+            // Jump event
             if (IsKeyPressed(KeyboardKey.Space))
             {
+                // Prevent cross-jumping
                 if (player.State != PlayerState.Jumping)
                 {
                     player.State = PlayerState.Jumping;
                     player.VJump = Player.JUMP_FORCE;
                 }
             }
+            // Shooting event
             if (IsMouseButtonDown(MouseButton.Left))
             {
                 player.State = PlayerState.Shooting;
             }
+            // Stop shooting event
             else if (IsMouseButtonUp(MouseButton.Left) && player.State == PlayerState.Shooting) 
             {
                 player.State = PlayerState.Running;
                 anims[3].Frame = 0;
             }
+        }
+        /// <summary>
+        /// Set a model's transform
+        /// </summary>
+        /// <param name="model">Model to modifiy</param>
+        /// <param name="transform">Transform to set</param>
+        /// <returns></returns>
+        static Model SetModelTransform(Model model, Matrix4x4 transform)
+        {
+            Model copy = model;
+            copy.Transform = transform;
+            return copy;
+        }
+        /// <summary>
+        /// Transform the player's model according to rotation and shake
+        /// </summary>
+        /// <param name="yaw">Camera yaw rotation</param>
+        /// <param name="pitch">Camera pitch rotation</param>
+        /// <param name="sideShake">Camera side shake</param>
+        /// <returns></returns>
+        static Matrix4x4 TransformPlayer(float yaw, float pitch, float sideShake)
+        {
+            Matrix4x4 rotationYaw = MatrixRotateY(yaw);
+            Matrix4x4 rotationPitch = MatrixRotateX(-pitch);
+            Matrix4x4 rotationRoll = MatrixRotateZ(sideShake);
+            Matrix4x4 weaponRotation = MatrixMultiply(rotationPitch, rotationYaw);
+            // Return final transform
+            return MatrixMultiply(rotationRoll, weaponRotation);
         }
     }
 }
