@@ -4,6 +4,7 @@ using static Raylib_cs.Raymath;
 using System.Numerics;
 using static UnirayEngine.UnirayEngine;
 using uniray_Project;
+using System.Text;
 
 namespace Lurkers_revamped
 {
@@ -41,8 +42,22 @@ namespace Lurkers_revamped
             float sideShake = 0.0f;
 
 
+
+            // Change the current directory so the embedded materials from the models can be loaded successfully
+            sbyte* dir = GetApplicationDirectory();
+            string workdir = new string(dir);
+            string newDir = workdir + "src\\textures\\materials\\";
+            SetWorkdir(newDir);
+            //ChangeDirectory()
             // Load dictionary of utilities (weapons, meds, etc.)
             Dictionary<string, Model> utilities = LoadUtilities();
+
+            // Test zombie models
+            Model cop = LoadModel("../../models/cop.m3d");
+            Model officer = LoadModel("../../models/officer.m3d");
+
+            // Set the working directory back to its original value 
+            SetWorkdir(workdir);
             // Load rifle animations
             List<Animation> rifleAnims = LoadAnimationList("src/animations/rifle.m3d");
 
@@ -51,9 +66,6 @@ namespace Lurkers_revamped
             // Assign a default weapon to the player
             player.CurrentWeapon = new Weapon("Lambert 1", "rifle", 50);
 
-            // Test zombie models
-            Model cop = LoadModel("src/models/cop.m3d");
-            Model officer = LoadModel("src/models/officer.m3d");
 
             // Set Window state when loading is done
             SetWindowState(ConfigFlags.ResizableWindow);
@@ -61,7 +73,10 @@ namespace Lurkers_revamped
 
             // Set target FPS
             SetTargetFPS(60);
-            DisableCursor();            
+            DisableCursor();
+
+            Console.WriteLine(workdir);
+
             while (!WindowShouldClose())
             {
                 // Update the camera
@@ -264,7 +279,7 @@ namespace Lurkers_revamped
             Dictionary<string, Model> models = new Dictionary<string, Model>();
 
             // Load Rifle Model
-            Model rifle = LoadModel("src/models/rifle.m3d");
+            Model rifle = LoadModel("../../models/rifle.m3d");
             for (int j = 0; j < rifle.Meshes[0].VertexCount * 4; j++)
                 rifle.Meshes[0].Colors[j] = 255;
             UpdateMeshBuffer(rifle.Meshes[0], 3, rifle.Meshes[0].Colors, rifle.Meshes[0].VertexCount * 4, 0);
@@ -305,6 +320,16 @@ namespace Lurkers_revamped
             {
                 player.WeaponState = PlayerWeaponState.Idle;
                 anims[3].Frame = 0;
+            }
+        }
+        static void SetWorkdir(string directory)
+        {
+            // Transform the sent string to a byte array
+            byte[] array = Encoding.UTF8.GetBytes(directory);
+            fixed (byte* p = array)
+            {
+                sbyte* sp = (sbyte*)p;
+                ChangeDirectory(sp);
             }
         }
         /// <summary>
