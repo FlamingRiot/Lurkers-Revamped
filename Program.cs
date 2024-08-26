@@ -71,7 +71,8 @@ namespace Lurkers_revamped
             // Create list of zombies
             List<Zombie> zombies = new List<Zombie>()
             {
-                new Zombie(new Vector3(2, 0, 2), "cop")
+                new Zombie(new Vector3(-10, 0, 2), "cop"),
+                new Zombie(new Vector3(10, 0, 2), "cop")
             };
 
             foreach (Zombie zombie in zombies)
@@ -129,8 +130,10 @@ namespace Lurkers_revamped
                             // Remove killed zombie if collisiion occured
                             if (rIndex > -1)
                             {
+                                Random r = new Random();
+
                                 zombies.RemoveAt(rIndex);
-                                Zombie zombzomb = new Zombie(Vector3.Zero, "cop");
+                                Zombie zombzomb = new Zombie(new Vector3(r.Next(-50, 50), 0, r.Next(-50, 50)), "cop");
                                 zombzomb.CurrentAnimation = zombieAnims[8];
                                 zombies.Add(zombzomb);
                             }
