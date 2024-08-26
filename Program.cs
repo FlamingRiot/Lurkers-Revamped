@@ -61,7 +61,7 @@ namespace Lurkers_revamped
             SetWorkdir(workdir);
             // Load rifle animations
             List<Animation> rifleAnims = LoadAnimationList("src/animations/rifle.m3d");
-
+            List<Animation> zombieAnims = LoadAnimationList("src/animations/walker.m3d");
             // Create player
             Player player = new Player("Anonymous254");
             // Assign a default weapon to the player
@@ -70,14 +70,18 @@ namespace Lurkers_revamped
             // Create list of zombies
             List<Zombie> zombies = new List<Zombie>()
             {
-                new Zombie(new Vector3(2, 0, 2), "cop"),
-                new Zombie(new Vector3(2, 0, 0), "officer")
+                new Zombie(new Vector3(2, 0, 2), "cop")
             };
+
+            foreach (Zombie zombie in zombies)
+            {
+                zombie.CurrentAnimation = zombieAnims[7];   
+            }
 
             // Set Window state when loading is done
             SetWindowState(ConfigFlags.ResizableWindow);
             SetWindowState(ConfigFlags.MaximizedWindow);
-
+            
             // Set target FPS
             SetTargetFPS(60);
             DisableCursor();
@@ -108,14 +112,13 @@ namespace Lurkers_revamped
                             int rIndex = -1;
                             foreach (Zombie zombie in zombies)
                             {
-                                player.CurrentWeapon.bullets.Last().Collision = GetRayCollisionSphere(player.CurrentWeapon.bullets.Last().Ray, rigged["cop"].BindPose[5].Translation * 3.5f + zombie.Position, 0.3f);
+                                player.CurrentWeapon.bullets.Last().Collision = GetRayCollisionSphere(player.CurrentWeapon.bullets.Last().Ray, zombie.CurrentAnimation.Anim.FramePoses[zombie.CurrentAnimation.Frame][5].Translation * 3.5f + zombie.Position, 0.3f);
                                 if (player.CurrentWeapon.bullets.Last().Collision.Hit)
                                 {
                                     rIndex = zombies.IndexOf(zombie);
                                     player.CurrentWeapon.bullets.Last().ResetCollision();
                                 }
                             }
-
                             // Remove killed zombie if collisiion occured
                             if (rIndex > -1)
                             {
@@ -126,7 +129,7 @@ namespace Lurkers_revamped
                         break;
                     case PlayerWeaponState.Reloading:
                         player.CurrentAnimation = rifleAnims[2];
-                        if (rifleAnims[2].Frame == rifleAnims[2].FrameCount()) player.WeaponState = PlayerWeaponState.Idle;
+                        if (rifleAnims[2].Frame == rifleAnims[2].FrameCount() - 1) player.WeaponState = PlayerWeaponState.Idle;
                         break;
                     case PlayerWeaponState.Taking:
                         player.CurrentAnimation = rifleAnims[4];
@@ -166,17 +169,18 @@ namespace Lurkers_revamped
                 // Draw player's current model
                 DrawModel(utilities[player.CurrentWeapon.ModelID], new Vector3(camera.Position.X - GetCameraForward(ref camera).X / 3, camera.Position.Y - 0.2f, camera.Position.Z - GetCameraForward(ref camera).Z / 3), 3.5f, Color.White);
 
-                // Draw bullet rays (for debug)s
-                foreach (Bullet bullet in player.CurrentWeapon.bullets)
-                {
-                    DrawRay(bullet.Ray, Color.Red);
-                }
-
                 // Draw the current zombies of the scene
                 foreach (Zombie zombie in zombies)
                 {
                     // Draw Model
                     DrawModel(rigged[zombie.Type], zombie.Position, 3.5f, Color.White);
+
+                    // Update the zombie model according to its state
+                    UpdateModelAnimation(rigged[zombie.Type], zombie.CurrentAnimation.Anim, zombie.CurrentAnimation.UpdateFrame());
+
+                    // Debug bone drawing
+                    Vector3 posA = zombie.CurrentAnimation.Anim.FramePoses[zombie.CurrentAnimation.Frame][5].Translation * 3.5f + zombie.Position;
+                    DrawSphere(posA, 0.3f, Color.Red);
                 }
 
                 // End 3D mode context

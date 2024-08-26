@@ -18,6 +18,10 @@ namespace uniray_Project
         /// </summary>
         private Matrix4x4 transform;
         /// <summary>
+        /// The current animation of the zombie
+        /// </summary>
+        private Animation currentAnimation;
+        /// <summary>
         /// The current health of the zombie
         /// </summary>
         public int Health { get { return health; } set { health = value; } }
@@ -29,6 +33,10 @@ namespace uniray_Project
         /// The 4x4 matrix used to render the zombie
         /// </summary>
         public Matrix4x4 Transform { get { return transform; } set { transform = value; } }
+        /// <summary>
+        /// The current animations of the zombie
+        /// </summary>
+        public Animation CurrentAnimation { get { return currentAnimation; } set { currentAnimation = value; } }
         /// <summary>
         /// The position of the zombie extracted from the matrix
         /// </summary>

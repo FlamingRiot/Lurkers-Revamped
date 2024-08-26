@@ -43,7 +43,7 @@ namespace uniray_Project
         /// <returns>The updated frame</returns>
         public int UpdateFrame()
         {
-            if (frame < anim.FrameCount)
+            if (frame < anim.FrameCount - 1)
             {
                 frame++;
             }
