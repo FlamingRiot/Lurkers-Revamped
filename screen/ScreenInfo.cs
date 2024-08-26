@@ -4,10 +4,6 @@ namespace uniray_Project
     public class ScreenInfo
     {
         /// <summary>
-        /// Text of the info
-        /// </summary>
-        private string info;
-        /// <summary>
         /// Position of the info on the screen
         /// </summary>
         private Vector2 position;
@@ -19,10 +15,6 @@ namespace uniray_Project
         /// Cooldown time of the info before disappearing
         /// </summary>
         private double cooldown;
-        /// <summary>
-        /// Text of the info
-        /// </summary>
-        public string Info { get { return info; } set { info = value; } }
         /// <summary>
         /// Position of the info the screen
         /// </summary>
@@ -50,9 +42,8 @@ namespace uniray_Project
         /// <param name="position">Position of the info on the screen</param>
         /// <param name="cooldown">Cooldown of the info before disappearing</param>
         /// <param name="start">Start time of the info</param>
-        public ScreenInfo(string info, Vector2 position, double start, double cooldown)
+        public ScreenInfo(Vector2 position, double start, double cooldown)
         {
-            this.info = info;
             this.position = position;
             this.start = start;
             this.cooldown = cooldown;

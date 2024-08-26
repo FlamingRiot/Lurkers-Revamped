@@ -7,6 +7,7 @@ using uniray_Project;
 using System.Text;
 using System.Reflection.Metadata;
 using UnirayEngine;
+using System.Globalization;
 
 namespace Lurkers_revamped
 {
@@ -61,9 +62,12 @@ namespace Lurkers_revamped
             // Load rigged models
             Dictionary<string, Model> rigged = rLoading.LoadRigged();
 
+            // Load UI textures
+            Dictionary<string, Texture2D> UITextures = rLoading.LoadUITextures();
+
             // Set the working directory back to its original value 
             SetWorkdir(workdir);
-            // Load rifle animations
+            // Load animation lists
             List<Animation> rifleAnims = LoadAnimationList("src/animations/rifle.m3d");
             List<Animation> zombieAnims = LoadAnimationList("src/animations/walker.m3d");
             // Create player
@@ -82,6 +86,9 @@ namespace Lurkers_revamped
             {
                 zombie.CurrentAnimation = zombieAnims[8]; 
             }
+
+            // Load UI Fonts
+            Font damageFont = LoadFont("src/fonts/damage.ttf");
 
             // Set Window state when loading is done
             SetWindowState(ConfigFlags.ResizableWindow);
@@ -127,7 +134,8 @@ namespace Lurkers_revamped
                                     // Play headshot sound
                                     audio.PlaySound("headshot");
                                     // Add screen info for the headshot
-                                    screen.AddInfo(new ScreenInfo("100", GetWorldToScreen(player.CurrentWeapon.bullets.Last().Collision.Point, camera), GetTime(), 0.2f));
+                                    //screen.AddInfo(new uniray_Project.TextInfo(GetWorldToScreen(player.CurrentWeapon.bullets.Last().Collision.Point, camera), "100", damageFont, GetTime(), 0.5f));
+                                    screen.AddInfo(new TextureInfo(new Vector2(GetScreenWidth() / 2 - UITextures["headshot"].Width / 2 + 15, 200), UITextures["headshot"], GetTime(), 0.5f));
                                     // Start death animation for the zombie
                                     rIndex = zombies.IndexOf(zombie);
                                     // Reset the collision variable

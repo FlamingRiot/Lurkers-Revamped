@@ -52,7 +52,17 @@ namespace uniray_Project
                 double chrono = Raylib.GetTime() - info.Start;
                 double alpha = Raymath.Clamp(-(int)(info.Cooldown - chrono * 1000), 0, 255);
 
-                Raylib.DrawText(info.Info, (int)info.X, (int)info.Y, 20, new Color(0, 0, 0, (int)alpha));
+                // Draw the different types of informations
+                switch (info)
+                {
+                    case TextureInfo texture:
+                        Raylib.DrawTexture(texture.Texture, (int)texture.X, (int)texture.Y, new Color(255, 255, 255, (int)alpha));
+                        break;
+                    case uniray_Project.TextInfo text:
+                        Raylib.DrawTextPro(text.Font, text.Text, text.Position, Vector2.Zero, 0, 50, 1, new Color(0, 0, 0, (int)alpha));
+                        Raylib.DrawTextPro(text.Font, text.Text, text.Position, Vector2.Zero, 0, 40, 1, new Color(255, 255, 0, (int)alpha));
+                        break;
+                }
             }
         }
         /// <summary>

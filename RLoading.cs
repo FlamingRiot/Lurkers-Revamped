@@ -8,7 +8,10 @@ namespace uniray_Project
         {
             TraceLog(TraceLogLevel.Info, "New RLoading instance launched");
         }
-
+        /// <summary>
+        /// Load rigged models
+        /// </summary>
+        /// <returns>The dictionary of rigged models</returns>
         public Dictionary<string, Model> LoadRigged()
         {
             Dictionary<string, Model> rigged = new Dictionary<string, Model>()
@@ -19,8 +22,22 @@ namespace uniray_Project
                 {"yaku", LoadModel("../../models/Yaku.m3d") },
                 {"torso", LoadModel("../../models/torso.m3d") }
             };
-
+            // Return the dictionary
             return rigged;
+        }
+
+        /// <summary>
+        /// Load UI textures (screen textures)
+        /// </summary>
+        /// <returns></returns>
+        public Dictionary<string, Texture2D> LoadUITextures()
+        {
+            Dictionary<string, Texture2D> textures = new Dictionary<string, Texture2D>()
+            {
+                {"headshot", LoadTexture("../headshot.png") }
+            };
+            // Return the dictionary
+            return textures;
         }
     }
 }
