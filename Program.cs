@@ -113,10 +113,16 @@ namespace Lurkers_revamped
                             int rIndex = -1;
                             foreach (Zombie zombie in zombies)
                             {
-                                player.CurrentWeapon.bullets.Last().Collision = GetRayCollisionSphere(player.CurrentWeapon.bullets.Last().Ray, zombie.CurrentAnimation.Anim.FramePoses[zombie.CurrentAnimation.Frame][5].Translation * 3.5f + zombie.Position, 0.3f);
+                                // Calculate the position of the bone according to the rotation and scale of the model
+                                Vector3 bonePos = RotateNormalizedBone(zombie.CurrentAnimation.Anim.FramePoses[zombie.CurrentAnimation.Frame][5].Translation, zombie.Angle, zombie.Position);
+                                // Check collision between bullet and the zombie's head bone
+                                player.CurrentWeapon.bullets.Last().Collision = GetRayCollisionSphere(player.CurrentWeapon.bullets.Last().Ray, bonePos, 0.3f);
+                                // Check collsion details
                                 if (player.CurrentWeapon.bullets.Last().Collision.Hit)
                                 {
+                                    // Start death animation for the zombie
                                     rIndex = zombies.IndexOf(zombie);
+                                    // Reset the collision variable
                                     player.CurrentWeapon.bullets.Last().ResetCollision();
                                 }
                             }
@@ -124,6 +130,9 @@ namespace Lurkers_revamped
                             if (rIndex > -1)
                             {
                                 zombies.RemoveAt(rIndex);
+                                Zombie zombzomb = new Zombie(Vector3.Zero, "cop");
+                                zombzomb.CurrentAnimation = zombieAnims[8];
+                                zombies.Add(zombzomb);
                             }
                             player.CurrentWeapon.bullets.RemoveAt(0);
                         }
@@ -173,40 +182,37 @@ namespace Lurkers_revamped
                 // Draw and tick the current zombies of the scene
                 foreach (Zombie zombie in zombies)
                 {
+                    // Define origin vector of the rotation
                     Vector3 origin = Vector3.UnitZ;
-                    Vector3 direction = Vector3Subtract(new Vector3(camera.Position.X - GetCameraForward(ref camera).X / 3, camera.Position.Y - 0.2f, camera.Position.Z - GetCameraForward(ref camera).Z / 3), zombie.Position);
+                    // Define direction of the rotation
+                    Vector3 direction = Vector3Normalize(Vector3Subtract(camera.Position, zombie.Position)) * 0.1f;
 
+                    // Calculate cosine of the angle
                     float angle = (Vector3DotProduct(origin, direction)) / (Vector3Length(origin) * Vector3Length(direction));
+                    // Calculate the angle from the cosine
                     float alpha = (float)Math.Acos(angle) * RAD2DEG;
 
+                    // Reverse angle if needed
                     if (camera.Position.X < zombie.Position.X)
                     {
                         alpha = - alpha;
                     }
 
-                    DrawText(alpha.ToString(), 0, 0, 5, Color.Red);
+                    // Set the rotation of the zombie
+                    zombie.Angle = alpha;
 
-                    // Draw Model
-                    //DrawModel(rigged[zombie.Type], zombie.Position, 3.5f, Color.White);
-
-                    DrawModelEx(rigged[zombie.Type], zombie.Position, Vector3.UnitY, alpha, new Vector3(3.5f), Color.White);
+                    // Draw zombie model
+                    DrawModelEx(rigged[zombie.Type], zombie.Position, Vector3.UnitY, zombie.Angle, new Vector3(3.5f), Color.White);
 
                     // Update the zombie model according to its state 
-                    UpdateModelAnimation(rigged[zombie.Type], zombie.CurrentAnimation.Anim, zombie.CurrentAnimation.UpdateFrame()); 
+                    UpdateModelAnimation(rigged[zombie.Type], zombie.CurrentAnimation.Anim, zombie.CurrentAnimation.UpdateFrame());
 
                     // Debug bone drawing
-                    // Vector3 posA = zombie.CurrentAnimation.Anim.FramePoses[zombie.CurrentAnimation.Frame][5].Translation * 3.5f + zombie.Position;
-                    // DrawSphere(posA, 0.3f, Color.Red);
+                    // Vector3 posA = RotateNormalizedBone(zombie.CurrentAnimation.Anim.FramePoses[zombie.CurrentAnimation.Frame][5].Translation, zombie.Angle, zombie.Position);
+                    //DrawSphere(posA, 0.3f, Color.Red);
 
-                    // Update zombie's actions
-                    /*foreach (UModel go in CurrentScene.GameObjects.Where(x => x is UModel))
-                    {
-                        BoundingBox box = GetModelBoundingBox(Ressource.)
-                        RayCollision collision = GetRay
-                    }*/
-
-                    Vector3 diff = Vector3Normalize(Vector3Subtract(camera.Position, zombie.Position)) * 0.1f;
-                    zombie.Position += new Vector3(diff.X, 0, diff.Z);
+                    // Move the zombie along its direction vector
+                    zombie.Position += new Vector3(direction.X, 0, direction.Z);
                 }
 
                 // End 3D mode context
@@ -421,6 +427,22 @@ namespace Lurkers_revamped
             Matrix4x4 weaponRotation = MatrixMultiply(rotationPitch, rotationYaw);
             // Return final transform
             return MatrixMultiply(rotationRoll, weaponRotation);
+        }
+        /// <summary>
+        /// Get the rotate vector (XZ) of a normalized point from a model bone position
+        /// </summary>
+        /// <param name="normalizedPos"></param>
+        /// <param name="alpha"></param>
+        /// <param name="pos"></param>
+        /// <returns></returns>
+        static Vector3 RotateNormalizedBone(Vector3 normalizedPos, float alpha, Vector3 pos)
+        {
+            // Create the new vector according to the passed parameters 
+            Vector3 spacePos = new Vector3(
+                normalizedPos.X * (float)Math.Cos(alpha / RAD2DEG) + normalizedPos.Z * (float)Math.Sin(alpha / RAD2DEG), normalizedPos.Y,
+                -normalizedPos.X * (float)Math.Sin(alpha / RAD2DEG) + normalizedPos.Z * (float)Math.Cos(alpha / RAD2DEG)) * 3.5f + pos;
+            // Return the newly calculated position
+            return spacePos;
         }
     }
 }

@@ -27,6 +27,10 @@ namespace uniray_Project
         /// </summary>
         private string type;
         /// <summary>
+        /// The angle rotation of the model
+        /// </summary>
+        private float angle;
+        /// <summary>
         /// The 4x4 matrix used to render the zombie
         /// </summary>
         private Matrix4x4 transform;
@@ -42,6 +46,10 @@ namespace uniray_Project
         /// The current health of the zombie
         /// </summary>
         public int Health { get { return health; } set { health = value; } }
+        /// <summary>
+        /// The angle rotation of the model
+        /// </summary>
+        public float Angle { get { return angle; } set { angle = value; } }
         /// <summary>
         /// The type of the zombie
         /// </summary>
@@ -69,6 +77,8 @@ namespace uniray_Project
             transform.M14 = position.X;
             transform.M24 = position.Y;
             transform.M34 = position.Z;
+            // Define rotation
+            Angle = 0;
             // Define type
             this.type = type;
             // Define health bar
