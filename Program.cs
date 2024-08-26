@@ -6,6 +6,7 @@ using static UnirayEngine.UnirayEngine;
 using uniray_Project;
 using System.Text;
 using System.Reflection.Metadata;
+using UnirayEngine;
 
 namespace Lurkers_revamped
 {
@@ -64,7 +65,7 @@ namespace Lurkers_revamped
             List<Animation> zombieAnims = LoadAnimationList("src/animations/walker.m3d");
             // Create player
             Player player = new Player("Anonymous254");
-            // Assign a default weapon to the player
+            // Assign a default weapon to the player<
             player.CurrentWeapon = new Weapon("Lambert 1", "rifle", 50);
 
             // Create list of zombies
@@ -75,7 +76,7 @@ namespace Lurkers_revamped
 
             foreach (Zombie zombie in zombies)
             {
-                zombie.CurrentAnimation = zombieAnims[7];   
+                zombie.CurrentAnimation = zombieAnims[8]; 
             }
 
             // Set Window state when loading is done
@@ -169,18 +170,43 @@ namespace Lurkers_revamped
                 // Draw player's current model
                 DrawModel(utilities[player.CurrentWeapon.ModelID], new Vector3(camera.Position.X - GetCameraForward(ref camera).X / 3, camera.Position.Y - 0.2f, camera.Position.Z - GetCameraForward(ref camera).Z / 3), 3.5f, Color.White);
 
-                // Draw the current zombies of the scene
+                // Draw and tick the current zombies of the scene
                 foreach (Zombie zombie in zombies)
                 {
-                    // Draw Model
-                    DrawModel(rigged[zombie.Type], zombie.Position, 3.5f, Color.White);
+                    Vector3 origin = Vector3.UnitZ;
+                    Vector3 direction = Vector3Subtract(new Vector3(camera.Position.X - GetCameraForward(ref camera).X / 3, camera.Position.Y - 0.2f, camera.Position.Z - GetCameraForward(ref camera).Z / 3), zombie.Position);
 
-                    // Update the zombie model according to its state
-                    UpdateModelAnimation(rigged[zombie.Type], zombie.CurrentAnimation.Anim, zombie.CurrentAnimation.UpdateFrame());
+                    float angle = (Vector3DotProduct(origin, direction)) / (Vector3Length(origin) * Vector3Length(direction));
+                    float alpha = (float)Math.Acos(angle) * RAD2DEG;
+
+                    if (camera.Position.X < zombie.Position.X)
+                    {
+                        alpha = - alpha;
+                    }
+
+                    DrawText(alpha.ToString(), 0, 0, 5, Color.Red);
+
+                    // Draw Model
+                    //DrawModel(rigged[zombie.Type], zombie.Position, 3.5f, Color.White);
+
+                    DrawModelEx(rigged[zombie.Type], zombie.Position, Vector3.UnitY, alpha, new Vector3(3.5f), Color.White);
+
+                    // Update the zombie model according to its state 
+                    UpdateModelAnimation(rigged[zombie.Type], zombie.CurrentAnimation.Anim, zombie.CurrentAnimation.UpdateFrame()); 
 
                     // Debug bone drawing
-                    Vector3 posA = zombie.CurrentAnimation.Anim.FramePoses[zombie.CurrentAnimation.Frame][5].Translation * 3.5f + zombie.Position;
-                    DrawSphere(posA, 0.3f, Color.Red);
+                    // Vector3 posA = zombie.CurrentAnimation.Anim.FramePoses[zombie.CurrentAnimation.Frame][5].Translation * 3.5f + zombie.Position;
+                    // DrawSphere(posA, 0.3f, Color.Red);
+
+                    // Update zombie's actions
+                    /*foreach (UModel go in CurrentScene.GameObjects.Where(x => x is UModel))
+                    {
+                        BoundingBox box = GetModelBoundingBox(Ressource.)
+                        RayCollision collision = GetRay
+                    }*/
+
+                    Vector3 diff = Vector3Normalize(Vector3Subtract(camera.Position, zombie.Position)) * 0.1f;
+                    zombie.Position += new Vector3(diff.X, 0, diff.Z);
                 }
 
                 // End 3D mode context
@@ -188,7 +214,7 @@ namespace Lurkers_revamped
 
                 // Draw crosshair
                 DrawText("+", GetScreenWidth() / 2 - 4, GetScreenHeight() / 2 - 4, 20, Color.White);
-
+                
                 // Debug positions
                 DrawText("Position: " + camera.Position.ToString() + "\nJump Force: " + player.VJump, 200, 200, 20, Color.Red);
 
@@ -205,6 +231,10 @@ namespace Lurkers_revamped
                     UnloadMaterial(utilitesList.Value.Materials[i]);
                 }
                 UnloadModel(utilitesList.Value);
+            }
+            foreach (KeyValuePair<string, Model> riggedObject in rigged)
+            {
+                UnloadModel(riggedObject.Value);
             }
         }
         /// <summary>

@@ -14,7 +14,10 @@ namespace uniray_Project
             Dictionary<string, Model> rigged = new Dictionary<string, Model>()
             {
                 {"cop", LoadModel("../../models/cop.m3d") },
-                {"officer", LoadModel("../../models/officer.m3d") }
+                {"officer", LoadModel("../../models/officer.m3d") },
+                {"blonde", LoadModel("../../models/blonde.m3d") },
+                {"yaku", LoadModel("../../models/Yaku.m3d") },
+                {"torso", LoadModel("../../models/torso.m3d") }
             };
 
             return rigged;

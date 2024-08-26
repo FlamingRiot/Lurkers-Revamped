@@ -1,8 +1,21 @@
 ﻿using System.Numerics;
-
+using Raylib_cs;
 
 namespace uniray_Project
 {
+    /// <summary>
+    /// The state of the zombie
+    /// </summary>
+    public enum ZombieState
+    {
+        Idle,
+        Running,
+        Attacking,
+        Dying,
+        Crawling,
+        Killing
+    }
+
     public class Zombie
     {
         /// <summary>
@@ -22,6 +35,10 @@ namespace uniray_Project
         /// </summary>
         private Animation currentAnimation;
         /// <summary>
+        /// The zombie's player detection ray
+        /// </summary>
+        private Ray ray;
+        /// <summary>
         /// The current health of the zombie
         /// </summary>
         public int Health { get { return health; } set { health = value; } }
@@ -37,6 +54,10 @@ namespace uniray_Project
         /// The current animations of the zombie
         /// </summary>
         public Animation CurrentAnimation { get { return currentAnimation; } set { currentAnimation = value; } }
+        /// <summary>
+        /// The zombie's player detection ray
+        /// </summary>
+        public Ray VisionRay { get { return ray; } set { ray = value; } }
         /// <summary>
         /// The position of the zombie extracted from the matrix
         /// </summary>
