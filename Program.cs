@@ -34,6 +34,9 @@ namespace Lurkers_revamped
             // Init Audio Center
             AudioCenter audio = new AudioCenter();
 
+            // Init screen center
+            ScreenCenter screen = new ScreenCenter();
+
             // Define 3D camera
             Camera3D camera = new Camera3D();
             camera.Position = new Vector3(0.0f, 3.0f, 0.0f);
@@ -104,7 +107,7 @@ namespace Lurkers_revamped
                     case PlayerWeaponState.Shooting:
                         player.CurrentAnimation = rifleAnims[3];
                         // Double the framerate
-                        rifleAnims[3].UpdateFrame();
+                       // rifleAnims[3].UpdateFrame();
                         if (rifleAnims[3].Frame == 1)
                         {
                             player.CurrentWeapon.ShootBullet(new Vector3(camera.Position.X, camera.Position.Y - 0.045f, camera.Position.Z) + GetCameraRight(ref camera) / 12, GetCameraForward(ref camera)); ;
@@ -117,10 +120,14 @@ namespace Lurkers_revamped
                                 // Calculate the position of the bone according to the rotation and scale of the model
                                 Vector3 bonePos = RotateNormalizedBone(zombie.CurrentAnimation.Anim.FramePoses[zombie.CurrentAnimation.Frame][5].Translation, zombie.Angle, zombie.Position);
                                 // Check collision between bullet and the zombie's head bone
-                                player.CurrentWeapon.bullets.Last().Collision = GetRayCollisionSphere(player.CurrentWeapon.bullets.Last().Ray, bonePos, 0.3f);
+                                player.CurrentWeapon.bullets.Last().Collision = GetRayCollisionSphere(player.CurrentWeapon.bullets.Last().Ray, bonePos, 0.4f);
                                 // Check collsion details
                                 if (player.CurrentWeapon.bullets.Last().Collision.Hit)
                                 {
+                                    // Play headshot sound
+                                    audio.PlaySound("headshot");
+                                    // Add screen info for the headshot
+                                    screen.AddInfo(new ScreenInfo("100", GetWorldToScreen(player.CurrentWeapon.bullets.Last().Collision.Point, camera), GetTime(), 0.2f));
                                     // Start death animation for the zombie
                                     rIndex = zombies.IndexOf(zombie);
                                     // Reset the collision variable
@@ -157,6 +164,9 @@ namespace Lurkers_revamped
 
                 // Update the player event handler
                 TickPlayer(player, rifleAnims);
+
+                // Update the screen center (info displayer)
+                screen.Tick();
 
                 // Begin drawing context
                 BeginDrawing();
@@ -220,6 +230,9 @@ namespace Lurkers_revamped
 
                 // End 3D mode context
                 EndMode3D();
+
+                // Draw screen infos
+                screen.DrawScreenInfos();
 
                 // Draw crosshair
                 DrawText("+", GetScreenWidth() / 2 - 4, GetScreenHeight() / 2 - 4, 20, Color.White);
