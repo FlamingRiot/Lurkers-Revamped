@@ -29,7 +29,10 @@ namespace uniray_Project
         /// The 4x4 matrix used to render the zombie
         /// </summary>
         public Matrix4x4 Transform { get { return transform; } set { transform = value; } }
-
+        /// <summary>
+        /// The position of the zombie extracted from the matrix
+        /// </summary>
+        public Vector3 Position { get { return new Vector3(transform.M14, transform.M24, transform.M34); } set { transform.M14 = value.X;transform.M24 = value.Y; transform.M34 = value.Z; } }
         public Zombie(Vector3 position, string type)
         {
             // Define position

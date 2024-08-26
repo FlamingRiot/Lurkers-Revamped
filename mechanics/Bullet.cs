@@ -31,5 +31,12 @@ namespace uniray_Project
             ray = new Ray(origin, direction);
             collision = new RayCollision();
         }
+        /// <summary>
+        /// Reset the collision of the bullet
+        /// </summary>
+        public void ResetCollision()
+        {
+            collision.Hit = false;
+        }
     }
 }

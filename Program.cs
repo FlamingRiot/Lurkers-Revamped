@@ -5,6 +5,7 @@ using System.Numerics;
 using static UnirayEngine.UnirayEngine;
 using uniray_Project;
 using System.Text;
+using System.Reflection.Metadata;
 
 namespace Lurkers_revamped
 {
@@ -26,6 +27,9 @@ namespace Lurkers_revamped
             // Init the Uniray engine background code 
             InitEngine();
 
+            // Init RLoading instance
+            RLoading rLoading = new RLoading();
+
             // Init Audio Center
             AudioCenter audio = new AudioCenter();
 
@@ -41,8 +45,6 @@ namespace Lurkers_revamped
             float pitch = 0.0f;
             float sideShake = 0.0f;
 
-
-
             // Change the current directory so the embedded materials from the models can be loaded successfully
             sbyte* dir = GetApplicationDirectory();
             string workdir = new string(dir);
@@ -52,9 +54,8 @@ namespace Lurkers_revamped
             // Load dictionary of utilities (weapons, meds, etc.)
             Dictionary<string, Model> utilities = LoadUtilities();
 
-            // Test zombie models
-            Model cop = LoadModel("../../models/cop.m3d");
-            Model officer = LoadModel("../../models/officer.m3d");
+            // Load rigged models
+            Dictionary<string, Model> rigged = rLoading.LoadRigged();
 
             // Set the working directory back to its original value 
             SetWorkdir(workdir);
@@ -66,6 +67,12 @@ namespace Lurkers_revamped
             // Assign a default weapon to the player
             player.CurrentWeapon = new Weapon("Lambert 1", "rifle", 50);
 
+            // Create list of zombies
+            List<Zombie> zombies = new List<Zombie>()
+            {
+                new Zombie(new Vector3(2, 0, 2), "cop"),
+                new Zombie(new Vector3(2, 0, 0), "officer")
+            };
 
             // Set Window state when loading is done
             SetWindowState(ConfigFlags.ResizableWindow);
@@ -97,6 +104,24 @@ namespace Lurkers_revamped
                             player.CurrentWeapon.ShootBullet(new Vector3(camera.Position.X, camera.Position.Y - 0.045f, camera.Position.Z) + GetCameraRight(ref camera) / 12, GetCameraForward(ref camera)); ;
                             // Play shooting sound
                             audio.PlaySound("rifleShoot");
+                            // Check collision with zombies
+                            int rIndex = -1;
+                            foreach (Zombie zombie in zombies)
+                            {
+                                player.CurrentWeapon.bullets.Last().Collision = GetRayCollisionSphere(player.CurrentWeapon.bullets.Last().Ray, rigged["cop"].BindPose[5].Translation * 3.5f + zombie.Position, 0.3f);
+                                if (player.CurrentWeapon.bullets.Last().Collision.Hit)
+                                {
+                                    rIndex = zombies.IndexOf(zombie);
+                                    player.CurrentWeapon.bullets.Last().ResetCollision();
+                                }
+                            }
+
+                            // Remove killed zombie if collisiion occured
+                            if (rIndex > -1)
+                            {
+                                zombies.RemoveAt(rIndex);
+                            }
+                            player.CurrentWeapon.bullets.RemoveAt(0);
                         }
                         break;
                     case PlayerWeaponState.Reloading:
@@ -147,9 +172,12 @@ namespace Lurkers_revamped
                     DrawRay(bullet.Ray, Color.Red);
                 }
 
-                // Draw debug zombie models
-                DrawModel(cop, new Vector3(2, 0, 2), 3.5f, Color.White);
-                DrawModel(officer, new Vector3(2, 0, 0), 3.5f, Color.White);
+                // Draw the current zombies of the scene
+                foreach (Zombie zombie in zombies)
+                {
+                    // Draw Model
+                    DrawModel(rigged[zombie.Type], zombie.Position, 3.5f, Color.White);
+                }
 
                 // End 3D mode context
                 EndMode3D();
