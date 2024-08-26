@@ -8,6 +8,7 @@
         Taking,
         Hiding,
         GetUp,
+        Aiming
     }
     public enum PlayerMoveState
     {

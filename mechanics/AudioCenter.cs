@@ -41,7 +41,8 @@ namespace uniray_Project
             Dictionary<string, Sound> sounds = new()
             {
                 { "rifleShoot", LoadSound("src/sounds/rifle/shoot.wav") },
-                { "headshot", LoadSound("src/sounds/rifle/headshot.wav") }
+                { "headshot", LoadSound("src/sounds/rifle/headshot.wav") },
+                { "headshot_voice", LoadSound("src/sounds/headshot_voice.wav") }
             };
             return sounds;
         }

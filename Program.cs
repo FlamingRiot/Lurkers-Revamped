@@ -133,9 +133,9 @@ namespace Lurkers_revamped
                                 {
                                     // Play headshot sound
                                     audio.PlaySound("headshot");
+                                    audio.PlaySound("headshot_voice");
                                     // Add screen info for the headshot
-                                    //screen.AddInfo(new uniray_Project.TextInfo(GetWorldToScreen(player.CurrentWeapon.bullets.Last().Collision.Point, camera), "100", damageFont, GetTime(), 0.5f));
-                                    screen.AddInfo(new TextureInfo(new Vector2(GetScreenWidth() / 2 - UITextures["headshot"].Width / 2 + 15, 200), UITextures["headshot"], GetTime(), 0.5f));
+                                    screen.AddInfo(new TextureInfo(new Vector2(GetScreenWidth() / 2 - UITextures["headshot"].Width / 2 + 15, 200), UITextures["headshot"], GetTime(), 0.7f));
                                     // Start death animation for the zombie
                                     rIndex = zombies.IndexOf(zombie);
                                     // Reset the collision variable
@@ -147,7 +147,9 @@ namespace Lurkers_revamped
                             {
                                 Random r = new Random();
 
+                                // Remove the zomb
                                 zombies.RemoveAt(rIndex);
+                                // Spawn a new zombie (debug sandbox only)
                                 Zombie zombzomb = new Zombie(new Vector3(r.Next(-50, 50), 0, r.Next(-50, 50)), "cop");
                                 zombzomb.CurrentAnimation = zombieAnims[8];
                                 zombies.Add(zombzomb);
@@ -171,7 +173,7 @@ namespace Lurkers_revamped
                 UpdateModelAnimation(utilities[player.CurrentWeapon.ModelID], player.CurrentAnimation.Anim, player.CurrentAnimation.UpdateFrame());
 
                 // Update the player event handler
-                TickPlayer(player, rifleAnims);
+                TickPlayer(player, rifleAnims, ref camera);
 
                 // Update the screen center (info displayer)
                 screen.Tick();
@@ -384,7 +386,7 @@ namespace Lurkers_revamped
         /// Tick the player events
         /// </summary>
         /// <param name="player">The player to check</param>
-        static void TickPlayer(Player player, List<Animation> anims)
+        static void TickPlayer(Player player, List<Animation> anims, ref Camera3D camera)
         {
             // Manager input events
             // Reload event
@@ -401,6 +403,17 @@ namespace Lurkers_revamped
                     player.MoveState = PlayerMoveState.Jumping;
                     player.VJump = Player.JUMP_FORCE;
                 }
+            }
+            // Aiming event
+            if (IsMouseButtonDown(MouseButton.Right))
+            {
+                Vector3 direction = GetCameraForward(ref camera);
+                camera.Position += new Vector3(direction.X, 0, direction.Z);
+                camera.Target += new Vector3(direction.X, 0, direction.Z);
+            }
+            else if (IsMouseButtonUp(MouseButton.Right) && player.WeaponState == PlayerWeaponState.Aiming)
+            {
+                player.WeaponState = PlayerWeaponState.Idle;
             }
             // Shooting event
             if (IsMouseButtonDown(MouseButton.Left))
