@@ -401,7 +401,6 @@ namespace Lurkers_revamped
                 if (camera.Position.Y <= 3)
                 {
                     player.MoveState = PlayerMoveState.Running;
-                    player.WeaponState = PlayerWeaponState.Idle;
                     // Fix jump offset
                     camera.Position.Y = (float)Math.Round(camera.Position.Y, 3);
                 }
