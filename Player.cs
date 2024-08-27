@@ -32,6 +32,10 @@
         /// </summary>
         private string name;
         /// <summary>
+        /// The inventory of the player
+        /// </summary>
+        private List<Weapon> inventory;
+        /// <summary>
         /// The currently held weapon of the player
         /// </summary>
         private Weapon? currentWeapon;
@@ -99,6 +103,24 @@
             currentWeapon = null;
             // Set the player state
             WeaponState = PlayerWeaponState.Idle;
+            // Init the inventory
+            inventory = new List<Weapon>();
+        }
+        /// <summary>
+        /// Add a weapon to the inventory of the player
+        /// </summary>
+        /// <param name="weapon">Weapon of the player</param>
+        public void AddWeapon(Weapon weapon)
+        {
+            inventory.Add(weapon);
+        }
+        /// <summary>
+        /// Set the current weapon of the player
+        /// </summary>
+        /// <param name="index"></param>
+        public void SetCurrentWeapon(int index)
+        {
+            CurrentWeapon = inventory[index];
         }
     }
 }

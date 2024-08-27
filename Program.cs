@@ -5,9 +5,6 @@ using System.Numerics;
 using static UnirayEngine.UnirayEngine;
 using uniray_Project;
 using System.Text;
-using System.Reflection.Metadata;
-using UnirayEngine;
-using System.Globalization;
 
 namespace Lurkers_revamped
 {
@@ -38,6 +35,9 @@ namespace Lurkers_revamped
             // Init screen center
             ScreenCenter screen = new ScreenCenter();
 
+            // Init shader center
+            ShaderCenter shaders = new ShaderCenter();
+
             // Define 3D camera
             Camera3D camera = new Camera3D();
             camera.Position = new Vector3(0.0f, 3.0f, 0.0f);
@@ -58,6 +58,11 @@ namespace Lurkers_revamped
             //ChangeDirectory()
             // Load dictionary of utilities (weapons, meds, etc.)
             Dictionary<string, Model> utilities = LoadUtilities();
+            // Set highlight shader on rifle
+            utilities["rifle"].Materials[1].Shader = shaders.OutlineShader;
+
+            // Set shader hightlight to the corresponding level of the current weapon
+            SetShaderValue(shaders.OutlineShader, GetShaderLocation(shaders.OutlineShader, "highlightCol"), Weapon.Nv5Color, ShaderUniformDataType.Vec4);
 
             // Load rigged models
             Dictionary<string, Model> rigged = rLoading.LoadRigged();
@@ -73,7 +78,8 @@ namespace Lurkers_revamped
             // Create player
             Player player = new Player("Anonymous254");
             // Assign a default weapon to the player<
-            player.CurrentWeapon = new Weapon("Lambert 1", "rifle", 50);
+            player.AddWeapon(new Weapon("Lambert Niv. 1", "rifle", 50, 1));
+            player.SetCurrentWeapon(0);
 
             // Create list of zombies
             List<Zombie> zombies = new List<Zombie>()

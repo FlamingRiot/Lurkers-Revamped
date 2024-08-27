@@ -1,8 +1,20 @@
 ﻿using System.Numerics;
+using Raylib_cs;
 namespace uniray_Project
 {
     public class Weapon
-    { 
+    {
+        // Weapon's different level Vector4
+        public static readonly Vector4 Nv1Color = new Vector4(184, 181, 186, 255);
+        public static readonly Vector4 Nv2Color = new Vector4(61, 252, 3, 255);
+        public static readonly Vector4 Nv3Color = new Vector4(23, 214, 252, 255);
+        public static readonly Vector4 Nv4Color = new Vector4(148, 3, 252, 255);
+        public static readonly Vector4 Nv5Color = new Vector4(252, 186, 3, 255);
+
+        /// <summary>
+        /// Level of the weapon
+        /// </summary>
+        private int level;
         /// <summary>
         /// The name of the weapon
         /// </summary>
@@ -28,6 +40,10 @@ namespace uniray_Project
         /// </summary>
         public string Name { get { return name; } set { name = value; } }
         /// <summary>
+        /// Level of the weapon
+        /// </summary>
+        public int Level { get { return level; } set { level = value; } }
+        /// <summary>
         /// The ID for the used mesh of the weapon
         /// </summary>
         public string ModelID { get { return modelID; } set { modelID = value; } }
@@ -45,7 +61,7 @@ namespace uniray_Project
         /// <param name="name">Weapon name</param>
         /// <param name="meshID">Weapon meshID</param>
         /// <param name="maxAmmos">Weapon maxAmmos</param>
-        public Weapon(string name, string modelID, int maxAmmos)
+        public Weapon(string name, string modelID, int maxAmmos, int level)
         {
             bullets = new List<Bullet>();
             this.name = name;
