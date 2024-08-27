@@ -78,8 +78,7 @@ namespace Lurkers_revamped
             // Create list of zombies
             List<Zombie> zombies = new List<Zombie>()
             {
-                new Zombie(new Vector3(-10, 0, 2), "cop"),
-                new Zombie(new Vector3(10, 0, 2), "cop")
+                new Zombie(new Vector3(-10, 0, 2), "cop")
             };
 
             foreach (Zombie zombie in zombies)
@@ -121,7 +120,6 @@ namespace Lurkers_revamped
                             // Play shooting sound
                             audio.PlaySound("rifleShoot");
                             // Check collision with zombies
-                            int rIndex = -1;
                             foreach (Zombie zombie in zombies)
                             {
                                 // Calculate the position of the bone according to the rotation and scale of the model
@@ -131,28 +129,20 @@ namespace Lurkers_revamped
                                 // Check collsion details
                                 if (player.CurrentWeapon.bullets.Last().Collision.Hit)
                                 {
+                                    Random r = new Random();
                                     // Play headshot sound
                                     audio.PlaySound("headshot");
                                     audio.PlaySound("headshot_voice");
                                     // Add screen info for the headshot
-                                    screen.AddInfo(new TextureInfo(new Vector2(GetScreenWidth() / 2 - UITextures["headshot"].Width / 2 + 15, 200), UITextures["headshot"], GetTime(), 0.7f));
-                                    // Start death animation for the zombie
-                                    rIndex = zombies.IndexOf(zombie);
+                                    Vector2 pos = new Vector2(GetScreenWidth() / 2 - UITextures["headshot"].Width / 2 + 15, 200);
+                                    screen.AddInfo(new TextureInfo(pos, UITextures["headshot"], GetTime(), 0.7f));
+                                    screen.AddInfo(new TextureInfo(new Vector2(pos.X + UITextures["headshot"].Width - 100, pos.Y + UITextures["headshot"].Height - 100), UITextures["plus_coin"], GetTime(), 0.7f));
+                                    // Start death animation (random)
+                                    if (r.Next(0, 2) == 1) zombie.State = ZombieState.Dying1;
+                                    else zombie.State = ZombieState.Dying2;
                                     // Reset the collision variable
                                     player.CurrentWeapon.bullets.Last().ResetCollision();
                                 }
-                            }
-                            // Remove killed zombie if collisiion occured
-                            if (rIndex > -1)
-                            {
-                                Random r = new Random();
-
-                                // Remove the zomb
-                                zombies.RemoveAt(rIndex);
-                                // Spawn a new zombie (debug sandbox only)
-                                Zombie zombzomb = new Zombie(new Vector3(r.Next(-50, 50), 0, r.Next(-50, 50)), "cop");
-                                zombzomb.CurrentAnimation = zombieAnims[8];
-                                zombies.Add(zombzomb);
                             }
                             player.CurrentWeapon.bullets.RemoveAt(0);
                         }
@@ -203,39 +193,84 @@ namespace Lurkers_revamped
                 DrawModel(utilities[player.CurrentWeapon.ModelID], new Vector3(camera.Position.X - GetCameraForward(ref camera).X / 3, camera.Position.Y - 0.2f, camera.Position.Z - GetCameraForward(ref camera).Z / 3), 3.5f, Color.White);
 
                 // Draw and tick the current zombies of the scene
+                int killIndex = -1;
                 foreach (Zombie zombie in zombies)
-                {
-                    // Define origin vector of the rotation
-                    Vector3 origin = Vector3.UnitZ;
-                    // Define direction of the rotation
-                    Vector3 direction = Vector3Normalize(Vector3Subtract(camera.Position, zombie.Position)) * 0.1f;
-
-                    // Calculate cosine of the angle
-                    float angle = (Vector3DotProduct(origin, direction)) / (Vector3Length(origin) * Vector3Length(direction));
-                    // Calculate the angle from the cosine
-                    float alpha = (float)Math.Acos(angle) * RAD2DEG;
-
-                    // Reverse angle if needed
-                    if (camera.Position.X < zombie.Position.X)
-                    {
-                        alpha = - alpha;
-                    }
-
-                    // Set the rotation of the zombie
-                    zombie.Angle = alpha;
-
+                { 
                     // Draw zombie model
                     DrawModelEx(rigged[zombie.Type], zombie.Position, Vector3.UnitY, zombie.Angle, new Vector3(3.5f), Color.White);
 
                     // Update the zombie model according to its state 
                     UpdateModelAnimation(rigged[zombie.Type], zombie.CurrentAnimation.Anim, zombie.CurrentAnimation.UpdateFrame());
+                    switch (zombie.State)
+                    {
+                        case ZombieState.Running:
+                            zombie.CurrentAnimation = zombieAnims[8];
+                            break;
+                        case ZombieState.Dying1:
+                            zombie.CurrentAnimation = zombieAnims[5];
+                            // Check if the zombie is done dying
+                            if (zombie.CurrentAnimation.Frame == zombie.CurrentAnimation.FrameCount() - 1)
+                            {
+                                // Remove the zombie from the list
+                                killIndex = zombies.IndexOf(zombie);
+                                // Reset the frame of the animation
+                                zombie.CurrentAnimation.Frame = 0;
+                            }
+                            break;
+                        case ZombieState.Dying2:
+                            zombie.CurrentAnimation = zombieAnims[4];
+                            // Check if the zombie is done dying
+                            if (zombie.CurrentAnimation.Frame == zombie.CurrentAnimation.FrameCount() - 1)
+                            {
+                                // Remove the zombie from the list
+                                killIndex = zombies.IndexOf(zombie);
+                                // Reste the frame of the animation
+                                zombie.CurrentAnimation.Frame = 0;
+                            }
+                            break;
+                    }
 
                     // Debug bone drawing
                     // Vector3 posA = RotateNormalizedBone(zombie.CurrentAnimation.Anim.FramePoses[zombie.CurrentAnimation.Frame][5].Translation, zombie.Angle, zombie.Position);
                     //DrawSphere(posA, 0.3f, Color.Red);
 
-                    // Move the zombie along its direction vector
-                    zombie.Position += new Vector3(direction.X, 0, direction.Z);
+                    // Move and rotate the zombie if running
+                    if (zombie.State == ZombieState.Running)
+                    {
+                        // Define origin vector of the rotation
+                        Vector3 origin = Vector3.UnitZ;
+                        // Define direction of the rotation
+                        Vector3 direction = Vector3Normalize(Vector3Subtract(camera.Position, zombie.Position)) * 0.1f;
+
+                        // Calculate cosine of the angle
+                        float angle = (Vector3DotProduct(origin, direction)) / (Vector3Length(origin) * Vector3Length(direction));
+                        // Calculate the angle from the cosine
+                        float alpha = (float)Math.Acos(angle) * RAD2DEG;
+
+                        // Reverse angle if needed
+                        if (camera.Position.X < zombie.Position.X)
+                        {
+                            alpha = -alpha;
+                        }
+
+                        // Set the rotation of the zombie
+                        zombie.Angle = alpha;
+
+                        // Move the zombie along its direction axis
+                        zombie.Position += new Vector3(direction.X, 0, direction.Z);
+                    }
+                }
+                // Remove the zombie from the list if killed
+                if (killIndex != -1)
+                {
+                    zombies.RemoveAt(killIndex);
+
+                    // Spawn a new zombie (debug sandbox only)
+                    Random r = new Random();
+
+                    Zombie zombzomb = new Zombie(new Vector3(r.Next(-50, 50), 0, r.Next(-50, 50)), "cop");
+                    zombzomb.CurrentAnimation = zombieAnims[8];
+                    zombies.Add(zombzomb);
                 }
 
                 // End 3D mode context
@@ -248,7 +283,7 @@ namespace Lurkers_revamped
                 DrawText("+", GetScreenWidth() / 2 - 4, GetScreenHeight() / 2 - 4, 20, Color.White);
                 
                 // Debug positions
-                DrawText("Position: " + camera.Position.ToString() + "\nJump Force: " + player.VJump, 200, 200, 20, Color.Red);
+                DrawText("Position: " + camera.Position.ToString() + "\nJump Force: " + player.VJump + "\nFrame: " + zombies.First().CurrentAnimation.Frame, 200, 200, 20, Color.Red);
 
                 // End drawing context
                 EndDrawing();

@@ -34,7 +34,8 @@ namespace uniray_Project
         {
             Dictionary<string, Texture2D> textures = new Dictionary<string, Texture2D>()
             {
-                {"headshot", LoadTexture("../headshot.png") }
+                {"headshot", LoadTexture("../headshot.png") },
+                {"plus_coin", LoadTexture("../plus_coin.png") },
             };
             // Return the dictionary
             return textures;

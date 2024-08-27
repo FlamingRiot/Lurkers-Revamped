@@ -34,13 +34,21 @@ namespace uniray_Project
                     removeIndexes.Add(infos.IndexOf(info));
                 }
             }
+
             // Remove all the infos needed
-            foreach (int index in removeIndexes)
+            if (removeIndexes.Count > 0)
             {
-                infos.RemoveAt(index);
+                for (int i = 0; i < removeIndexes.Count; i++)
+                {
+                    infos.RemoveAt(removeIndexes[i]);
+                    for (int j = 0; j < removeIndexes.Count; j++)
+                    {
+                        removeIndexes[j]--;
+                    }
+                }
+                // Clear list for future use
+                removeIndexes.Clear();
             }
-            // Clear list for future use
-            removeIndexes.Clear();
         }
         /// <summary>
         /// Draw every active screen infos

@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using System.Reflection.Metadata.Ecma335;
 using Raylib_cs;
 
 namespace uniray_Project
@@ -11,7 +12,8 @@ namespace uniray_Project
         Idle,
         Running,
         Attacking,
-        Dying,
+        Dying1,
+        Dying2,
         Crawling,
         Killing
     }
@@ -43,6 +45,10 @@ namespace uniray_Project
         /// </summary>
         private Ray ray;
         /// <summary>
+        /// The state of the zombie
+        /// </summary>
+        private ZombieState state;
+        /// <summary>
         /// The current health of the zombie
         /// </summary>
         public int Health { get { return health; } set { health = value; } }
@@ -58,6 +64,10 @@ namespace uniray_Project
         /// The 4x4 matrix used to render the zombie
         /// </summary>
         public Matrix4x4 Transform { get { return transform; } set { transform = value; } }
+        /// <summary>
+        /// The state of the zombie
+        /// </summary>
+        public ZombieState State { get { return state; } set { state = value; } }
         /// <summary>
         /// The current animations of the zombie
         /// </summary>
@@ -91,6 +101,9 @@ namespace uniray_Project
                     health = 120;
                     break;
             }
+
+            // Set default state
+            this.state = ZombieState.Running;
         }
     }
 }
