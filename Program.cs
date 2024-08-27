@@ -63,7 +63,7 @@ namespace Lurkers_revamped
             utilities["rifle"].Materials[1].Shader = shaders.OutlineShader;
 
             // Set shader hightlight to the corresponding level of the current weapon
-            SetShaderValue(shaders.OutlineShader, GetShaderLocation(shaders.OutlineShader, "highlightCol"), Weapon.Nv3Color, ShaderUniformDataType.Vec4);
+            SetShaderValue(shaders.OutlineShader, GetShaderLocation(shaders.OutlineShader, "highlightCol"), Weapon.Nv1Color, ShaderUniformDataType.Vec4);
 
             // Load rigged models
             Dictionary<string, Model> rigged = rLoading.LoadRigged();
@@ -110,7 +110,7 @@ namespace Lurkers_revamped
             screen.AddInfo(new TextureInfo(new Vector2(GetScreenWidth() - 120, GetScreenHeight() - 460), UITextures["inventory_case"], GetTime(), -1.0));
 
             // Add current weapon splash
-            screen.AddInfo(new TextureInfo(new Vector2(GetScreenWidth() - 120, GetScreenHeight() - 800), UITextures["rifle_blue_splash"], GetTime(), -1.0));
+            screen.AddInfo(new TextureInfo(new Vector2(GetScreenWidth() - 120, GetScreenHeight() - 800), UITextures["rifle_gray_splash"], GetTime(), -1.0));
 
             // Crosshair color variable
             Color crosshairColor = Color.White;
@@ -157,9 +157,9 @@ namespace Lurkers_revamped
                                     audio.PlaySound("headshot");
                                     audio.PlaySound("headshot_voice");
                                     // Add screen info for the headshot
-                                    Vector2 pos = new Vector2(GetScreenWidth() / 2 - UITextures["headshot"].Width / 2 + 15, 120);
-                                    screen.AddInfo(new TextureInfo(pos, UITextures["headshot"], GetTime(), 0.7f));
-                                    screen.AddInfo(new TextureInfo(new Vector2(pos.X + UITextures["headshot"].Width - 100, pos.Y + UITextures["headshot"].Height - 100), UITextures["plus_coin"], GetTime(), 0.7f));
+                                    Vector2 pos = new Vector2(GetScreenWidth() - UITextures["headshot"].Width / 2 - 170, GetScreenHeight() - 285);
+                                    screen.AddInfo(new TextureInfo(pos, UITextures["headshot"], GetTime(), 1f));
+                                    screen.AddInfo(new TextureInfo(new Vector2(pos.X + UITextures["headshot"].Width - 100, pos.Y + UITextures["headshot"].Height - 100), UITextures["plus_coin"], GetTime(), 1f));
                                     // Start death animation (random)
                                     if (r.Next(0, 2) == 1) zombie.State = ZombieState.Dying1;
                                     else zombie.State = ZombieState.Dying2;
