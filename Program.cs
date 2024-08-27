@@ -62,12 +62,12 @@ namespace Lurkers_revamped
             utilities["rifle"].Materials[1].Shader = shaders.OutlineShader;
 
             // Set shader hightlight to the corresponding level of the current weapon
-            SetShaderValue(shaders.OutlineShader, GetShaderLocation(shaders.OutlineShader, "highlightCol"), Weapon.Nv5Color, ShaderUniformDataType.Vec4);
+            SetShaderValue(shaders.OutlineShader, GetShaderLocation(shaders.OutlineShader, "highlightCol"), Weapon.Nv3Color, ShaderUniformDataType.Vec4);
 
             // Load rigged models
             Dictionary<string, Model> rigged = rLoading.LoadRigged();
 
-            // Load UI textures
+            // Load UI textures and set permanent Screen Infos
             Dictionary<string, Texture2D> UITextures = rLoading.LoadUITextures();
 
             // Set the working directory back to its original value 
@@ -79,6 +79,7 @@ namespace Lurkers_revamped
             Player player = new Player("Anonymous254");
             // Assign a default weapon to the player<
             player.AddWeapon(new Weapon("Lambert Niv. 1", "rifle", 50, 1));
+            player.AddWeapon(new Weapon("Lambert Niv. 2", "rifle", 50, 2));
             player.SetCurrentWeapon(0);
 
             // Create list of zombies
@@ -98,7 +99,17 @@ namespace Lurkers_revamped
             // Set Window state when loading is done
             SetWindowState(ConfigFlags.ResizableWindow);
             SetWindowState(ConfigFlags.MaximizedWindow);
-            
+
+            // Set permanent informations of the screen according to the final screen size
+            screen.AddInfo(new TextureInfo(new Vector2(GetScreenWidth() - 120, GetScreenHeight() - 800), UITextures["inventory_case"], GetTime(), -1.0));
+            screen.AddInfo(new TextureInfo(new Vector2(GetScreenWidth() - 120, GetScreenHeight() - 715), UITextures["inventory_case"], GetTime(), -1.0));
+            screen.AddInfo(new TextureInfo(new Vector2(GetScreenWidth() - 120, GetScreenHeight() - 630), UITextures["inventory_case"], GetTime(), -1.0));
+            screen.AddInfo(new TextureInfo(new Vector2(GetScreenWidth() - 120, GetScreenHeight() - 545), UITextures["inventory_case"], GetTime(), -1.0));
+            screen.AddInfo(new TextureInfo(new Vector2(GetScreenWidth() - 120, GetScreenHeight() - 460), UITextures["inventory_case"], GetTime(), -1.0));
+
+            // Add current weapon splash
+            screen.AddInfo(new TextureInfo(new Vector2(GetScreenWidth() - 120, GetScreenHeight() - 800), UITextures["rifle_blue_splash"], GetTime(), -1.0));
+
             // Set target FPS
             SetTargetFPS(60);
             DisableCursor();
@@ -159,9 +170,11 @@ namespace Lurkers_revamped
                         break;
                     case PlayerWeaponState.Taking:
                         player.CurrentAnimation = rifleAnims[4];
-                        break;
-                    case PlayerWeaponState.Hiding:
-                        player.CurrentAnimation = rifleAnims[0];
+                        if (player.CurrentAnimation.Frame == player.CurrentAnimation.FrameCount() - 1)
+                        {
+                            player.CurrentAnimation.UpdateFrame();
+                            player.WeaponState = PlayerWeaponState.Idle;
+                        }
                         break;
                 }
 
@@ -288,7 +301,7 @@ namespace Lurkers_revamped
 
                 // Draw crosshair
                 DrawText("+", GetScreenWidth() / 2 - 4, GetScreenHeight() / 2 - 4, 20, Color.White);
-                
+
                 // Debug positions
                 DrawText("Position: " + camera.Position.ToString() + "\nJump Force: " + player.VJump + "\nFrame: " + zombies.First().CurrentAnimation.Frame, 200, 200, 20, Color.Red);
 
@@ -448,17 +461,7 @@ namespace Lurkers_revamped
                     player.VJump = Player.JUMP_FORCE;
                 }
             }
-            // Aiming event
-            if (IsMouseButtonDown(MouseButton.Right))
-            {
-                Vector3 direction = GetCameraForward(ref camera);
-                camera.Position += new Vector3(direction.X, 0, direction.Z);
-                camera.Target += new Vector3(direction.X, 0, direction.Z);
-            }
-            else if (IsMouseButtonUp(MouseButton.Right) && player.WeaponState == PlayerWeaponState.Aiming)
-            {
-                player.WeaponState = PlayerWeaponState.Idle;
-            }
+
             // Shooting event
             if (IsMouseButtonDown(MouseButton.Left))
             {
@@ -469,6 +472,19 @@ namespace Lurkers_revamped
             {
                 player.WeaponState = PlayerWeaponState.Idle;
                 anims[3].Frame = 0;
+            }
+
+            // Inventory changing event
+            float wheel = GetMouseWheelMove();
+            if (wheel == -1)
+            {
+                player.WeaponState = PlayerWeaponState.Taking;
+                player.SetCurrentWeapon(1);
+            }
+            else if (wheel == 1) 
+            {
+                player.WeaponState = PlayerWeaponState.Taking;
+                player.SetCurrentWeapon(1);
             }
         }
         static void SetWorkdir(string directory)

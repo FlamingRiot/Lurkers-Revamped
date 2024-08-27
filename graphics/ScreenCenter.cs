@@ -29,9 +29,12 @@ namespace uniray_Project
             // Check all the infos time
             foreach (ScreenInfo info in infos)
             {
-                if (Raylib.GetTime() - info.Start >= info.Cooldown)
+                if (info.Cooldown != -1.0)
                 {
-                    removeIndexes.Add(infos.IndexOf(info));
+                    if (Raylib.GetTime() - info.Start >= info.Cooldown)
+                    {
+                        removeIndexes.Add(infos.IndexOf(info));
+                    }
                 }
             }
 
@@ -55,7 +58,8 @@ namespace uniray_Project
         /// </summary>
         public void DrawScreenInfos()
         {
-            foreach (ScreenInfo info in infos)
+            // Draw non-permanent infos
+            foreach (ScreenInfo info in infos.Where(x => x.Cooldown != -1.0))
             {
                 double chrono = Raylib.GetTime() - info.Start;
                 double alpha = Raymath.Clamp(-(int)(info.Cooldown - chrono * 1000), 0, 255);
@@ -69,6 +73,21 @@ namespace uniray_Project
                     case uniray_Project.TextInfo text:
                         Raylib.DrawTextPro(text.Font, text.Text, text.Position, Vector2.Zero, 0, 50, 1, new Color(0, 0, 0, (int)alpha));
                         Raylib.DrawTextPro(text.Font, text.Text, text.Position, Vector2.Zero, 0, 40, 1, new Color(255, 255, 0, (int)alpha));
+                        break;
+                }
+            }
+            // Draw permanent infos
+            foreach (ScreenInfo info in infos.Where(x => x.Cooldown == -1.0))
+            {
+                // Draw the different types of informations
+                switch (info)
+                {
+                    case TextureInfo texture:
+                        Raylib.DrawTexture(texture.Texture, (int)texture.X, (int)texture.Y, Color.White);
+                        break;
+                    case TextInfo text:
+                        Raylib.DrawTextPro(text.Font, text.Text, text.Position, Vector2.Zero, 0, 50, 1, Color.White);
+                        Raylib.DrawTextPro(text.Font, text.Text, text.Position, Vector2.Zero, 0, 40, 1, Color.White);
                         break;
                 }
             }
