@@ -5,6 +5,7 @@ using System.Numerics;
 using static UnirayEngine.UnirayEngine;
 using uniray_Project;
 using System.Text;
+using System.ComponentModel.Design;
 
 namespace Lurkers_revamped
 {
@@ -75,6 +76,7 @@ namespace Lurkers_revamped
             // Load animation lists
             List<Animation> rifleAnims = LoadAnimationList("src/animations/rifle.m3d");
             List<Animation> zombieAnims = LoadAnimationList("src/animations/walker.m3d");
+
             // Create player
             Player player = new Player("Anonymous254");
             // Assign a default weapon to the player<
@@ -110,6 +112,9 @@ namespace Lurkers_revamped
             // Add current weapon splash
             screen.AddInfo(new TextureInfo(new Vector2(GetScreenWidth() - 120, GetScreenHeight() - 800), UITextures["rifle_blue_splash"], GetTime(), -1.0));
 
+            // Crosshair color variable
+            Color crosshairColor = Color.White;
+
             // Set target FPS
             SetTargetFPS(60);
             DisableCursor();
@@ -129,13 +134,14 @@ namespace Lurkers_revamped
                         break;
                     case PlayerWeaponState.Shooting:
                         player.CurrentAnimation = rifleAnims[3];
-                        // Double the framerate
-                       // rifleAnims[3].UpdateFrame();
+                        // Check everytime a bullet is shot
                         if (rifleAnims[3].Frame == 1)
                         {
                             player.CurrentWeapon.ShootBullet(new Vector3(camera.Position.X, camera.Position.Y - 0.045f, camera.Position.Z) + GetCameraRight(ref camera) / 12, GetCameraForward(ref camera)); ;
                             // Play shooting sound
                             audio.PlaySound("rifleShoot");
+                            // Set crosshair color
+                            crosshairColor = Color.Red;
                             // Check collision with zombies
                             foreach (Zombie zombie in zombies)
                             {
@@ -161,8 +167,10 @@ namespace Lurkers_revamped
                                     player.CurrentWeapon.bullets.Last().ResetCollision();
                                 }
                             }
+                            
                             player.CurrentWeapon.bullets.RemoveAt(0);
                         }
+                        else if (rifleAnims[3].Frame > 7) crosshairColor = Color.White;
                         break;
                     case PlayerWeaponState.Reloading:
                         player.CurrentAnimation = rifleAnims[2];
@@ -182,7 +190,7 @@ namespace Lurkers_revamped
                 UpdateModelAnimation(utilities[player.CurrentWeapon.ModelID], player.CurrentAnimation.Anim, player.CurrentAnimation.UpdateFrame());
 
                 // Update the player event handler
-                TickPlayer(player, rifleAnims, ref camera);
+                TickPlayer(player, rifleAnims, ref camera, ref crosshairColor);
 
                 // Update the screen center (info displayer)
                 screen.Tick();
@@ -210,7 +218,6 @@ namespace Lurkers_revamped
                     
                 // Draw player's current model
                 DrawModel(utilities[player.CurrentWeapon.ModelID], new Vector3(camera.Position.X - GetCameraForward(ref camera).X / 3, camera.Position.Y - 0.2f, camera.Position.Z - GetCameraForward(ref camera).Z / 3), 3.5f, Color.White);
-                DrawModel(utilities["rifle_splash"], Vector3.Zero, 3.5f, Color.White);
 
                 // Draw and tick the current zombies of the scene
                 int killIndex = -1;
@@ -300,7 +307,7 @@ namespace Lurkers_revamped
                 screen.DrawScreenInfos();
 
                 // Draw crosshair
-                DrawText("+", GetScreenWidth() / 2 - 4, GetScreenHeight() / 2 - 4, 20, Color.White);
+                DrawTexture(UITextures["crosshair"], GetScreenWidth() / 2 - UITextures["crosshair"].Width / 2, GetScreenHeight() / 2 - UITextures["crosshair"].Height / 2, crosshairColor);
 
                 // Debug positions
                 DrawText("Position: " + camera.Position.ToString() + "\nJump Force: " + player.VJump + "\nFrame: " + zombies.First().CurrentAnimation.Frame, 200, 200, 20, Color.Red);
@@ -443,7 +450,7 @@ namespace Lurkers_revamped
         /// Tick the player events
         /// </summary>
         /// <param name="player">The player to check</param>
-        static void TickPlayer(Player player, List<Animation> anims, ref Camera3D camera)
+        static void TickPlayer(Player player, List<Animation> anims, ref Camera3D camera, ref Color crosshairColor)
         {
             // Manager input events
             // Reload event
@@ -471,6 +478,7 @@ namespace Lurkers_revamped
             else if (IsMouseButtonUp(MouseButton.Left) && player.WeaponState == PlayerWeaponState.Shooting) 
             {
                 player.WeaponState = PlayerWeaponState.Idle;
+                crosshairColor = Color.White;
                 anims[3].Frame = 0;
             }
 
