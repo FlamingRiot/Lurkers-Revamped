@@ -140,7 +140,7 @@ namespace Lurkers_revamped
                                     audio.PlaySound("headshot");
                                     audio.PlaySound("headshot_voice");
                                     // Add screen info for the headshot
-                                    Vector2 pos = new Vector2(GetScreenWidth() / 2 - UITextures["headshot"].Width / 2 + 15, 200);
+                                    Vector2 pos = new Vector2(GetScreenWidth() / 2 - UITextures["headshot"].Width / 2 + 15, 120);
                                     screen.AddInfo(new TextureInfo(pos, UITextures["headshot"], GetTime(), 0.7f));
                                     screen.AddInfo(new TextureInfo(new Vector2(pos.X + UITextures["headshot"].Width - 100, pos.Y + UITextures["headshot"].Height - 100), UITextures["plus_coin"], GetTime(), 0.7f));
                                     // Start death animation (random)
@@ -197,6 +197,7 @@ namespace Lurkers_revamped
                     
                 // Draw player's current model
                 DrawModel(utilities[player.CurrentWeapon.ModelID], new Vector3(camera.Position.X - GetCameraForward(ref camera).X / 3, camera.Position.Y - 0.2f, camera.Position.Z - GetCameraForward(ref camera).Z / 3), 3.5f, Color.White);
+                DrawModel(utilities["rifle_splash"], Vector3.Zero, 3.5f, Color.White);
 
                 // Draw and tick the current zombies of the scene
                 int killIndex = -1;
@@ -415,11 +416,13 @@ namespace Lurkers_revamped
 
             // Load Rifle Model
             Model rifle = LoadModel("../../models/rifle.m3d");
-            for (int j = 0; j < rifle.Meshes[0].VertexCount * 4; j++)
-                rifle.Meshes[0].Colors[j] = 255;
-            UpdateMeshBuffer(rifle.Meshes[0], 3, rifle.Meshes[0].Colors, rifle.Meshes[0].VertexCount * 4, 0);
-
+   
             models.Add("rifle", rifle);
+
+            // Load Rifle Model
+            Model rifleSplash = LoadModel("../../models/rifle_splash.m3d");
+
+            models.Add("rifle_splash", rifleSplash);
 
             return models;
         }
