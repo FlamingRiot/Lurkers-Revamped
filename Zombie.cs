@@ -80,7 +80,7 @@ namespace uniray_Project
         /// The position of the zombie extracted from the matrix
         /// </summary>
         public Vector3 Position { get { return new Vector3(transform.M14, transform.M24, transform.M34); } set { transform.M14 = value.X;transform.M24 = value.Y; transform.M34 = value.Z; } }
-        public Zombie(Vector3 position, string type)
+        public Zombie(Vector3 position, string type, Animation anim)
         {
             // Define position
             transform = Matrix4x4.Identity;
@@ -91,7 +91,7 @@ namespace uniray_Project
             Angle = 0;
             // Define type
             this.type = type;
-            // Define health bar
+            // Define health bar according to the type of the zombie
             switch (type)
             {
                 case "cop":
@@ -104,6 +104,9 @@ namespace uniray_Project
 
             // Set default state
             this.state = ZombieState.Running;
+
+            // Set current animation of the zombie
+            this.currentAnimation = anim;
         }
     }
 }

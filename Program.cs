@@ -11,7 +11,6 @@ namespace Lurkers_revamped
 {
     public unsafe class Program
     {
-        const float GRAVITY = 9.81f;
         public  static void Main(string[] args)
         {
             // Init splash window
@@ -59,11 +58,6 @@ namespace Lurkers_revamped
             //ChangeDirectory()
             // Load dictionary of utilities (weapons, meds, etc.)
             Dictionary<string, Model> utilities = LoadUtilities();
-            // Set highlight shader on rifle
-            utilities["rifle"].Materials[1].Shader = shaders.OutlineShader;
-
-            // Set shader hightlight to the corresponding level of the current weapon
-            SetShaderValue(shaders.OutlineShader, GetShaderLocation(shaders.OutlineShader, "highlightCol"), Weapon.Nv1Color, ShaderUniformDataType.Vec4);
 
             // Load rigged models
             Dictionary<string, Model> rigged = rLoading.LoadRigged();
@@ -73,27 +67,26 @@ namespace Lurkers_revamped
 
             // Set the working directory back to its original value 
             SetWorkdir(workdir);
+
             // Load animation lists
             List<Animation> rifleAnims = LoadAnimationList("src/animations/rifle.m3d");
             List<Animation> zombieAnims = LoadAnimationList("src/animations/walker.m3d");
 
-            // Create player
-            Player player = new Player("Anonymous254");
-            // Assign a default weapon to the player<
-            player.AddWeapon(new Weapon("Lambert Niv. 1", "rifle", 50, 1));
+            // Create player and its object dependancies
+            Player player = new Player("Anonymous254", new Weapon("Lambert Niv. 1", "rifle", 50, 1), rifleAnims[1]);
+            // Assign a default weapon to the player
             player.AddWeapon(new Weapon("Lambert Niv. 2", "rifle", 50, 2));
-            player.SetCurrentWeapon(0);
+
+            // Set highlight shader on rifle
+            utilities["rifle"].Materials[1].Shader = shaders.OutlineShader;
+            // Set shader hightlight to the corresponding level of the current weapon
+            SetShaderValue(shaders.OutlineShader, GetShaderLocation(shaders.OutlineShader, "highlightCol"), Weapon.Nv1Color, ShaderUniformDataType.Vec4);
 
             // Create list of zombies
             List<Zombie> zombies = new List<Zombie>()
             {
-                new Zombie(new Vector3(-10, 0, 2), "cop")
+                new Zombie(new Vector3(-10, 0, 2), "cop", zombieAnims[8])
             };
-
-            foreach (Zombie zombie in zombies)
-            {
-                zombie.CurrentAnimation = zombieAnims[8]; 
-            }
 
             // Load UI Fonts
             Font damageFont = LoadFont("src/fonts/damage.ttf");
@@ -295,8 +288,7 @@ namespace Lurkers_revamped
                     // Spawn a new zombie (debug sandbox only)
                     Random r = new Random();
 
-                    Zombie zombzomb = new Zombie(new Vector3(r.Next(-50, 50), 0, r.Next(-50, 50)), "cop");
-                    zombzomb.CurrentAnimation = zombieAnims[8];
+                    Zombie zombzomb = new Zombie(new Vector3(r.Next(-50, 50), 0, r.Next(-50, 50)), "cop", zombieAnims[8]);
                     zombies.Add(zombzomb);
                 }
 

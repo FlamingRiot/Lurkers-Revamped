@@ -38,7 +38,7 @@
         /// <summary>
         /// The currently held weapon of the player
         /// </summary>
-        private Weapon? currentWeapon;
+        private Weapon currentWeapon;
         /// <summary>
         /// The currently displayed animation
         /// </summary>
@@ -82,7 +82,7 @@
         /// <summary>
         /// The currently held weapon of the player
         /// </summary>
-        public Weapon? CurrentWeapon { get { return currentWeapon; } set { currentWeapon = value; } }
+        public Weapon CurrentWeapon { get { return currentWeapon; } set { currentWeapon = value; } }
         /// <summary>
         /// The currently displayed animation
         /// </summary>
@@ -95,14 +95,16 @@
         /// Player constructor
         /// </summary>
         /// <param name="name">Player name</param>
-        public Player(string name)
+        public Player(string name, Weapon baseWeapon, Animation currentAnimation)
         {
             this.name = name;
             life = 100;
             // Set the weapon to non when the player spawns
-            currentWeapon = null;
+            currentWeapon = baseWeapon;
             // Set the player state
             WeaponState = PlayerWeaponState.Idle;
+            // Set player current animation
+            this.currentAnimation = currentAnimation;
             // Init the inventory
             inventory = new List<Weapon>();
         }
