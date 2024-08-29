@@ -98,15 +98,17 @@
         public Player(string name, Weapon baseWeapon, Animation currentAnimation)
         {
             this.name = name;
+            // Init the inventory
+            inventory = new List<Weapon>();
+            // Set player life
             life = 100;
             // Set the weapon to non when the player spawns
             currentWeapon = baseWeapon;
+            inventory.Add(currentWeapon);
             // Set the player state
             WeaponState = PlayerWeaponState.Idle;
             // Set player current animation
             this.currentAnimation = currentAnimation;
-            // Init the inventory
-            inventory = new List<Weapon>();
         }
         /// <summary>
         /// Add a weapon to the inventory of the player
