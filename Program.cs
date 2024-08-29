@@ -74,10 +74,11 @@ namespace Lurkers_revamped
 
             // Create player and its object dependancies
             Player player = new Player("Anonymous254", new Weapon("Lambert Niv. 1", "rifle", 50, 1), rifleAnims[1]);
-            // Assign a default weapon to the player
+            // (Debug) Add a second weapon to the inventory of the player
             player.AddWeapon(new Weapon("Lambert Niv. 2", "rifle", 50, 2));
 
-            // Set highlight shader on rifle
+            // Cosmetic aspects of the rifle model
+            // Set highlight shader on rifle model
             utilities["rifle"].Materials[1].Shader = shaders.OutlineShader;
             // Set shader hightlight to the corresponding level of the current weapon
             SetShaderValue(shaders.OutlineShader, GetShaderLocation(shaders.OutlineShader, "highlightCol"), Weapon.Nv1Color, ShaderUniformDataType.Vec4);
@@ -96,11 +97,11 @@ namespace Lurkers_revamped
             SetWindowState(ConfigFlags.MaximizedWindow);
 
             // Set permanent informations of the screen according to the final screen size
-            screen.AddInfo(new TextureInfo(new Vector2(GetScreenWidth() - 120, GetScreenHeight() - 800), UITextures["inventory_case"], GetTime(), -1.0));
-            screen.AddInfo(new TextureInfo(new Vector2(GetScreenWidth() - 120, GetScreenHeight() - 715), UITextures["inventory_case"], GetTime(), -1.0));
-            screen.AddInfo(new TextureInfo(new Vector2(GetScreenWidth() - 120, GetScreenHeight() - 630), UITextures["inventory_case"], GetTime(), -1.0));
-            screen.AddInfo(new TextureInfo(new Vector2(GetScreenWidth() - 120, GetScreenHeight() - 545), UITextures["inventory_case"], GetTime(), -1.0));
-            screen.AddInfo(new TextureInfo(new Vector2(GetScreenWidth() - 120, GetScreenHeight() - 460), UITextures["inventory_case"], GetTime(), -1.0));
+            for (int i = 800; i >= 460; i -= 85)
+            {
+                // Add the 5 inventory cases displayed on the right side of the screen
+                screen.AddInfo(new TextureInfo(new Vector2(GetScreenWidth() - 120, GetScreenHeight() - i), UITextures["inventory_case"], GetTime(), -1.0));
+            }
 
             // Add current weapon splash
             screen.AddInfo(new TextureInfo(new Vector2(GetScreenWidth() - 120, GetScreenHeight() - 800), UITextures["rifle_gray_splash"], GetTime(), -1.0));
@@ -111,9 +112,8 @@ namespace Lurkers_revamped
             // Set target FPS
             SetTargetFPS(60);
             DisableCursor();
-
-            Console.WriteLine(workdir);
-
+            
+            // Game Loop
             while (!WindowShouldClose())
             {
                 // Update the camera
