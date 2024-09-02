@@ -320,6 +320,8 @@ namespace Lurkers_revamped
                 // Draw screen infos
                 screen.DrawScreenInfos();
 
+                DrawFPS(0, 0);
+
                 // Draw current inventory case
                 DrawTexture(UITextures["inventory_case_selected"], GetScreenWidth() - 121, GetScreenHeight() - (800 - (player.InventoryIndex) * 85) - 1, Color.White);
 
