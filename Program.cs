@@ -74,6 +74,15 @@ namespace Lurkers_revamped
             terrainMaterial.Shader = shaders.TilingShader;
             Matrix4x4 terrainTransform = MatrixScale(250, 250, 250);
 
+            // Load skybox
+            Mesh skybox = GenMeshCube(1, 1, 1);
+            // Load skybox texture
+            Texture2D panorama = LoadTexture("src/textures/skyboxes/skybox.hdr");
+            Texture2D cubemap = shaders.GenTexureCubemap(panorama, 256, PixelFormat.UncompressedR8G8B8A8);
+            shaders.SetCubemap(cubemap);
+            // Unload useless texture
+            UnloadTexture(panorama);
+
             // Load animation lists
             List<Animation> rifleAnims = LoadAnimationList("src/animations/rifle.m3d");
             List<Animation> zombieAnims = LoadAnimationList("src/animations/walker.m3d");
@@ -200,6 +209,13 @@ namespace Lurkers_revamped
 
                 // Begin 3D mode with the current scene's camera
                 BeginMode3D(camera);
+
+                // Draw the external skybox 
+                Rlgl.DisableBackfaceCulling();
+                Rlgl.DisableDepthMask();
+                DrawMesh(skybox, shaders.SkyboxMaterial, MatrixIdentity());
+                Rlgl.EnableBackfaceCulling();
+                Rlgl.EnableDepthMask();
 
                 // Draw terrain
                 DrawMesh(terrain, terrainMaterial, terrainTransform);
@@ -334,6 +350,8 @@ namespace Lurkers_revamped
             {
                 UnloadModel(riggedObject.Value);
             }
+            // Unload shaders
+            shaders.UnloadShaderCenter();
         }
         /// <summary>
         /// Update camera movement
