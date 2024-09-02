@@ -5,7 +5,6 @@ using System.Numerics;
 using static UnirayEngine.UnirayEngine;
 using uniray_Project;
 using System.Text;
-using System.ComponentModel.Design;
 
 namespace Lurkers_revamped
 {
@@ -81,7 +80,7 @@ namespace Lurkers_revamped
             // Set highlight shader on rifle model
             utilities["rifle"].Materials[1].Shader = shaders.OutlineShader;
             // Set shader hightlight to the corresponding level of the current weapon
-            SetShaderValue(shaders.OutlineShader, GetShaderLocation(shaders.OutlineShader, "highlightCol"), Weapon.Nv1Color, ShaderUniformDataType.Vec4);
+            SetShaderValue(shaders.OutlineShader, GetShaderLocation(shaders.OutlineShader, "highlightCol"), Weapon.Colors[0], ShaderUniformDataType.Vec4);
 
             // Create list of zombies
             List<Zombie> zombies = new List<Zombie>()
@@ -105,6 +104,7 @@ namespace Lurkers_revamped
 
             // Add current weapon splash
             screen.AddInfo(new TextureInfo(new Vector2(GetScreenWidth() - 120, GetScreenHeight() - 800), UITextures["rifle_gray_splash"], GetTime(), -1.0));
+            screen.AddInfo(new TextureInfo(new Vector2(GetScreenWidth() - 120, GetScreenHeight() - (800 - (player.InventorySize) * 85)), UITextures["rifle_green_splash"], GetTime(), -1.0));
 
             // Crosshair color variable
             Color crosshairColor = Color.White;
@@ -183,7 +183,7 @@ namespace Lurkers_revamped
                 UpdateModelAnimation(utilities[player.CurrentWeapon.ModelID], player.CurrentAnimation.Anim, player.CurrentAnimation.UpdateFrame());
 
                 // Update the player event handler
-                TickPlayer(player, rifleAnims, ref camera, ref crosshairColor);
+                TickPlayer(player, rifleAnims, ref crosshairColor, shaders);
 
                 // Update the screen center (info displayer)
                 screen.Tick();
@@ -302,7 +302,12 @@ namespace Lurkers_revamped
                 DrawTexture(UITextures["crosshair"], GetScreenWidth() / 2 - UITextures["crosshair"].Width / 2, GetScreenHeight() / 2 - UITextures["crosshair"].Height / 2, crosshairColor);
 
                 // Debug positions
-                DrawText("Position: " + camera.Position.ToString() + "\nJump Force: " + player.VJump + "\nFrame: " + zombies.First().CurrentAnimation.Frame, 200, 200, 20, Color.Red);
+                DrawText("Position: " + camera.Position.ToString() + 
+                    "\nJump Force: " + player.VJump + 
+                    "\nFrame: " + zombies.First().CurrentAnimation.Frame + 
+                    "\nInventory Index: " + player.InventoryIndex + 
+                    "\nWeapon Level: " + player.CurrentWeapon.Level
+                    , 200, 200, 20, Color.Red);
 
                 // End drawing context
                 EndDrawing();
@@ -441,7 +446,7 @@ namespace Lurkers_revamped
         /// Tick the player events
         /// </summary>
         /// <param name="player">The player to check</param>
-        static void TickPlayer(Player player, List<Animation> anims, ref Camera3D camera, ref Color crosshairColor)
+        static void TickPlayer(Player player, List<Animation> anims, ref Color crosshairColor, ShaderCenter shaders)
         {
             // Manager input events
             // Reload event
@@ -475,17 +480,37 @@ namespace Lurkers_revamped
 
             // Inventory changing event
             float wheel = GetMouseWheelMove();
-            if (wheel == -1)
+            if (wheel == -1 && player.WeaponState != PlayerWeaponState.Taking)
             {
+                // Manage inventory size
+                if (player.InventoryIndex == player.InventorySize) player.SetCurrentWeapon(0);
+                else player.SetCurrentWeapon(player.InventoryIndex + 1);
+
+                // Set appropriate color of the new weapon
+                SetShaderValue(shaders.OutlineShader, GetShaderLocation(shaders.OutlineShader, "highlightCol"), Weapon.Colors[player.CurrentWeapon.Level - 1], ShaderUniformDataType.Vec4);
+                
+
+                // Set player state
                 player.WeaponState = PlayerWeaponState.Taking;
-                player.SetCurrentWeapon(1);
             }
-            else if (wheel == 1) 
+            else if (wheel == 1 && player.WeaponState != PlayerWeaponState.Taking) 
             {
+                // Manage inventory size
+                if (player.InventoryIndex == 0) player.SetCurrentWeapon(player.InventorySize);
+                else player.SetCurrentWeapon(player.InventoryIndex - 1);
+
+                // Set appropriate color of the new weapon
+                SetShaderValue(shaders.OutlineShader, GetShaderLocation(shaders.OutlineShader, "highlightCol"), Weapon.Colors[player.CurrentWeapon.Level - 1], ShaderUniformDataType.Vec4);
+                
+
+                // Set player state
                 player.WeaponState = PlayerWeaponState.Taking;
-                player.SetCurrentWeapon(1);
             }
         }
+        /// <summary>
+        /// Set the working directory of Raylib
+        /// </summary>
+        /// <param name="directory">New directory</param>
         static void SetWorkdir(string directory)
         {
             // Transform the sent string to a byte array

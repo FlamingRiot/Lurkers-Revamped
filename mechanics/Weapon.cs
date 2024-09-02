@@ -4,12 +4,15 @@ namespace uniray_Project
 {
     public class Weapon
     {
-        // Weapon's different level Vector4
-        public static readonly Vector4 Nv1Color = new Vector4(184, 181, 186, 255);
-        public static readonly Vector4 Nv2Color = new Vector4(61, 252, 3, 255);
-        public static readonly Vector4 Nv3Color = new Vector4(23, 214, 252, 255);
-        public static readonly Vector4 Nv4Color = new Vector4(148, 3, 252, 255);
-        public static readonly Vector4 Nv5Color = new Vector4(252, 186, 3, 255);
+        // Weapon's different level colors
+        public static readonly List<Vector4> Colors = new List<Vector4>() 
+        {
+            new Vector4(184, 181, 186, 255),
+            new Vector4(61, 252, 3, 255),
+            new Vector4(23, 214, 252, 255),
+            new Vector4(148, 3, 252, 255),
+            new Vector4(252, 186, 3, 255)
+        };
 
         /// <summary>
         /// Level of the weapon
@@ -67,6 +70,7 @@ namespace uniray_Project
             this.name = name;
             this.modelID = modelID;
             this.maxAmmos = maxAmmos;
+            this.level = level;
         }
         /// <summary>
         /// Shoot a bullet from the weapon

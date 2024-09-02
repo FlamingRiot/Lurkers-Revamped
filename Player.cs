@@ -36,6 +36,10 @@
         /// </summary>
         private List<Weapon> inventory;
         /// <summary>
+        /// The index in the inventory of the active weapon
+        /// </summary>
+        private int inventoryIndex;
+        /// <summary>
         /// The currently held weapon of the player
         /// </summary>
         private Weapon currentWeapon;
@@ -72,6 +76,14 @@
         /// </summary>
         public int Life { get { return life; } set { life = value; } }
         /// <summary>
+        /// The inventory index of the active weapon
+        /// </summary>
+        public int InventoryIndex { get { return inventoryIndex; } set { inventoryIndex = value; } }
+        /// <summary>
+        /// The size of the inventory (starting from 0)
+        /// </summary>
+        public int InventorySize { get { return inventory.Count - 1; } }
+        /// <summary>
         /// The time delay for the player's actions
         /// </summary>
         public double ActionDelay { get { return actionDelay; } set { actionDelay = value; } }
@@ -105,6 +117,7 @@
             // Set the weapon to non when the player spawns
             currentWeapon = baseWeapon;
             inventory.Add(currentWeapon);
+            InventoryIndex = 0;
             // Set the player state
             WeaponState = PlayerWeaponState.Idle;
             // Set player current animation
@@ -124,7 +137,8 @@
         /// <param name="index"></param>
         public void SetCurrentWeapon(int index)
         {
-            CurrentWeapon = inventory[index];
+            InventoryIndex = index;
+            CurrentWeapon = inventory[InventoryIndex];
         }
     }
 }
