@@ -33,5 +33,10 @@
 		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  
+  <ItemGroup>
+    <None Remove="src\shaders\tiling.fs" />
+    <None Remove="src\shaders\tiling.vs" />
+  </ItemGroup>
 
 </Project>

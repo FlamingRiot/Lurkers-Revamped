@@ -39,7 +39,7 @@ namespace Lurkers_revamped
 
             // Define 3D camera
             Camera3D camera = new Camera3D();
-            camera.Position = new Vector3(0.0f, 3.0f, 0.0f);
+            camera.Position = new Vector3(3.0f, 3.0f, 3.0f);
             camera.Target = new Vector3(3.0f, 3.0f, 0.0f);
             camera.Up = Vector3.UnitY;
             camera.Projection = CameraProjection.Perspective;
@@ -66,6 +66,13 @@ namespace Lurkers_revamped
 
             // Set the working directory back to its original value 
             SetWorkdir(workdir);
+
+            // Load terrain
+            Mesh terrain = GenMeshPlane(1, 1, 1, 1);
+            Material terrainMaterial = LoadMaterialDefault();
+            SetMaterialTexture(ref terrainMaterial, MaterialMapIndex.Diffuse, LoadTexture("src/textures/terrain.png"));
+            terrainMaterial.Shader = shaders.TilingShader;
+            Matrix4x4 terrainTransform = MatrixScale(250, 250, 250);
 
             // Load animation lists
             List<Animation> rifleAnims = LoadAnimationList("src/animations/rifle.m3d");
@@ -146,9 +153,7 @@ namespace Lurkers_revamped
                                 if (player.CurrentWeapon.bullets.Last().Collision.Hit)
                                 {
                                     Random r = new Random();
-                                    // Play headshot sound
-                                    audio.PlaySound("headshot");
-                                    audio.PlaySound("headshot_voice");
+                                    // Play headshot soundas
                                     // Add screen info for the headshot
                                     Vector2 pos = new Vector2(GetScreenWidth() - UITextures["headshot"].Width / 2 - 170, GetScreenHeight() - 285);
                                     screen.AddInfo(new TextureInfo(pos, UITextures["headshot"], GetTime(), 1f));
@@ -173,7 +178,6 @@ namespace Lurkers_revamped
                         player.CurrentAnimation = rifleAnims[4];
                         if (player.CurrentAnimation.Frame == player.CurrentAnimation.FrameCount() - 1)
                         {
-                            player.CurrentAnimation.UpdateFrame();
                             player.WeaponState = PlayerWeaponState.Idle;
                         }
                         break;
@@ -183,7 +187,7 @@ namespace Lurkers_revamped
                 UpdateModelAnimation(utilities[player.CurrentWeapon.ModelID], player.CurrentAnimation.Anim, player.CurrentAnimation.UpdateFrame());
 
                 // Update the player event handler
-                TickPlayer(player, rifleAnims, ref crosshairColor, shaders);
+                TickPlayer(player, rifleAnims, ref camera, ref crosshairColor, shaders, terrain, terrainTransform);
 
                 // Update the screen center (info displayer)
                 screen.Tick();
@@ -197,8 +201,8 @@ namespace Lurkers_revamped
                 // Begin 3D mode with the current scene's camera
                 BeginMode3D(camera);
 
-                // Draw temporary grid for development
-                DrawGrid(10, 10);
+                // Draw terrain
+                DrawMesh(terrain, terrainMaterial, terrainTransform);
 
                 // Draw the gameobjects of the environment (from Uniray)
                 DrawScene();
@@ -297,6 +301,9 @@ namespace Lurkers_revamped
 
                 // Draw screen infos
                 screen.DrawScreenInfos();
+
+                // Draw current inventory case
+                DrawTexture(UITextures["inventory_case_selected"], GetScreenWidth() - 121, GetScreenHeight() - (800 - (player.InventoryIndex) * 85) - 1, Color.White);
 
                 // Draw crosshair
                 DrawTexture(UITextures["crosshair"], GetScreenWidth() / 2 - UITextures["crosshair"].Width / 2, GetScreenHeight() / 2 - UITextures["crosshair"].Height / 2, crosshairColor);
@@ -446,7 +453,7 @@ namespace Lurkers_revamped
         /// Tick the player events
         /// </summary>
         /// <param name="player">The player to check</param>
-        static void TickPlayer(Player player, List<Animation> anims, ref Color crosshairColor, ShaderCenter shaders)
+        static void TickPlayer(Player player, List<Animation> anims, ref Camera3D camera, ref Color crosshairColor, ShaderCenter shaders, Mesh terrain, Matrix4x4 transform)
         {
             // Manager input events
             // Reload event

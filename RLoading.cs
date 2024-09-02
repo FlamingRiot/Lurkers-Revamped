@@ -39,6 +39,7 @@ namespace uniray_Project
                 {"rifle_gold_splash", LoadTexture("../weapon_splashes/rifle_gold.png") },
                 {"inventory_case", LoadTexture("../inventory_case.png") },
                 {"crosshair", LoadTexture("../crosshair.png") },
+                {"inventory_case_selected", LoadTexture("../inventory_case_selected.png") },
             };
             // Return the dictionary
             return textures;

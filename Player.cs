@@ -1,4 +1,6 @@
-﻿namespace uniray_Project
+﻿using System.Numerics;
+using Raylib_cs;
+namespace uniray_Project
 {
     public enum PlayerWeaponState
     {
@@ -22,7 +24,6 @@
         /// Player's jump force
         /// </summary>
         public const float JUMP_FORCE = 0.5f; 
-
         /// <summary>
         /// The time delay for the player's actions
         /// </summary>
@@ -31,6 +32,18 @@
         /// Player name
         /// </summary>
         private string name;
+        /// <summary>
+        /// The y position of the player
+        /// </summary>
+        private float yPos;
+        /// <summary>
+        /// The y collision ray of the player
+        /// </summary>
+        private Ray ray;
+        /// <summary>
+        /// The ray collision of the player
+        /// </summary>
+        private RayCollision rayCollision;
         /// <summary>
         /// The inventory of the player
         /// </summary>
@@ -68,6 +81,26 @@
         /// </summary>
         public PlayerWeaponState WeaponState { get { return weaponState; } set { weaponState = value; } }
         /// <summary>
+        /// The collision of the player ray
+        /// </summary>
+        public RayCollision RayCollision { get { return rayCollision; } set { rayCollision = value; } }
+        /// <summary>
+        /// The hit attribute of the rayCollision object
+        /// </summary>
+        public bool CollisionHit { get { return rayCollision.Hit; } set { rayCollision.Hit = value; } }
+        /// <summary>
+        /// The ray of the player
+        /// </summary>
+        public Ray Ray { get { return ray; } set { ray = value; } }
+        /// <summary>
+        /// The direction of the ray
+        /// </summary>
+        public Vector3 RayDirection { get { return ray.Direction; } set { ray.Direction = value; } }
+        /// <summary>
+        /// The position of the ray
+        /// </summary>
+        public Vector3 RayPosition { get { return ray.Position; } set { ray.Position = value; } }
+        /// <summary>
         /// The secondary state of the player
         /// </summary>
         public PlayerMoveState MoveState { get { return moveState; } set { moveState = value; } }
@@ -75,6 +108,10 @@
         /// The current amount of life the player has
         /// </summary>
         public int Life { get { return life; } set { life = value; } }
+        /// <summary>
+        /// The y position of the player
+        /// </summary>
+        public float YPos { get { return yPos; } set { yPos = value; } }
         /// <summary>
         /// The inventory index of the active weapon
         /// </summary>
@@ -122,6 +159,8 @@
             WeaponState = PlayerWeaponState.Idle;
             // Set player current animation
             this.currentAnimation = currentAnimation;
+            // Set player ray direction
+            RayDirection = -Vector3.UnitY;
         }
         /// <summary>
         /// Add a weapon to the inventory of the player

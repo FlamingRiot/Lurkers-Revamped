@@ -14,9 +14,17 @@ namespace uniray_Project
         /// </summary>
         private Material outlineMaterial;
         /// <summary>
+        /// The texture-tiling shader for the terrain
+        /// </summary>
+        private Shader tilingShader;
+        /// <summary>
         /// The outline shader
         /// </summary>
         public Shader OutlineShader { get { return outlineShader; } }
+        /// <summary>
+        /// The texture-tiling shader for the terrain
+        /// </summary>
+        public Shader TilingShader { get { return tilingShader; } }
         /// <summary>
         /// The outline material
         /// </summary>
@@ -38,6 +46,8 @@ namespace uniray_Project
         {
             // Load outline shader
             outlineShader = LoadShader("src/shaders/outline.vs", "src/shaders/outline.fs");
+            // Load tiling shader
+            tilingShader = LoadShader("src/shaders/tiling.vs", "src/shaders/tiling.fs");
         }
         /// <summary>
         /// Load all the shader materials
