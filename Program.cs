@@ -161,8 +161,10 @@ namespace Lurkers_revamped
                                 // Check collsion details
                                 if (player.CurrentWeapon.bullets.Last().Collision.Hit)
                                 {
+
                                     Random r = new Random();
-                                    // Play headshot soundas
+                                    // Play headshot sounds
+                                    audio.PlaySound("headshot");
                                     // Add screen info for the headshot
                                     Vector2 pos = new Vector2(GetScreenWidth() - UITextures["headshot"].Width / 2 - 170, GetScreenHeight() - 285);
                                     screen.AddInfo(new TextureInfo(pos, UITextures["headshot"], GetTime(), 1f));
