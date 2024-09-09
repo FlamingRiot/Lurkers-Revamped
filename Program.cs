@@ -333,10 +333,6 @@ namespace Lurkers_revamped
                 // Draw screen infos
                 screen.DrawScreenInfos();
 #if DEBUG
-                foreach (UModel mod in CurrentScene.GameObjects.Where(x => x is UModel))
-                {
-                    DrawText(mod.Yaw.ToString(), (int)GetWorldToScreen(mod.Position, camera).X, (int)GetWorldToScreen(mod.Position, camera).Y, 20, Color.Green);
-                }
 
                 // Debug positions
                 DrawText("Position: " + camera.Position.ToString() +
@@ -437,12 +433,8 @@ namespace Lurkers_revamped
             {
                 // Normalize vector
                 movement = Vector3Normalize(movement) * speed * player.MotionConstraint.Value;
-                // Block movement according to the motion constraint)
-                Console.WriteLine(direction);
-                if (player.MotionConstraint.Constraint.Z == 1 && movement.Z > 0)
-                {
-                    movement *= new Vector3(Math.Abs(player.MotionConstraint.Constraint.X), 0, Math.Abs(player.MotionConstraint.Constraint.Z));
-                }
+                // Block movement according to the motion constraint
+                AddConstraintMovement(ref movement, player.MotionConstraint.Constraint);
                 // Limit the movement to X and Z axis and normalize
                 movement = new Vector3(movement.X, 0.0f, movement.Z);
             }
@@ -451,7 +443,7 @@ namespace Lurkers_revamped
             camera.Position += movement;
             camera.Target = Vector3Add(camera.Position, direction);
 
-            // Make the camera jump if needed
+            // Make the player jump if needed
             if (player.MoveState == PlayerMoveState.Jumping)
             {
                 // Add jump force
@@ -544,7 +536,7 @@ namespace Lurkers_revamped
             foreach (BoundingBox staticBox in boxes)
             {
 #if DEBUG
-                DrawBoundingBox(staticBox, Color.Red);
+                //DrawBoundingBox(staticBox, Color.Red);
 #endif
                 // Check individual collision
                 if (CheckCollisionBoxes(playerBox, staticBox))
@@ -570,6 +562,42 @@ namespace Lurkers_revamped
             {
                 sbyte* sp = (sbyte*)p;
                 ChangeDirectory(sp);
+            }
+        }
+        /// <summary>
+        /// Add constraint to the incoming movement
+        /// </summary>
+        /// <param name="movement">Incoming movement</param>
+        /// <param name="constraint">Constraint to apply</param>
+        static void AddConstraintMovement(ref Vector3 movement, Vector3 constraint)
+        {
+            if (constraint.Z == 1 && constraint.X == 0)
+            {
+                if (movement.X > 0)
+                {
+                    movement *= new Vector3(Math.Abs(constraint.X), 0, Math.Abs(constraint.Z));
+                }
+            }
+            else if (constraint.Z == -1 && constraint.X == 0)
+            {
+                if (movement.X < 0)
+                {
+                    movement *= new Vector3(Math.Abs(constraint.X), 0, Math.Abs(constraint.Z));
+                }
+            }
+            else if (constraint.X == 1 && constraint.Z == 0)
+            {
+                if (movement.Z > 0)
+                {
+                    movement *= new Vector3(Math.Abs(constraint.X), 0, Math.Abs(constraint.Z));
+                }
+            }
+            else if (constraint.X == -1 && constraint.Z == 0)
+            {
+                if (movement.Z < 0)
+                {
+                    movement *= new Vector3(Math.Abs(constraint.X), 0, Math.Abs(constraint.Z));
+                }
             }
         }
         /// <summary>
