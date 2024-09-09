@@ -132,10 +132,14 @@ namespace Lurkers_revamped
             // Set target FPS
             SetTargetFPS(60);
             DisableCursor();
-            
+
+            audio.PlayMusic("reapers");
             // Game Loop
             while (!WindowShouldClose())
             {
+                // Update music stream
+                audio.UpdateMusic("reapers");
+
                 // Update the camera
                 UpdateCamera(ref camera, 0.3f, ref yaw, ref pitch, ref sideShake, player);
 
@@ -344,9 +348,9 @@ namespace Lurkers_revamped
                     "\nMotion Constraint: " + player.MotionConstraint.Value +
                     "\nConstraint: " + player.MotionConstraint.Constraint
                     , 200, 200, 20, Color.Red);
-#endif
 
                 DrawFPS(0, 0);
+#endif
 
                 // Draw current inventory case
                 DrawTexture(UITextures["inventory_case_selected"], GetScreenWidth() - 121, GetScreenHeight() - (800 - (player.InventoryIndex) * 85) - 1, Color.White);
@@ -536,7 +540,7 @@ namespace Lurkers_revamped
             foreach (BoundingBox staticBox in boxes)
             {
 #if DEBUG
-                //DrawBoundingBox(staticBox, Color.Red);
+                DrawBoundingBox(staticBox, Color.Red);
 #endif
                 // Check individual collision
                 if (CheckCollisionBoxes(playerBox, staticBox))

@@ -53,14 +53,34 @@ namespace uniray_Project
         private Dictionary<string, Music> LoadMusics()
         {
             Dictionary<string, Music> musics = new() 
-            { 
-            
+            {
+                {"reapers", LoadMusicStream("src/sounds/musics/reapers.mp3") }
             };
             return musics;
         }
+        /// <summary>
+        /// Play a selected sound
+        /// </summary>
+        /// <param name="key">Dictionary key of the sound</param>
         public void PlaySound(string key)
         {
             Raylib.PlaySound(sounds[key]);
+        }
+        /// <summary>
+        /// Play a selected music
+        /// </summary>
+        /// <param name="key">Dictionary key of the music</param>
+        public void PlayMusic(string key)
+        {
+            Raylib.PlayMusicStream(musics[key]);
+        }
+        /// <summary>
+        /// UPdate a selected music
+        /// </summary>
+        /// <param name="key">Dictionary key of the music</param>
+        public void UpdateMusic(string key)
+        {
+            Raylib.UpdateMusicStream(musics[key]);
         }
     }
 }
