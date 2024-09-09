@@ -192,6 +192,7 @@ namespace uniray_Project
 
             // Set default motion constraint
             this.motionConstraint.Value = 1;
+            this.motionConstraint.Constraint = new Vector3(1, 0, 1);
         }
         /// <summary>
         /// Add a weapon to the inventory of the player

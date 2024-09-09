@@ -430,13 +430,19 @@ namespace Lurkers_revamped
                 if (sideShake < 0.0f) sideShake += 0.01f;
                 else if (sideShake > 0.0f) sideShake -= 0.01f;
             }
-            // Normalize the vector if length is higher than 0
+
+            // Final movement transformations
             if (Vector3Length(movement) > 0)
             {
-                movement = Vector3Normalize(movement) * speed;
+                // Normalize vector
+                movement = Vector3Normalize(movement) * speed * player.MotionConstraint.Value;
+                // Block movement according to the motion constraint
+                movement *= player.MotionConstraint.Constraint;
+                // Limit the movement to X and Z axis and normalize
                 movement = new Vector3(movement.X, 0.0f, movement.Z);
             }
 
+            // Increment movement
             camera.Position += movement;
             camera.Target = Vector3Add(camera.Position, direction);
 
@@ -528,6 +534,7 @@ namespace Lurkers_revamped
         /// <param name="boxes">Static objects Bounding Boxes</param>
         static void CheckCollisionPlayer(BoundingBox playerBox, List<BoundingBox> boxes, Player player, Camera3D camera)
         {
+            bool hit = false;
             // Loop over all the static objects
             foreach (BoundingBox staticBox in boxes)
             {
@@ -541,9 +548,10 @@ namespace Lurkers_revamped
                     // Calculate the motion constraint corresponding to the angle between target and box
                     player.CalculateMotionConstraint(new Vector3(cf.X, 0, cf.Z), staticBox);
 
-                    //break;
+                    hit = true;
                 }
             }
+            if (!hit) player.MotionConstraint = MotionConstraint.Default;
         }
         /// <summary>
         /// Set the working directory of Raylib
