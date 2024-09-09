@@ -1,6 +1,8 @@
 ﻿using Raylib_cs;
 using UnirayEngine;
 using static Raylib_cs.Raylib;
+using System.Numerics;
+
 namespace uniray_Project
 {
     public unsafe class RLoading
@@ -104,6 +106,15 @@ namespace uniray_Project
                     Model model = LoadModelFromMesh(((UModel)gos[i]).Mesh);
                     // Load the box from the model
                     BoundingBox box = GetModelBoundingBox(model);
+
+                    // Rotate for static buildings
+                    if (((UModel)gos[i]).Yaw % 180 != 0)
+                    {
+                        Vector3 min = box.Min;
+                        box.Min = new Vector3(box.Min.Z, box.Min.Y, -box.Max.X);
+                        box.Max = new Vector3(box.Max.Z, box.Max.Y, -min.X);
+                    }
+
                     // Add the go's position
                     box.Min += gos[i].Position;
                     box.Max += gos[i].Position;
