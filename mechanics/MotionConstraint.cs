@@ -24,7 +24,7 @@ namespace uniray_Project
         /// <param name="target">Target vector of the player</param>
         /// <param name="box">Bounding box to calculate with</param>
         /// </summary>
-        public void Calculate(Vector3 target, BoundingBox box)
+        public void Calculate(Vector3 target, BoundingBox box, Vector3 position)
         {
             // Face Value Z
             float vz = Raymath.Vector3Subtract(new Vector3(box.Max.X, target.Y, box.Min.Z), new Vector3(box.Max.X, target.Y, box.Max.Z)).Z;
@@ -36,14 +36,28 @@ namespace uniray_Project
             {
                 // Calculate constraint
                 Value = Math.Abs(Raymath.Vector3DotProduct(target, Vector3.UnitX));
-                Constraint = Vector3.UnitX;
+                if (position.Z < ((box.Min + box.Max) / 2).Z)
+                {
+                    Constraint = Vector3.UnitX;
+                }
+                else
+                {
+                    Constraint = -Vector3.UnitX;
+                }
             }
             // Object is facing X axis
             else
             {
                 // Calculate constraint
                 Value = Math.Abs(Raymath.Vector3DotProduct(target, Vector3.UnitZ));
-                Constraint = Vector3.UnitZ;
+                if (position.X < ((box.Min + box.Max) / 2).X)
+                {
+                    Constraint = Vector3.UnitZ;
+                }
+                else
+                {
+                    Constraint = -Vector3.UnitZ;
+                }
             }
         }
     }

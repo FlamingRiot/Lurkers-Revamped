@@ -225,9 +225,9 @@ namespace uniray_Project
         /// </summary>
         /// <param name="target">Target of the player</param>
         /// <param name="box">Bounding box to calculate with</param>
-        public void CalculateMotionConstraint(Vector3 target, BoundingBox box)
+        public void CalculateMotionConstraint(Vector3 target, BoundingBox box, Vector3 position)
         {
-            this.motionConstraint.Calculate(target, box);
+            this.motionConstraint.Calculate(target, box, position);
         }
     }
 }

@@ -344,8 +344,9 @@ namespace Lurkers_revamped
                     "\nFrame: " + zombies.First().CurrentAnimation.Frame +
                     "\nInventory Index: " + player.InventoryIndex +
                     "\nWeapon Level: " + player.CurrentWeapon.Level +
-                    "\nCamera Target:" + camera.Target.ToString() + 
-                    "\nMotion Constraint: " + player.MotionConstraint.Value
+                    "\nCamera Target:" + camera.Target.ToString() +
+                    "\nMotion Constraint: " + player.MotionConstraint.Value +
+                    "\nConstraint: " + player.MotionConstraint.Constraint
                     , 200, 200, 20, Color.Red);
 #endif
 
@@ -436,8 +437,12 @@ namespace Lurkers_revamped
             {
                 // Normalize vector
                 movement = Vector3Normalize(movement) * speed * player.MotionConstraint.Value;
-                // Block movement according to the motion constraint
-                movement *= player.MotionConstraint.Constraint;
+                // Block movement according to the motion constraint)
+                Console.WriteLine(direction);
+                if (player.MotionConstraint.Constraint.Z == 1 && movement.Z > 0)
+                {
+                    movement *= new Vector3(Math.Abs(player.MotionConstraint.Constraint.X), 0, Math.Abs(player.MotionConstraint.Constraint.Z));
+                }
                 // Limit the movement to X and Z axis and normalize
                 movement = new Vector3(movement.X, 0.0f, movement.Z);
             }
@@ -546,7 +551,7 @@ namespace Lurkers_revamped
                 {
                     Vector3 cf = GetCameraForward(ref camera);
                     // Calculate the motion constraint corresponding to the angle between target and box
-                    player.CalculateMotionConstraint(new Vector3(cf.X, 0, cf.Z), staticBox);
+                    player.CalculateMotionConstraint(new Vector3(cf.X, 0, cf.Z), staticBox, camera.Position);
 
                     hit = true;
                 }
