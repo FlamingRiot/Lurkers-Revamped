@@ -230,7 +230,7 @@ namespace Lurkers_revamped
                 // Add current position
                 player.MinBox += camera.Position;
                 player.MaxBox += camera.Position;
-                CheckCollisionPlayer(player.Box, staticBoxes);
+                CheckCollisionPlayer(player.Box, staticBoxes, player, camera);
 #if DEBUG
                 // Draw player's bounding box
                 DrawBoundingBox(player.Box, Color.Red);
@@ -343,7 +343,8 @@ namespace Lurkers_revamped
                     "\nJump Force: " + player.VJump +
                     "\nFrame: " + zombies.First().CurrentAnimation.Frame +
                     "\nInventory Index: " + player.InventoryIndex +
-                    "\nWeapon Level: " + player.CurrentWeapon.Level
+                    "\nWeapon Level: " + player.CurrentWeapon.Level +
+                    "\nCamera Target:" + camera.Target.ToString()
                     , 200, 200, 20, Color.Red);
 #endif
 
@@ -524,7 +525,7 @@ namespace Lurkers_revamped
         /// </summary>
         /// <param name="playerBox">Player Bounding Box</param>
         /// <param name="boxes">Static objects Bounding Boxes</param>
-        static void CheckCollisionPlayer(BoundingBox playerBox, List<BoundingBox> boxes)
+        static void CheckCollisionPlayer(BoundingBox playerBox, List<BoundingBox> boxes, Player player, Camera3D camera)
         {
             // Loop over all the static objects
             foreach (BoundingBox staticBox in boxes)
@@ -535,7 +536,9 @@ namespace Lurkers_revamped
                 // Check individual collision
                 if (CheckCollisionBoxes(playerBox, staticBox))
                 {
-                    Console.WriteLine(GetTime());
+                    Vector3 cf = GetCameraForward(ref camera);
+                    // Calculate the motion constraint corresponding to the angle between target and box
+                    player.MotionConstraint.Calculate(new Vector3(cf.X, 0, cf.Z), staticBox);
                 }
             }
         }

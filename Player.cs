@@ -49,6 +49,10 @@ namespace uniray_Project
         /// </summary>
         private BoundingBox box;
         /// <summary>
+        /// Motion constraint of the player
+        /// </summary>
+        private MotionConstraint motionConstraint;
+        /// <summary>
         /// The inventory of the player
         /// </summary>
         private List<Weapon> inventory;
@@ -88,6 +92,10 @@ namespace uniray_Project
         /// The collision of the player ray
         /// </summary>
         public RayCollision RayCollision { get { return rayCollision; } set { rayCollision = value; } }
+        /// <summary>
+        /// Motion constraint of the player
+        /// </summary>
+        public MotionConstraint MotionConstraint { get { return motionConstraint; } set { motionConstraint = value; } }
         /// <summary>
         /// The hit attribute of the rayCollision object
         /// </summary>
