@@ -1,12 +1,15 @@
 ﻿using Raylib_cs;
+using UnirayEngine;
 using static Raylib_cs.Raylib;
 namespace uniray_Project
 {
-    public class RLoading
+    public unsafe class RLoading
     {
         public RLoading() 
         {
+            Console.ForegroundColor = ConsoleColor.Green;
             TraceLog(TraceLogLevel.Info, "New RLoading instance launched");
+            Console.ForegroundColor = ConsoleColor.White;
         }
         /// <summary>
         /// Load rigged models
@@ -43,6 +46,56 @@ namespace uniray_Project
             };
             // Return the dictionary
             return textures;
+        }
+        /// <summary>
+        /// Load all the utilities 3D models
+        /// </summary>
+        /// <returns>The dictionary containing all the loaded models</returns>
+        public Dictionary<string, Model> LoadUtilities()
+        {
+            // Initialize the models dictionary 
+            Dictionary<string, Model> models = new Dictionary<string, Model>();
+
+            // Load Rifle Model
+            Model rifle = LoadModel("../../models/rifle.m3d");
+
+            models.Add("rifle", rifle);
+
+            // Load Rifle Model
+            Model rifleSplash = LoadModel("../../models/rifle_splash.m3d");
+
+            models.Add("rifle_splash", rifleSplash);
+
+            return models;
+        }
+        /// <summary>
+        /// Load animation list from m3d file
+        /// </summary>
+        /// <param name="animation">The path to the file</param>
+        /// <returns>The list of the animations</returns>
+        public List<Animation> LoadAnimationList(string animation)
+        {
+            // Load animations into the RAM from the m3d file
+            int animCount = 0;
+            ModelAnimation* animations = LoadModelAnimations(animation, ref animCount);
+            // Create and fill animation list 
+            List<Animation> list = new List<Animation>();
+            for (int i = 0; i < animCount; i++)
+            {
+                list.Add(new Animation(animations[i]));
+            }
+            return list;
+        }
+        /// <summary>
+        /// Load the list of static boxes from the current scene's game objects
+        /// </summary>
+        /// <param name="gos"></param>
+        /// <returns></returns>
+        public List<BoundingBox> LoadStaticBoxes(List<GameObject3D> gos)
+        {
+            List<BoundingBox> boxes = new List<BoundingBox>();
+
+            return boxes;
         }
     }
 }

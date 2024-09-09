@@ -56,13 +56,16 @@ namespace Lurkers_revamped
             SetWorkdir(newDir);
             //ChangeDirectory()
             // Load dictionary of utilities (weapons, meds, etc.)
-            Dictionary<string, Model> utilities = LoadUtilities();
+            Dictionary<string, Model> utilities = rLoading.LoadUtilities();
 
             // Load rigged models
             Dictionary<string, Model> rigged = rLoading.LoadRigged();
 
             // Load UI textures and set permanent Screen Infos
             Dictionary<string, Texture2D> UITextures = rLoading.LoadUITextures();
+
+            // Load static objects' boundind box
+            List<BoundingBox> staticBoxes = rLoading.LoadStaticBoxes(GetCurrentScene().GameObjects);
 
             // Set the working directory back to its original value 
             SetWorkdir(workdir);
@@ -84,8 +87,8 @@ namespace Lurkers_revamped
             UnloadTexture(panorama);
 
             // Load animation lists
-            List<Animation> rifleAnims = LoadAnimationList("src/animations/rifle.m3d");
-            List<Animation> zombieAnims = LoadAnimationList("src/animations/walker.m3d");
+            List<Animation> rifleAnims = rLoading.LoadAnimationList("src/animations/rifle.m3d");
+            List<Animation> zombieAnims = rLoading.LoadAnimationList("src/animations/walker.m3d");
 
             // Create player and its object dependancies
             Player player = new Player("Anonymous254", new Weapon("Lambert Niv. 1", "rifle", 50, 1), rifleAnims[1]);
@@ -431,45 +434,6 @@ namespace Lurkers_revamped
                     camera.Position.Y = (float)Math.Round(camera.Position.Y, 3);
                 }
             }
-        }
-        /// <summary>
-        /// Load animation list from m3d file
-        /// </summary>
-        /// <param name="animation">The path to the file</param>
-        /// <returns>The list of the animations</returns>
-        static List<Animation> LoadAnimationList(string animation)
-        {
-            // Load animations into the RAM from the m3d file
-            int animCount = 0;
-            ModelAnimation* animations = LoadModelAnimations(animation, ref animCount);
-            // Create and fill animation list 
-            List<Animation> list = new List<Animation>();
-            for (int i = 0; i < animCount; i++) 
-            {
-                list.Add(new Animation(animations[i]));
-            }
-            return list;
-        }
-        /// <summary>
-        /// Load all the utilities 3D models
-        /// </summary>
-        /// <returns>The dictionary containing all the loaded models</returns>
-        static Dictionary<string, Model> LoadUtilities()
-        {
-            // Initialize the models dictionary 
-            Dictionary<string, Model> models = new Dictionary<string, Model>();
-
-            // Load Rifle Model
-            Model rifle = LoadModel("../../models/rifle.m3d");
-   
-            models.Add("rifle", rifle);
-
-            // Load Rifle Model
-            Model rifleSplash = LoadModel("../../models/rifle_splash.m3d");
-
-            models.Add("rifle_splash", rifleSplash);
-
-            return models;
         }
         /// <summary>
         /// Tick the player events
