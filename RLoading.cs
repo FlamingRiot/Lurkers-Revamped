@@ -94,7 +94,27 @@ namespace uniray_Project
         public List<BoundingBox> LoadStaticBoxes(List<GameObject3D> gos)
         {
             List<BoundingBox> boxes = new List<BoundingBox>();
+            
+            for (int i = 0; i < gos.Count; i++)
+            {
+                // Load the box only for UModels
+                if (gos[i] is UModel)
+                {
+                    // Load model from the mesh
+                    Model model = LoadModelFromMesh(((UModel)gos[i]).Mesh);
+                    // Load the box from the model
+                    BoundingBox box = GetModelBoundingBox(model);
+                    // Add the go's position
+                    box.Min += gos[i].Position;
+                    box.Max += gos[i].Position;
 
+
+                    boxes.Add(box);
+                    // Unload the model
+                    //UnloadModel(model);
+                }
+            }
+            // Return all the models
             return boxes;
         }
     }

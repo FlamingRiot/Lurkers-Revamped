@@ -5,6 +5,7 @@ using System.Numerics;
 using static UnirayEngine.UnirayEngine;
 using uniray_Project;
 using System.Text;
+using UnirayEngine;
 
 namespace Lurkers_revamped
 {
@@ -65,7 +66,7 @@ namespace Lurkers_revamped
             Dictionary<string, Texture2D> UITextures = rLoading.LoadUITextures();
 
             // Load static objects' boundind box
-            List<BoundingBox> staticBoxes = rLoading.LoadStaticBoxes(GetCurrentScene().GameObjects);
+            List<BoundingBox> staticBoxes = rLoading.LoadStaticBoxes(CurrentScene.GameObjects);
 
             // Set the working directory back to its original value 
             SetWorkdir(workdir);
@@ -203,13 +204,6 @@ namespace Lurkers_revamped
                 // Update the player event handler
                 TickPlayer(player, rifleAnims, ref camera, ref crosshairColor, shaders, terrain, terrainTransform);
 
-                // Check collisions between the player and the static objects
-
-                // Add current position
-                player.MinBox += camera.Position;
-                player.MaxBox += camera.Position;
-                CheckCollisionPlayer(player.Box, staticBoxes);
-
                 // Update the screen center (info displayer)
                 screen.Tick();
 
@@ -232,6 +226,11 @@ namespace Lurkers_revamped
                 // Draw terrain
                 DrawMesh(terrain, terrainMaterial, terrainTransform);
 
+                // Check collisions between the player and the static objects
+                // Add current position
+                player.MinBox += camera.Position;
+                player.MaxBox += camera.Position;
+                CheckCollisionPlayer(player.Box, staticBoxes);
 #if DEBUG
                 // Draw player's bounding box
                 DrawBoundingBox(player.Box, Color.Red);
@@ -333,6 +332,20 @@ namespace Lurkers_revamped
 
                 // Draw screen infos
                 screen.DrawScreenInfos();
+#if DEBUG
+                foreach (UModel mod in CurrentScene.GameObjects.Where(x => x is UModel))
+                {
+                    DrawText(mod.Yaw.ToString(), (int)GetWorldToScreen(mod.Position, camera).X, (int)GetWorldToScreen(mod.Position, camera).Y, 20, Color.Green);
+                }
+
+                // Debug positions
+                DrawText("Position: " + camera.Position.ToString() +
+                    "\nJump Force: " + player.VJump +
+                    "\nFrame: " + zombies.First().CurrentAnimation.Frame +
+                    "\nInventory Index: " + player.InventoryIndex +
+                    "\nWeapon Level: " + player.CurrentWeapon.Level
+                    , 200, 200, 20, Color.Red);
+#endif
 
                 DrawFPS(0, 0);
 
@@ -341,14 +354,6 @@ namespace Lurkers_revamped
 
                 // Draw crosshair
                 DrawTexture(UITextures["crosshair"], GetScreenWidth() / 2 - UITextures["crosshair"].Width / 2, GetScreenHeight() / 2 - UITextures["crosshair"].Height / 2, crosshairColor);
-
-                // Debug positions
-                DrawText("Position: " + camera.Position.ToString() + 
-                    "\nJump Force: " + player.VJump + 
-                    "\nFrame: " + zombies.First().CurrentAnimation.Frame + 
-                    "\nInventory Index: " + player.InventoryIndex + 
-                    "\nWeapon Level: " + player.CurrentWeapon.Level
-                    , 200, 200, 20, Color.Red);
 
                 // End drawing context
                 EndDrawing();
@@ -524,10 +529,13 @@ namespace Lurkers_revamped
             // Loop over all the static objects
             foreach (BoundingBox staticBox in boxes)
             {
+#if DEBUG
+                DrawBoundingBox(staticBox, Color.Red);
+#endif
                 // Check individual collision
                 if (CheckCollisionBoxes(playerBox, staticBox))
                 {
-                    
+                    Console.WriteLine(GetTime());
                 }
             }
         }
