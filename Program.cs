@@ -344,7 +344,8 @@ namespace Lurkers_revamped
                     "\nFrame: " + zombies.First().CurrentAnimation.Frame +
                     "\nInventory Index: " + player.InventoryIndex +
                     "\nWeapon Level: " + player.CurrentWeapon.Level +
-                    "\nCamera Target:" + camera.Target.ToString()
+                    "\nCamera Target:" + camera.Target.ToString() + 
+                    "\nMotion Constraint: " + player.MotionConstraint.Value
                     , 200, 200, 20, Color.Red);
 #endif
 
@@ -538,7 +539,9 @@ namespace Lurkers_revamped
                 {
                     Vector3 cf = GetCameraForward(ref camera);
                     // Calculate the motion constraint corresponding to the angle between target and box
-                    player.MotionConstraint.Calculate(new Vector3(cf.X, 0, cf.Z), staticBox);
+                    player.CalculateMotionConstraint(new Vector3(cf.X, 0, cf.Z), staticBox);
+
+                    //break;
                 }
             }
         }

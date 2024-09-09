@@ -189,6 +189,9 @@ namespace uniray_Project
             // Set the player's default Bounding box dimensions
             MaxBox = new Vector3(0.5f, 0, 0.5f);
             MinBox = new Vector3(-0.5f, -3, -0.5f);
+
+            // Set default motion constraint
+            this.motionConstraint.Value = 1;
         }
         /// <summary>
         /// Add a weapon to the inventory of the player
@@ -215,6 +218,15 @@ namespace uniray_Project
             // Set the player's default Bounding box dimensions
             MaxBox = new Vector3(0.5f, 0, 0.5f);
             MinBox = new Vector3(-0.5f, -3, -0.5f);
+        }
+        /// <summary>
+        /// Calculate motion constraint of the player
+        /// </summary>
+        /// <param name="target">Target of the player</param>
+        /// <param name="box">Bounding box to calculate with</param>
+        public void CalculateMotionConstraint(Vector3 target, BoundingBox box)
+        {
+            this.motionConstraint.Calculate(target, box);
         }
     }
 }
