@@ -45,6 +45,10 @@ namespace uniray_Project
         /// </summary>
         private RayCollision rayCollision;
         /// <summary>
+        /// Bouding box of the player
+        /// </summary>
+        private BoundingBox box;
+        /// <summary>
         /// The inventory of the player
         /// </summary>
         private List<Weapon> inventory;
@@ -100,6 +104,18 @@ namespace uniray_Project
         /// The position of the ray
         /// </summary>
         public Vector3 RayPosition { get { return ray.Position; } set { ray.Position = value; } }
+        /// <summary>
+        /// Min value of the player's bounding box
+        /// </summary>
+        public Vector3 MinBox { get { return box.Min; } set { box.Min = value; } }
+        /// <summary>
+        /// Max value of the player's bounding box
+        /// </summary>
+        public Vector3 MaxBox { get { return box.Max; } set { box.Max = value; } }
+        /// <summary>
+        /// The player's bounding box
+        /// </summary>
+        public BoundingBox Box { get { return box; } }
         /// <summary>
         /// The secondary state of the player
         /// </summary>
@@ -161,6 +177,10 @@ namespace uniray_Project
             this.currentAnimation = currentAnimation;
             // Set player ray direction
             RayDirection = -Vector3.UnitY;
+
+            // Set the player's default Bounding box dimensions
+            MaxBox = new Vector3(0.5f, 0, 0.5f);
+            MinBox = new Vector3(-0.5f, -3, -0.5f);
         }
         /// <summary>
         /// Add a weapon to the inventory of the player
@@ -178,6 +198,15 @@ namespace uniray_Project
         {
             InventoryIndex = index;
             CurrentWeapon = inventory[InventoryIndex];
+        }
+        /// <summary>
+        /// Reset the box's dimensions
+        /// </summary>
+        public void ResetBox()
+        {
+            // Set the player's default Bounding box dimensions
+            MaxBox = new Vector3(0.5f, 0, 0.5f);
+            MinBox = new Vector3(-0.5f, -3, -0.5f);
         }
     }
 }

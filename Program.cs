@@ -203,6 +203,13 @@ namespace Lurkers_revamped
                 // Update the player event handler
                 TickPlayer(player, rifleAnims, ref camera, ref crosshairColor, shaders, terrain, terrainTransform);
 
+                // Check collisions between the player and the static objects
+
+                // Add current position
+                player.MinBox += camera.Position;
+                player.MaxBox += camera.Position;
+                CheckCollisionPlayer(player.Box, staticBoxes);
+
                 // Update the screen center (info displayer)
                 screen.Tick();
 
@@ -225,6 +232,10 @@ namespace Lurkers_revamped
                 // Draw terrain
                 DrawMesh(terrain, terrainMaterial, terrainTransform);
 
+#if DEBUG
+                // Draw player's bounding box
+                DrawBoundingBox(player.Box, Color.Red);
+#endif
                 // Draw the gameobjects of the environment (from Uniray)
                 DrawScene();
 
@@ -341,6 +352,9 @@ namespace Lurkers_revamped
 
                 // End drawing context
                 EndDrawing();
+
+                // Reset the player's box
+                player.ResetBox();
             }
             CloseWindow();
 
@@ -498,6 +512,23 @@ namespace Lurkers_revamped
 
                 // Set player state
                 player.WeaponState = PlayerWeaponState.Taking;
+            }
+        }
+        /// <summary>
+        /// Check collisions between the player and the static objects of the map
+        /// </summary>
+        /// <param name="playerBox">Player Bounding Box</param>
+        /// <param name="boxes">Static objects Bounding Boxes</param>
+        static void CheckCollisionPlayer(BoundingBox playerBox, List<BoundingBox> boxes)
+        {
+            // Loop over all the static objects
+            foreach (BoundingBox staticBox in boxes)
+            {
+                // Check individual collision
+                if (CheckCollisionBoxes(playerBox, staticBox))
+                {
+                    
+                }
             }
         }
         /// <summary>
