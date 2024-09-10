@@ -40,7 +40,7 @@ namespace Lurkers_revamped
 
             // Define 3D camera
             Camera3D camera = new Camera3D();
-            camera.Position = new Vector3(3.0f, 3.0f, 3.0f);
+            camera.Position = new Vector3(9.0f, 3.0f, -15.0f);
             camera.Target = new Vector3(3.0f, 3.0f, 0.0f);
             camera.Up = Vector3.UnitY;
             camera.Projection = CameraProjection.Perspective;
@@ -129,11 +129,12 @@ namespace Lurkers_revamped
             // Crosshair color variable
             Color crosshairColor = Color.White;
 
+
+            audio.PlayMusic("reapers");
+
             // Set target FPS
             SetTargetFPS(60);
             DisableCursor();
-
-            audio.PlayMusic("reapers");
             // Game Loop
             while (!WindowShouldClose())
             {
@@ -206,7 +207,7 @@ namespace Lurkers_revamped
                 UpdateModelAnimation(utilities[player.CurrentWeapon.ModelID], player.CurrentAnimation.Anim, player.CurrentAnimation.UpdateFrame());
 
                 // Update the player event handler
-                TickPlayer(player, rifleAnims, ref camera, ref crosshairColor, shaders, terrain, terrainTransform);
+                TickPlayer(player, rifleAnims, ref crosshairColor, shaders);
 
                 // Update the screen center (info displayer)
                 screen.Tick();
@@ -288,11 +289,11 @@ namespace Lurkers_revamped
                             }
                             break;
                     }
-
+#if DEBUG
                     // Debug bone drawing
-                    // Vector3 posA = RotateNormalizedBone(zombie.CurrentAnimation.Anim.FramePoses[zombie.CurrentAnimation.Frame][5].Translation, zombie.Angle, zombie.Position);
-                    //DrawSphere(posA, 0.3f, Color.Red);
-
+                    Vector3 posA = RotateNormalizedBone(zombie.CurrentAnimation.Anim.FramePoses[zombie.CurrentAnimation.Frame][5].Translation, zombie.Angle, zombie.Position);
+                    DrawSphere(posA, 0.3f, Color.Red);
+#endif
                     // Move and rotate the zombie if running
                     if (zombie.State == ZombieState.Running)
                     {
@@ -467,7 +468,7 @@ namespace Lurkers_revamped
         /// Tick the player events
         /// </summary>
         /// <param name="player">The player to check</param>
-        static void TickPlayer(Player player, List<Animation> anims, ref Camera3D camera, ref Color crosshairColor, ShaderCenter shaders, Mesh terrain, Matrix4x4 transform)
+        static void TickPlayer(Player player, List<Animation> anims, ref Color crosshairColor, ShaderCenter shaders)
         {
             // Manager input events
             // Reload event

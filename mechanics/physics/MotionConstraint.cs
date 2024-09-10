@@ -5,8 +5,10 @@ namespace uniray_Project
 {
     public struct MotionConstraint
     {
-        // Default motion constraint object
-        public static readonly MotionConstraint Default = new MotionConstraint()
+        /// <summary>
+        /// Default MotionConstraint object
+        /// </summary>
+        public static readonly MotionConstraint Default = new()
         {
             Value = 1,
             Constraint = new Vector3(1f, 0f, 1f)
@@ -14,7 +16,7 @@ namespace uniray_Project
         /// <summary>
         /// Intensity of the constraint
         /// </summary>
-        public float Value { get; set;  }
+        public float Value { get; set; }
         /// <summary>
         /// Constraint vector of the object
         /// </summary>
