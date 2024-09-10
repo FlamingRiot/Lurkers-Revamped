@@ -23,7 +23,7 @@ namespace uniray_Project
         /// <summary>
         /// Player's jump force
         /// </summary>
-        public const float JUMP_FORCE = 0.5f; 
+        public const float JUMP_FORCE = 0.3f; 
         /// <summary>
         /// The time delay for the player's actions
         /// </summary>
