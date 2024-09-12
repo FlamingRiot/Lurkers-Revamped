@@ -129,7 +129,6 @@ namespace Lurkers_revamped
             // Crosshair color variable
             Color crosshairColor = Color.White;
 
-
             audio.PlayMusic("reapers");
 
             // Set target FPS
