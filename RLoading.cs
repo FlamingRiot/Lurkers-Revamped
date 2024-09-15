@@ -1,23 +1,17 @@
 ﻿using Raylib_cs;
 using UnirayEngine;
+using uniray_Project;
 using static Raylib_cs.Raylib;
 using System.Numerics;
 
-namespace uniray_Project
+namespace Lurkers_revamped
 {
-    public unsafe class RLoading
+    /// <summary>Loading instance used to centralize all the GPU loading actions provided by Raylib</summary>
+    public unsafe struct RLoading
     {
-        public RLoading() 
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            TraceLog(TraceLogLevel.Info, "New RLoading instance launched");
-            Console.ForegroundColor = ConsoleColor.White;
-        }
-        /// <summary>
-        /// Load rigged models
-        /// </summary>
+        /// <summary>Loads the rigged (animation-ready) complex character models</summary>
         /// <returns>The dictionary of rigged models</returns>
-        public Dictionary<string, Model> LoadRigged()
+        public static Dictionary<string, Model> LoadRigged()
         {
             Dictionary<string, Model> rigged = new Dictionary<string, Model>()
             {
@@ -27,11 +21,9 @@ namespace uniray_Project
             return rigged;
         }
 
-        /// <summary>
-        /// Load UI textures (screen textures)
-        /// </summary>
-        /// <returns></returns>
-        public Dictionary<string, Texture2D> LoadUITextures()
+        /// <summary>Loads the textures used for 2D rendering on the screen</summary>
+        /// <returns>The list of loaded textures</returns>
+        public static Dictionary<string, Texture2D> LoadUITextures()
         {
             Dictionary<string, Texture2D> textures = new Dictionary<string, Texture2D>()
             {
@@ -49,11 +41,10 @@ namespace uniray_Project
             // Return the dictionary
             return textures;
         }
-        /// <summary>
-        /// Load all the utilities 3D models
-        /// </summary>
+
+        /// <summary>Loads the utilities, which consist of various game objects that do not include animations</summary>
         /// <returns>The dictionary containing all the loaded models</returns>
-        public Dictionary<string, Model> LoadUtilities()
+        public static Dictionary<string, Model> LoadUtilities()
         {
             // Initialize the models dictionary 
             Dictionary<string, Model> models = new Dictionary<string, Model>();
@@ -70,12 +61,11 @@ namespace uniray_Project
 
             return models;
         }
-        /// <summary>
-        /// Load animation list from m3d file
-        /// </summary>
-        /// <param name="animation">The path to the file</param>
-        /// <returns>The list of the animations</returns>
-        public List<Animation> LoadAnimationList(string animation)
+
+        /// <summary>Loads animation list from .m3d file</summary>
+        /// <param name="animation">Relative path to the file containg the animations</param>
+        /// <returns>The list of the animations contained in the file</returns>
+        public static List<Animation> LoadAnimationList(string animation)
         {
             // Load animations into the RAM from the m3d file
             int animCount = 0;
@@ -88,12 +78,11 @@ namespace uniray_Project
             }
             return list;
         }
-        /// <summary>
-        /// Load the list of static boxes from the current scene's game objects
-        /// </summary>
-        /// <param name="gos"></param>
-        /// <returns></returns>
-        public List<BoundingBox> LoadStaticBoxes(List<GameObject3D> gos)
+
+        /// <summary>Loads the list of static boxes from the current scene's game objects</summary>
+        /// <param name="gos">The game objects to use to load the static bounding-boxes</param>
+        /// <returns>The list of bounding boxes corresponding to the passed game objects</returns>
+        public static List<BoundingBox> LoadStaticBoxes(List<GameObject3D> gos)
         {
             List<BoundingBox> boxes = new List<BoundingBox>();
             
@@ -127,6 +116,18 @@ namespace uniray_Project
             }
             // Return all the models
             return boxes;
+        }
+
+        /// <summary>Generates the base terrain for the game</summary>
+        /// <returns>The generated terrain with the material, mesh and transform already set and loaded</returns>
+        public static Terrain GenTerrain()
+        {
+            Mesh mesh = GenMeshPlane(1, 1, 1, 1);
+            Material mat = LoadMaterialDefault();
+            SetMaterialTexture(ref mat, MaterialMapIndex.Diffuse, LoadTexture("src/textures/terrain.png"));
+            Matrix4x4 transform = Raymath.MatrixScale(250, 250, 250);
+
+            return new Terrain(mesh, mat, transform);
         }
     }
 }

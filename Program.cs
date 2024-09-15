@@ -5,7 +5,6 @@ using System.Numerics;
 using static UnirayEngine.UnirayEngine;
 using uniray_Project;
 using System.Text;
-using UnirayEngine;
 
 namespace Lurkers_revamped
 {
@@ -25,9 +24,6 @@ namespace Lurkers_revamped
 
             // Init the Uniray engine background code 
             InitEngine();
-
-            // Init RLoading instance
-            RLoading rLoading = new RLoading();
 
             // Init Audio Center
             AudioCenter audio = new AudioCenter();
@@ -57,26 +53,23 @@ namespace Lurkers_revamped
             SetWorkdir(newDir);
             //ChangeDirectory()
             // Load dictionary of utilities (weapons, meds, etc.)
-            Dictionary<string, Model> utilities = rLoading.LoadUtilities();
+            Dictionary<string, Model> utilities = RLoading.LoadUtilities();
 
             // Load rigged models
-            Dictionary<string, Model> rigged = rLoading.LoadRigged();
+            Dictionary<string, Model> rigged = RLoading.LoadRigged();
 
             // Load UI textures and set permanent Screen Infos
-            Dictionary<string, Texture2D> UITextures = rLoading.LoadUITextures();
+            Dictionary<string, Texture2D> UITextures = RLoading.LoadUITextures();
 
             // Load static objects' boundind box
-            List<BoundingBox> staticBoxes = rLoading.LoadStaticBoxes(CurrentScene.GameObjects);
+            List<BoundingBox> staticBoxes = RLoading.LoadStaticBoxes(CurrentScene.GameObjects);
 
             // Set the working directory back to its original value 
             SetWorkdir(workdir);
 
             // Load terrain
-            Mesh terrain = GenMeshPlane(1, 1, 1, 1);
-            Material terrainMaterial = LoadMaterialDefault();
-            SetMaterialTexture(ref terrainMaterial, MaterialMapIndex.Diffuse, LoadTexture("src/textures/terrain.png"));
-            terrainMaterial.Shader = shaders.TilingShader;
-            Matrix4x4 terrainTransform = MatrixScale(250, 250, 250);
+            Terrain terrain = RLoading.GenTerrain();
+            terrain.SetShader(shaders.TilingShader);
 
             // Load skybox
             Mesh skybox = GenMeshCube(1, 1, 1);
@@ -88,8 +81,8 @@ namespace Lurkers_revamped
             UnloadTexture(panorama);
 
             // Load animation lists
-            List<Animation> rifleAnims = rLoading.LoadAnimationList("src/animations/rifle.m3d");
-            List<Animation> zombieAnims = rLoading.LoadAnimationList("src/animations/walker.m3d");
+            List<Animation> rifleAnims = RLoading.LoadAnimationList("src/animations/rifle.m3d");
+            List<Animation> zombieAnims = RLoading.LoadAnimationList("src/animations/walker.m3d");
 
             // Create player and its object dependancies
             Player player = new Player("Anonymous254", new Weapon("Lambert Niv. 1", "rifle", 50, 1), rifleAnims[1]);
@@ -228,7 +221,7 @@ namespace Lurkers_revamped
                 Rlgl.EnableDepthMask();
 
                 // Draw terrain
-                DrawMesh(terrain, terrainMaterial, terrainTransform);
+                DrawMesh(terrain.Mesh, terrain.Material, terrain.Transform);
 
                 // Check collisions between the player and the static objects
                 // Add current position
