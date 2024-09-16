@@ -41,10 +41,8 @@ namespace Lurkers_revamped
             camera.Up = Vector3.UnitY;
             camera.Projection = CameraProjection.Perspective;
             camera.FovY = 60f;
-            // Camera additional variables
-            float yaw = 0.0f;
-            float pitch = 0.0f;
-            float sideShake = 0.0f;
+            // Additional camera motion data
+            CameraMotion cameraMotion = new CameraMotion();
 
             // Change the current directory so the embedded materials from the models can be loaded successfully
             sbyte* dir = GetApplicationDirectory();
@@ -92,7 +90,8 @@ namespace Lurkers_revamped
             // Create list of zombies
             List<Zombie> zombies = new List<Zombie>()
             {
-                new Zombie(new Vector3(-10, 0, 2), "cop", zombieAnims[8])
+                new Zombie(new Vector3(-10, 0, 2), "cop", zombieAnims[8]),
+                new Zombie(new Vector3(10, 0, 2), "cop", zombieAnims[8])
             };
 
             // Load UI Fonts
@@ -128,7 +127,7 @@ namespace Lurkers_revamped
                 audio.UpdateMusic("reapers");
 
                 // Update the camera
-                UpdateCamera(ref camera, 0.3f, ref yaw, ref pitch, ref sideShake, player);
+                UpdateCamera(ref camera, ref cameraMotion, player);
 
                 // Update the current animation of the player
                 switch (player.WeaponState)
@@ -230,7 +229,7 @@ namespace Lurkers_revamped
                 DrawScene();
 
                 // Transform the player's current model
-                Matrix4x4 mTransform = TransformPlayer(yaw, pitch, sideShake);
+                Matrix4x4 mTransform = TransformPlayer(cameraMotion.Yaw, cameraMotion.Pitch, cameraMotion.SideShake);
 
                 // Assign new rotation matrix to the model
                 utilities[player.CurrentWeapon.ModelID] = SetModelTransform(utilities[player.CurrentWeapon.ModelID], mTransform);
@@ -376,21 +375,21 @@ namespace Lurkers_revamped
         /// <param name="speed">The camera speed</param>
         /// <param name="yaw">The camera yaw rotation</param>
         /// <param name="pitch">The camera pithc rotation</param>
-        static void UpdateCamera(ref Camera3D camera, float speed, ref float yaw, ref float pitch, ref float sideShake, Player player)
+        static void UpdateCamera(ref Camera3D camera, ref CameraMotion cameraMotion, Player player)
         {
             // Calculate the camera rotation
             Vector2 mouse = GetMouseDelta();
-            yaw -= mouse.X * 0.003f;
-            pitch -= mouse.Y * 0.003f;
+            cameraMotion.Yaw -= mouse.X * 0.003f;
+            cameraMotion.Pitch -= mouse.Y * 0.003f;
 
-            pitch = Math.Clamp(pitch, -1.5f, 1.5f);
+            cameraMotion.Pitch = Math.Clamp(cameraMotion.Pitch, -1.5f, 1.5f);
 
             // Calculate camera direction
             Vector3 direction;
-            direction.X = (float)(Math.Cos(pitch) * Math.Sin(yaw));
-            direction.Y = (float)Math.Sin(pitch);
+            direction.X = (float)(Math.Cos(cameraMotion.Pitch) * Math.Sin(cameraMotion.Yaw));
+            direction.Y = (float)Math.Sin(cameraMotion.Pitch);
             //direction.Y = 0;
-            direction.Z = (float)(Math.Cos(pitch) * Math.Cos(yaw));
+            direction.Z = (float)(Math.Cos(cameraMotion.Pitch) * Math.Cos(cameraMotion.Yaw));
 
             // Calculate the camera movement
             Vector3 movement = Vector3.Zero;
@@ -406,24 +405,24 @@ namespace Lurkers_revamped
             if (IsKeyDown(KeyboardKey.D))
             {
                 movement += GetCameraRight(ref camera);
-                if (sideShake < 0.15f) sideShake += 0.01f;
+                if (cameraMotion.SideShake < 0.15f) cameraMotion.SideShake += 0.01f;
             }
             if (IsKeyDown(KeyboardKey.A))
             {
                 movement -= GetCameraRight(ref camera);
-                if (sideShake > -0.15f) sideShake -= 0.01f;
+                if (cameraMotion.SideShake > -0.15f) cameraMotion.SideShake -= 0.01f;
             }
             if (IsKeyUp(KeyboardKey.A) && IsKeyUp(KeyboardKey.D))
             {
-                if (sideShake < 0.0f) sideShake += 0.01f;
-                else if (sideShake > 0.0f) sideShake -= 0.01f;
+                if (cameraMotion.SideShake < 0.0f) cameraMotion.SideShake += 0.01f;
+                else if (cameraMotion.SideShake > 0.0f) cameraMotion.SideShake -= 0.01f;
             }
 
             // Final movement transformations
             if (Vector3Length(movement) > 0)
             {
                 // Normalize vector
-                movement = Vector3Normalize(movement) * speed * player.MotionConstraint.Value;
+                movement = Vector3Normalize(movement) * Player.SPEED * player.MotionConstraint.Value;
                 // Block movement according to the motion constraint
                 AddConstraintMovement(ref movement, player.MotionConstraint.Constraint);
                 // Limit the movement to X and Z axis and normalize

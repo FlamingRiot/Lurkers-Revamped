@@ -1,5 +1,7 @@
 ﻿using System.Numerics;
 using Raylib_cs;
+using Lurkers_revamped;
+
 namespace uniray_Project
 {
     public enum PlayerWeaponState
@@ -20,10 +22,12 @@ namespace uniray_Project
     }
     public class Player
     {
-        /// <summary>
-        /// Player's jump force
-        /// </summary>
-        public const float JUMP_FORCE = 0.3f; 
+        /// <summary>Player's max jump force</summary>
+        public static readonly float JUMP_FORCE = 0.3f;
+
+        /// <summary>Player's base movement speed</summary>
+        public static readonly float SPEED = 0.2f;
+
         /// <summary>
         /// The time delay for the player's actions
         /// </summary>
