@@ -110,8 +110,6 @@ namespace Lurkers_revamped
 
 
                     boxes.Add(box);
-                    // Unload the model
-                    //UnloadModel(model);
                 }
             }
             // Return all the models
@@ -128,6 +126,19 @@ namespace Lurkers_revamped
             Matrix4x4 transform = Raymath.MatrixScale(250, 250, 250);
 
             return new Terrain(mesh, mat, transform);
+        }
+
+        /// <summary>Generates the general skybox for the game</summary>
+        /// <returns>The generated mesh corresponding to the skybox. Background texturing and loading is done as well</returns>
+        public static Mesh GenSkybox(ShaderCenter shaders)
+        {
+            Mesh skybox = GenMeshCube(1, 1, 1);
+            Texture2D panorama = LoadTexture("src/textures/skyboxes/skybox.hdr");
+            Texture2D cubemap = shaders.GenTexureCubemap(panorama, 256, PixelFormat.UncompressedR8G8B8A8);
+            shaders.SetCubemap(cubemap);
+            UnloadTexture(panorama);
+
+            return skybox;
         }
     }
 }

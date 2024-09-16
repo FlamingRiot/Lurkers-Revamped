@@ -72,13 +72,7 @@ namespace Lurkers_revamped
             terrain.SetShader(shaders.TilingShader);
 
             // Load skybox
-            Mesh skybox = GenMeshCube(1, 1, 1);
-            // Load skybox texture
-            Texture2D panorama = LoadTexture("src/textures/skyboxes/skybox.hdr");
-            Texture2D cubemap = shaders.GenTexureCubemap(panorama, 256, PixelFormat.UncompressedR8G8B8A8);
-            shaders.SetCubemap(cubemap);
-            // Unload useless texture
-            UnloadTexture(panorama);
+            Mesh skybox = RLoading.GenSkybox(shaders);
 
             // Load animation lists
             List<Animation> rifleAnims = RLoading.LoadAnimationList("src/animations/rifle.m3d");
