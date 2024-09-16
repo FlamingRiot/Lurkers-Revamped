@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using Raylib_cs;
 
-namespace uniray_Project
+namespace Lurkers_revamped
 {
     public struct MotionConstraint
     {
