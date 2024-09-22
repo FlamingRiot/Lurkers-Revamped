@@ -90,8 +90,7 @@ namespace Lurkers_revamped
             // Create list of zombies
             List<Zombie> zombies = new List<Zombie>()
             {
-                new Zombie(new Vector3(-10, 0, 2), "cop", zombieAnims[8]),
-                new Zombie(new Vector3(10, 0, 2), "cop", zombieAnims[8])
+                new Zombie(new Vector3(-10, 0, 2), "cop", zombieAnims[8])
             };
 
             // Load UI Fonts
