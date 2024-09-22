@@ -38,37 +38,30 @@ namespace Lurkers_revamped
         /// <param name="box">Bounding box to calculate with</param>
         public void Calculate(Vector3 target, BoundingBox box, Vector3 position)
         {
-            // Face Value Z
-            float vz = Raymath.Vector3Subtract(new Vector3(box.Max.X, target.Y, box.Min.Z), new Vector3(box.Max.X, target.Y, box.Max.Z)).Z;
-            // Face Value X
-            float vx = Raymath.Vector3Subtract(new Vector3(box.Min.X, target.Y, box.Max.Z), new Vector3(box.Max.X, target.Y, box.Max.Z)).X;
-
-            // Object is facing Z axis
-            if (vz > vx)
+            if (position.Z < box.Max.Z && position.Z > box.Min.Z)
             {
-                // Calculate constraint
-                Value = Math.Abs(Raymath.Vector3DotProduct(target, Vector3.UnitX));
-                if (position.Z < ((box.Min + box.Max) / 2).Z)
-                {
-                    Constraint = Vector3.UnitX;
-                }
-                else
-                {
-                    Constraint = -Vector3.UnitX;
-                }
-            }
-            // Object is facing X axis
-            else
-            {
-                // Calculate constraint
                 Value = Math.Abs(Raymath.Vector3DotProduct(target, Vector3.UnitZ));
-                if (position.X < ((box.Min + box.Max) / 2).X)
+
+                if (position.X < box.Min.X)
                 {
                     Constraint = Vector3.UnitZ;
                 }
                 else
                 {
                     Constraint = -Vector3.UnitZ;
+                }
+            }
+            else if (position.X < box.Max.X && position.X > box.Min.X)
+            {
+                Value = Math.Abs(Raymath.Vector3DotProduct(target, Vector3.UnitX));
+
+                if (position.Z < box.Min.Z)
+                {
+                    Constraint = Vector3.UnitX;
+                }
+                else
+                {
+                    Constraint = -Vector3.UnitX;
                 }
             }
         }
