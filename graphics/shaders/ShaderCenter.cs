@@ -6,67 +6,41 @@ namespace uniray_Project
 {
     public unsafe class ShaderCenter
     {
+        /// <summary>Base resolution for shadow map</summary>
         public const int SHADOW_MAP_RESOLUTION = 4096;
 
+        /// <summary>Light View-Projection matrix location in lighting shader</summary>
         private int lightVPLoc;
 
+        /// <summary>Shadow map location in lighting shader</summary>
         private int shadowMapLoc;
 
-        /// <summary>
-        /// The outline shader
-        /// </summary>
-        private Shader outlineShader;
-        /// <summary>
-        /// The material used for the outline shader
-        /// </summary>
-        private Material outlineMaterial;
-        /// <summary>
-        /// The texture-tiling shader for the terrain
-        /// </summary>
-        private Shader tilingShader;
-        /// <summary>
-        /// The skybox shader
-        /// </summary>
-        private Shader skyboxShader;
-        /// <summary>
-        /// The cubemap shader
-        /// </summary>
-        private Shader cubemapShader;
+        // ################### Shaders ###################
+
+        /// <summary>Outline shader</summary>
+        public Shader OutlineShader;
+        
+        /// <summary>The texture-tiling shader for the terrain</summary>
+        public Shader TilingShader;
+
+        /// <summary>Skybox shader</summary>
+        public Shader SkyboxShader;
+        
+        /// <summary>Cubemap shader</summary>
+        public Shader CubemapShader;
 
         /// <summary>Ambient lighting shader</summary>
-        public Shader lightingShader;
+        public Shader LightingShader;
 
-        /// <summary>
-        /// The skybox material
-        /// </summary>
-        private Material skyboxMaterial;
-        /// <summary>
-        /// The outline shader
-        /// </summary>
-        public Shader OutlineShader { get { return outlineShader; } }
-        /// <summary>
-        /// The texture-tiling shader for the terrain
-        /// </summary>
-        public Shader TilingShader { get { return tilingShader; } }
-        /// <summary>
-        /// The skybox shader
-        /// </summary>
-        public Shader SkyboxShader { get { return skyboxShader; } }
-        /// <summary>
-        /// The cubemap generation shader
-        /// </summary>
-        public Shader CubemapShader { get { return cubemapShader; } }
-        /// <summary>
-        /// The outline material
-        /// </summary>
-        public Material OutlineMaterial { get { return outlineMaterial; } }
-        /// <summary>
-        /// The skybox material
-        /// </summary>
-        public Material SkyboxMaterial { get { return skyboxMaterial; } }
-        /// <summary>
-        /// ShaderCenter constructor
-        /// </summary>
+        // ################### Materials ###################
+
+        /// <summary>Skybox material</summary>
+        public Material SkyboxMaterial;
+
+        /// <summary>The material used for the outline shader</summary>
+        public Material OutlineMaterial;
+
+        /// <summary>ShaderCenter constructor</summary>
         public ShaderCenter()
         {
             // Load shaders
@@ -75,19 +49,22 @@ namespace uniray_Project
             LoadMaterials();
         }
 
+        /// <summary>Loads lighting shader and assigns required values</summary>
+        /// <param name="lightDirection">Direction of lighting</param>
+        /// <param name="lightColor">General coloration of lighting</param>
         public void LoadLighting(Vector3 lightDirection, Color lightColor)
         {
             // Load shader
-            lightingShader = LoadShader("src/shaders/lighting.vs", "src/shaders/lighting.fs");
-            lightingShader.Locs[(int)ShaderLocationIndex.VectorView] = GetShaderLocation(lightingShader, "viewPos");
+            LightingShader = LoadShader("src/shaders/lighting.vs", "src/shaders/lighting.fs");
+            LightingShader.Locs[(int)ShaderLocationIndex.VectorView] = GetShaderLocation(LightingShader, "viewPos");
 
             // Retrieve locations from shader code
-            int lightDirLoc = GetShaderLocation(lightingShader, "lightDir");
-            int lightColLoc = GetShaderLocation(lightingShader, "lightColor");
-            int ambientLoc = GetShaderLocation(lightingShader, "ambient");
-            lightVPLoc = GetShaderLocation(lightingShader, "lightVP");
-            shadowMapLoc = GetShaderLocation(lightingShader, "shadowMap");
-            int shadowMapResolutionLoc = GetShaderLocation(lightingShader, "shadowMapResolution");
+            int lightDirLoc = GetShaderLocation(LightingShader, "lightDir");
+            int lightColLoc = GetShaderLocation(LightingShader, "lightColor");
+            int ambientLoc = GetShaderLocation(LightingShader, "ambient");
+            lightVPLoc = GetShaderLocation(LightingShader, "lightVP");
+            shadowMapLoc = GetShaderLocation(LightingShader, "shadowMap");
+            int shadowMapResolutionLoc = GetShaderLocation(LightingShader, "shadowMapResolution");
 
             // Define values
             float[] ambient = new[] { 0.5f, 0.5f, 0.5f, 1.0f };
@@ -95,90 +72,64 @@ namespace uniray_Project
             Vector4 normalizedColor = ColorNormalize(lightColor);
 
             // Set values at shader locations
-            SetShaderValue(lightingShader, lightDirLoc, &lightDirection, ShaderUniformDataType.Vec3);
-            SetShaderValue(lightingShader, lightColLoc, &normalizedColor, ShaderUniformDataType.Vec4);
-            SetShaderValue(lightingShader, ambientLoc, ambient, ShaderUniformDataType.Vec4);
-            SetShaderValue(lightingShader, shadowMapResolutionLoc, &shadowMapResolution, ShaderUniformDataType.Int);
+            SetShaderValue(LightingShader, lightDirLoc, &lightDirection, ShaderUniformDataType.Vec3);
+            SetShaderValue(LightingShader, lightColLoc, &normalizedColor, ShaderUniformDataType.Vec4);
+            SetShaderValue(LightingShader, ambientLoc, ambient, ShaderUniformDataType.Vec4);
+            SetShaderValue(LightingShader, shadowMapResolutionLoc, &shadowMapResolution, ShaderUniformDataType.Int);
         }
 
-        public void SetLightMatrix(Matrix4x4 mvp)
+        /// <summary>Updates light view-project matrix</summary>
+        /// <param name="mvp">Matrix View-Projection</param>
+        public void UpdateLightMatrix(Matrix4x4 mvp)
         {
-            SetShaderValueMatrix(lightingShader, lightVPLoc, mvp);
+            SetShaderValueMatrix(LightingShader, lightVPLoc, mvp);
         }
 
+        /// <summary>Updates shadow map to the shader</summary>
+        /// <param name="shadow">Shadow map to update</param>
         public void UpdateShadowMap(ShadowMap shadow)
         {
-            Rlgl.EnableShader(lightingShader.Id);
+            Rlgl.EnableShader(LightingShader.Id);
             int slot = 10;
             Rlgl.ActiveTextureSlot(10);
             Rlgl.EnableTexture(shadow.Map.Depth.Id);
             Rlgl.SetUniform(shadowMapLoc, &slot, 4, 1);
         }
 
-        /// <summary>
-        /// Load all the shaders
-        /// </summary>
+        /// <summary>Loads every basic shader in shader center</summary>
         private void LoadShaders()
         {
             // Load outline shader
-            outlineShader = LoadShader("src/shaders/outline.vs", "src/shaders/outline.fs");
+            OutlineShader = LoadShader("src/shaders/outline.vs", "src/shaders/outline.fs");
             // Load tiling shader
-            tilingShader = LoadShader("src/shaders/tiling.vs", "src/shaders/tiling.fs");
+            TilingShader = LoadShader("src/shaders/tiling.vs", "src/shaders/tiling.fs");
             // Load skybox shader
-            skyboxShader = LoadShader("src/shaders/skybox.vs", "src/shaders/skybox.fs");
-            SetShaderValue(skyboxShader, GetShaderLocation(skyboxShader, "environmentMap"), (int)MaterialMapIndex.Cubemap, ShaderUniformDataType.Int);
-            SetShaderValue(skyboxShader, GetShaderLocation(skyboxShader, "doGamma"), 1, ShaderUniformDataType.Int);
-            SetShaderValue(skyboxShader, GetShaderLocation(skyboxShader, "vflipped"), 1, ShaderUniformDataType.Int);
+            SkyboxShader = LoadShader("src/shaders/skybox.vs", "src/shaders/skybox.fs");
+            SetShaderValue(SkyboxShader, GetShaderLocation(SkyboxShader, "environmentMap"), (int)MaterialMapIndex.Cubemap, ShaderUniformDataType.Int);
+            SetShaderValue(SkyboxShader, GetShaderLocation(SkyboxShader, "doGamma"), 1, ShaderUniformDataType.Int);
+            SetShaderValue(SkyboxShader, GetShaderLocation(SkyboxShader, "vflipped"), 1, ShaderUniformDataType.Int);
             // Load cubemap shader
-            cubemapShader = LoadShader("src/shaders/cubemap.vs", "src/shaders/cubemap.fs");
-            SetShaderValue(cubemapShader, GetShaderLocation(cubemapShader, "equirectangularMap"), 0, ShaderUniformDataType.Int);
+            CubemapShader = LoadShader("src/shaders/cubemap.vs", "src/shaders/cubemap.fs");
+            SetShaderValue(CubemapShader, GetShaderLocation(CubemapShader, "equirectangularMap"), 0, ShaderUniformDataType.Int);
         }
 
-        /// <summary>
-        /// Load all the shader materials
-        /// </summary>
+        /// <summary>Loads every basic shader's material in shader center</summary>
         private void LoadMaterials()
         {
             // Init the outline material
-            outlineMaterial = LoadMaterialDefault();
-            outlineMaterial.Shader = outlineShader;
+            OutlineMaterial = LoadMaterialDefault();
+            OutlineMaterial.Shader = OutlineShader;
 
             // Init the skybox material
-            skyboxMaterial = LoadMaterialDefault();
-            skyboxMaterial.Shader = skyboxShader;
+            SkyboxMaterial = LoadMaterialDefault();
+            SkyboxMaterial.Shader = SkyboxShader;
         }
-        /// <summary>
-        /// Unload all the shader center data
-        /// </summary>
-        public void UnloadShaderCenter()
-        {
-            UnloadMaterials();
-            UnloadShaders();
-        }
-        /// <summary>
-        /// Unload all the shaders
-        /// </summary>
-        private void UnloadShaders()
-        {
-            UnloadShader(SkyboxShader);
-            UnloadShader(cubemapShader);
-            UnloadShader(outlineShader);
-        }
-        /// <summary>
-        /// Unload all the shader materials 
-        /// </summary>
-        private void UnloadMaterials()
-        {
-            UnloadMaterial(OutlineMaterial);
-            UnloadMaterial(SkyboxMaterial);
-        }
-        /// <summary>
-        /// Generate Cubemap according to the passed HDR texture
-        /// </summary>
+
+        /// <summary>Generates cubemap according to the passed HDR texture</summary>
         /// <param name="panorama">Texture to use/param>
         /// <param name="size">FrameBuffer size</param>
         /// <param name="format">Format of the cubemap</param>
-        /// <returns></returns>
+        /// <returns>Cubemap texture</returns>
         public Texture2D GenTexureCubemap(Texture2D panorama, int size, PixelFormat format)
         {
             Texture2D cubemap;
@@ -202,11 +153,11 @@ namespace uniray_Project
             }
 
             // Draw to framebuffer
-            Rlgl.EnableShader(cubemapShader.Id);
+            Rlgl.EnableShader(CubemapShader.Id);
 
             // Define projection matrix and send it to the shader
             Matrix4x4 matFboProjection = Raymath.MatrixPerspective(90.0f * DEG2RAD, 1.0f, Rlgl.CULL_DISTANCE_NEAR, Rlgl.CULL_DISTANCE_FAR);
-            Rlgl.SetUniformMatrix(cubemapShader.Locs[(int)ShaderLocationIndex.MatrixProjection], matFboProjection);
+            Rlgl.SetUniformMatrix(CubemapShader.Locs[(int)ShaderLocationIndex.MatrixProjection], matFboProjection);
 
             // Define view matrix for every side of the cube
             Matrix4x4[] fboViews = new Matrix4x4[]
@@ -229,7 +180,7 @@ namespace uniray_Project
             for (int i = 0; i < 6; i++)
             {
                 // Set the view matrix for current face
-                Rlgl.SetUniformMatrix(cubemapShader.Locs[(int)ShaderLocationIndex.MatrixView], fboViews[i]);
+                Rlgl.SetUniformMatrix(CubemapShader.Locs[(int)ShaderLocationIndex.MatrixView], fboViews[i]);
 
                 // Select the current cubemap face attachment for the fbo
                 Rlgl.FramebufferAttach(fbo, cubemap.Id, FramebufferAttachType.ColorChannel0, FramebufferAttachTextureType.CubemapPositiveX + i, 0);
@@ -256,13 +207,36 @@ namespace uniray_Project
 
             return cubemap;
         }
-        /// <summary>
-        /// Set the skybox material texture
-        /// </summary>
-        /// <param name="tex"></param>
+
+        /// <summary>Sets cubemap texture to the skybox material</summary>
+        /// <param name="tex">Cubemap texture to use</param>
         public void SetCubemap(Texture2D tex)
         {
-            SetMaterialTexture(ref skyboxMaterial, MaterialMapIndex.Cubemap, tex);
+            SetMaterialTexture(ref SkyboxMaterial, MaterialMapIndex.Cubemap, tex);
+        }
+
+        /// <summary>Unloads all data storred in shader center</summary>
+        public void UnloadShaderCenter()
+        {
+            UnloadMaterials();
+            UnloadShaders();
+        }
+
+        /// <summary>Unloads every shader storred in shader center</summary>
+        private void UnloadShaders()
+        {
+            UnloadShader(SkyboxShader);
+            UnloadShader(CubemapShader);
+            UnloadShader(OutlineShader);
+            UnloadShader(TilingShader);
+            UnloadShader(LightingShader);
+        }
+
+        /// <summary>Unloads every material storred in shader center</summary>
+        private void UnloadMaterials()
+        {
+            UnloadMaterial(OutlineMaterial);
+            UnloadMaterial(SkyboxMaterial);
         }
     }
 }
