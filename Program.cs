@@ -133,6 +133,16 @@ namespace Lurkers_revamped
 
             terrain.Material.Shader = shader;
 
+            for (int i = 0; i < utilities["rifle"].MaterialCount; i++)
+            {
+                utilities["rifle"].Materials[i].Shader = shader;    
+            }
+
+            for (int i = 0; i < rigged["cop"].MaterialCount; i++)
+            {
+                rigged["cop"].Materials[i].Shader = shader;
+            }
+
             RenderTexture2D shadowMap = LoadShadowMapRenderTexture(4096, 4096);
 
             Camera3D lightCam = new Camera3D();
@@ -155,12 +165,6 @@ namespace Lurkers_revamped
             Player player = new Player("Anonymous254", new Weapon("Lambert Niv. 1", "rifle", 50, 1), rifleAnims[1]);
             // (Debug) Add a second weapon to the inventory of the player
             player.AddWeapon(new Weapon("Lambert Niv. 2", "rifle", 50, 2));
-
-            // Cosmetic aspects of the rifle model
-            // Set highlight shader on rifle model
-            utilities["rifle"].Materials[1].Shader = shaders.OutlineShader;
-            // Set shader hightlight to the corresponding level of the current weapon
-            SetShaderValue(shaders.OutlineShader, GetShaderLocation(shaders.OutlineShader, "highlightCol"), Weapon.Colors[0], ShaderUniformDataType.Vec4);
 
             // Create list of zombies
             List<Zombie> zombies = new List<Zombie>()
@@ -349,11 +353,9 @@ namespace Lurkers_revamped
 
                 // Begin 3D mode with the current scene's camera
                 BeginMode3D(camera);
-
+#if DEBUG
                 DrawSphereWires(lightRay.Position, 2, 10, 10, Color.Red);
-
-                DrawRay(lightRay, Color.Red);
-
+#endif
                 // Draw the external skybox 
                 Rlgl.DisableBackfaceCulling();
                 Rlgl.DisableDepthMask();
@@ -425,7 +427,6 @@ namespace Lurkers_revamped
 #if DEBUG
                     // Debug bone drawing
                     Vector3 posA = RotateNormalizedBone(zombie.CurrentAnimation.Anim.FramePoses[zombie.CurrentAnimation.Frame][5].Translation, zombie.Angle, zombie.Position);
-                    DrawSphere(posA, 0.3f, Color.Red);
 #endif
                     // Move and rotate the zombie if running
                     if (zombie.State == ZombieState.Running)
