@@ -2,6 +2,7 @@
 using static Raylib_cs.Raylib;
 namespace uniray_Project
 {
+    /// <summary>Represents an audio managment instance</summary>
     public class AudioCenter
     {
         /// <summary>Dictionary of sounds</summary>
@@ -41,7 +42,7 @@ namespace uniray_Project
         {
             Dictionary<string, Music> musics = new() 
             {
-                {"reapers", LoadMusicStream("src/sounds/musics/reapers.mp3") }
+                {"ambience", LoadMusicStream("src/sounds/musics/ambience.mp3") }
             };
             return musics;
         }
@@ -82,6 +83,14 @@ namespace uniray_Project
         public void UpdateMusic(string key)
         {
             UpdateMusicStream(musics[key]);
+        }
+
+        /// <summary>Sets music volume</summary>
+        /// <param name="key">Dictionary key of the music</param>
+        /// <param name="volume">Volume to set</param>
+        public void SetMusicVolume(string key, float volume)
+        {
+            Raylib.SetMusicVolume(musics[key], volume);
         }
     }
 }
