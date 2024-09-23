@@ -83,19 +83,19 @@ namespace Lurkers_revamped
             // Assign shader to every object of the scene
             foreach (UModel go in CurrentScene.GameObjects.Where(x => x is UModel))
             {
-                go.SetShader(shaders.lightingShader);
+                go.SetShader(shaders.LightingShader);
             }
 
-            terrain.Material.Shader = shaders.lightingShader;
+            terrain.Material.Shader = shaders.LightingShader;
 
             for (int i = 0; i < utilities["rifle"].MaterialCount; i++)
             {
-                utilities["rifle"].Materials[i].Shader = shaders.lightingShader;    
+                utilities["rifle"].Materials[i].Shader = shaders.LightingShader;    
             }
 
             for (int i = 0; i < rigged["cop"].MaterialCount; i++)
             {
-                rigged["cop"].Materials[i].Shader = shaders.lightingShader;
+                rigged["cop"].Materials[i].Shader = shaders.LightingShader;
             }
 
             // Load animation lists
@@ -147,9 +147,8 @@ namespace Lurkers_revamped
 
                 // Update the camera
                 UpdateCamera(ref camera, ref cameraMotion, player);
-
-                // SHADOW MAP ######################################
                 
+                // Update lighting
                 BeginDrawing();
 
                 Matrix4x4 lightView = new Matrix4x4();
@@ -170,7 +169,6 @@ namespace Lurkers_revamped
                 }
 
                 DrawMesh(terrain.Mesh, terrain.Material, terrain.Transform);
-                // ------------------------------------------------
 
                 EndMode3D();
                 EndTextureMode();
@@ -179,18 +177,16 @@ namespace Lurkers_revamped
 
                 ClearBackground(Color.RayWhite);
 
-                shaders.SetLightMatrix(lightViewProj);
+                shaders.UpdateLightMatrix(lightViewProj);
 
                 shaders.UpdateShadowMap(shadowMap);
 
                 SetShaderValue(
-                    shaders.lightingShader,
-                    shaders.lightingShader.Locs[(int)ShaderLocationIndex.VectorView],
+                    shaders.LightingShader,
+                    shaders.LightingShader.Locs[(int)ShaderLocationIndex.VectorView],
                     camera.Position,
                     ShaderUniformDataType.Vec3
                 );
-
-                // #################################################
 
                 // Update the current animation of the player
                 switch (player.WeaponState)
