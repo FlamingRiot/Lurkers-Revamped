@@ -74,89 +74,30 @@ namespace Lurkers_revamped
             // Load skybox
             Mesh skybox = RLoading.GenSkybox(shaders);
 
-            // SHADOW MAP ############################################
+            // Load shadow map
+            ShadowMap shadowMap = new ShadowMap(LoadShadowMapRenderTexture(4096, 4096), new Vector3(-50.0f, 25.0f, -50.0f));
 
-            Shader shader = LoadShader(
-            "src/shaders/lighting.vs",
-            "src/shaders/lighting.fs"
-            );
+            // Load lighting and init shader
+            shaders.LoadLighting(shadowMap.CameraView.Target, new Color(70, 25, 0, 255));
 
-
-            // Récupérer les données essentielles pour le fonctionnement du shader
-            shader.Locs[(int)ShaderLocationIndex.VectorView] = GetShaderLocation(shader, "viewPos");
-
-            // Créer les points de lumière
-            Light[] lights = new Light[4];
-            lights[0] = Rlights.CreateLight(
-                0,
-                LightType.Point,
-                new Vector3(13.8f, 2.5f, -2.8f),
-                Raymath.Vector3Normalize(new Vector3(-0.35f, -2.0f, -0.35f)),
-                Color.Blue,
-                shader
-            );
-            lights[1] = Rlights.CreateLight(
-                1,
-                LightType.Point,
-                new Vector3(-50f, 25f, -50f),
-                Raymath.Vector3Normalize(new Vector3(0f, -1.0f, 1f)),
-                new Color(70, 25, 0, 255),
-                shader
-            );
-
-            // Définition du niveau de lumière ambient 
-            Vector3 lightDir = Raymath.Vector3Normalize(new Vector3(0.95f, -1.0f, 1.5f));
-            Vector3 lightPos = new Vector3(-20f, 20f, -50f);
-            Color lightColor = new Color(69, 15, 0, 255);
-            Vector4 lightColorNormalized = ColorNormalize(lightColor);
-
-
-            int lightDirLoc = GetShaderLocation(shader, "lightDir");
-            int lightColLoc = GetShaderLocation(shader, "lightColor");
-
-            SetShaderValue(shader, lightDirLoc, &lightDir, ShaderUniformDataType.Vec3);
-            SetShaderValue(shader, lightColLoc, &lightColorNormalized, ShaderUniformDataType.Vec4);
-
-            int ambientLoc = GetShaderLocation(shader, "ambient");
-            float[] ambient = new[] { 0.5f, 0.5f, 0.5f, 1.0f };
-            SetShaderValue(shader, ambientLoc, ambient, ShaderUniformDataType.Vec4);
-
-            int lightVPLoc = GetShaderLocation(shader, "lightVP");
-            int shadowMapLoc = GetShaderLocation(shader, "shadowMap");
-            int shadowMapResolution = 4096;
-            SetShaderValue(shader, GetShaderLocation(shader, "shadowMapResolution"), &shadowMapResolution, ShaderUniformDataType.Int);
-
+            // Assign shader to every object of the scene
             foreach (UModel go in CurrentScene.GameObjects.Where(x => x is UModel))
             {
-                go.SetShader(shader);
+                go.SetShader(shaders.lightingShader);
             }
 
-            terrain.Material.Shader = shader;
+            terrain.Material.Shader = shaders.lightingShader;
 
             for (int i = 0; i < utilities["rifle"].MaterialCount; i++)
             {
-                utilities["rifle"].Materials[i].Shader = shader;    
+                utilities["rifle"].Materials[i].Shader = shaders.lightingShader;    
             }
 
             for (int i = 0; i < rigged["cop"].MaterialCount; i++)
             {
-                rigged["cop"].Materials[i].Shader = shader;
+                rigged["cop"].Materials[i].Shader = shaders.lightingShader;
             }
 
-            RenderTexture2D shadowMap = LoadShadowMapRenderTexture(4096, 4096);
-
-            Camera3D lightCam = new Camera3D();
-            lightCam.Position = lightPos;
-            lightCam.Target = new Vector3(0, 0, 0);
-            lightCam.Projection = CameraProjection.Orthographic;
-            lightCam.Up = new Vector3(0f, 1f, 0f);
-            lightCam.FovY = 60f;
-
-            Ray lightRay = new Ray(lightCam.Position, lightCam.Target);
-
-
-
-            // ----------------------------------------
             // Load animation lists
             List<Animation> rifleAnims = RLoading.LoadAnimationList("src/animations/rifle.m3d");
             List<Animation> zombieAnims = RLoading.LoadAnimationList("src/animations/walker.m3d");
@@ -208,44 +149,19 @@ namespace Lurkers_revamped
                 UpdateCamera(ref camera, ref cameraMotion, player);
 
                 // SHADOW MAP ######################################
-
-                // =========== Update =============
-
-                if (IsKeyDown(KeyboardKey.Left))
-                {
-                    lightCam.Position.X += 0.1f;
-                }
-                else if (IsKeyDown(KeyboardKey.Right))
-                {
-                    lightCam.Position.X -= 0.1f;
-                }
-                else if (IsKeyDown(KeyboardKey.Up))
-                {
-                    lightCam.Position.Y += 0.1f;
-                }
-                else if (IsKeyDown(KeyboardKey.Down))
-                {
-                    lightCam.Position.Y -= 0.1f;
-                }
-
-                lightRay.Direction = camera.Target;
-                lightRay.Position = lightCam.Position;
-
-                SetShaderValue(shader, lightDirLoc, lights[1].Target, ShaderUniformDataType.Vec3);
-                SetShaderValue(shader, lightColLoc, ColorNormalize(lights[1].Color), ShaderUniformDataType.Vec4);
+                
                 BeginDrawing();
 
                 Matrix4x4 lightView = new Matrix4x4();
                 Matrix4x4 lightProj = new Matrix4x4();
 
-                BeginTextureMode(shadowMap);
+                BeginTextureMode(shadowMap.Map);
                 ClearBackground(Color.White);
-                BeginMode3D(lightCam);
+                BeginMode3D(shadowMap.CameraView);
                 lightView = Rlgl.GetMatrixModelview();
                 lightProj = Rlgl.GetMatrixProjection();
 
-                // Draw here
-
+                // Draw full scene to the shadow map render texture
                 DrawScene();
 
                 foreach (Zombie zombie in zombies)
@@ -254,28 +170,24 @@ namespace Lurkers_revamped
                 }
 
                 DrawMesh(terrain.Mesh, terrain.Material, terrain.Transform);
-
+                // ------------------------------------------------
 
                 EndMode3D();
                 EndTextureMode();
 
-                Matrix4x4 lightViewProj = Raymath.MatrixMultiply(lightView, lightProj);
+                Matrix4x4 lightViewProj = MatrixMultiply(lightView, lightProj);
 
                 ClearBackground(Color.RayWhite);
 
-                SetShaderValueMatrix(shader, lightVPLoc, lightViewProj);
+                shaders.SetLightMatrix(lightViewProj);
 
-                Rlgl.EnableShader(shader.Id);
-                int slot = 10;
-                Rlgl.ActiveTextureSlot(10);
-                Rlgl.EnableTexture(shadowMap.Depth.Id);
-                Rlgl.SetUniform(shadowMapLoc, &slot, 4, 1);
+                shaders.UpdateShadowMap(shadowMap);
 
                 SetShaderValue(
-                shader,
-                shader.Locs[(int)ShaderLocationIndex.VectorView],
-                camera.Position,
-                ShaderUniformDataType.Vec3
+                    shaders.lightingShader,
+                    shaders.lightingShader.Locs[(int)ShaderLocationIndex.VectorView],
+                    camera.Position,
+                    ShaderUniformDataType.Vec3
                 );
 
                 // #################################################
@@ -354,7 +266,7 @@ namespace Lurkers_revamped
                 // Begin 3D mode with the current scene's camera
                 BeginMode3D(camera);
 #if DEBUG
-                DrawSphereWires(lightRay.Position, 2, 10, 10, Color.Red);
+                DrawSphereWires(shadowMap.CameraView.Position, 2, 10, 10, Color.Red);
 #endif
                 // Draw the external skybox 
                 Rlgl.DisableBackfaceCulling();
@@ -598,6 +510,7 @@ namespace Lurkers_revamped
                 }
             }
         }
+
         /// <summary>
         /// Tick the player events
         /// </summary>

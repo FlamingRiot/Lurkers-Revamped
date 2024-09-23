@@ -17,45 +17,21 @@ namespace uniray_Project
         /// <summary>Shadow map render texture</summary>
         public RenderTexture2D Map;
 
-        /// <summary></summary>
-        public Light[] Lights;
-
         /// <summary>Creates a shadow map object</summary>
         /// <param name="shader">Lighting shader to use</param>
-        public ShadowMap(Shader shader)
+        public ShadowMap(RenderTexture2D texture, Vector3 position)
         {
-            // Init shadowmap lights
-            Lights = LoadLights(shader);
-
-            // Init light view camera
-            CameraView = new Camera3D()
-            {
-                Position = Lights[0].Position,
-                Target = Vector3.Zero,
+            // Load camera view
+            CameraView = new Camera3D() {
+                Position = position,
+                Target = Raymath.Vector3Normalize(new Vector3(0.95f, -1.0f, 1.5f)),
                 Projection = CameraProjection.Orthographic,
-                Up = Vector3.UnitY,
-                FovY = 20f
+                Up = new Vector3(0f, 1f, 0f),
+                FovY = 60f
             };
 
             // Load shadow map
-            Map = LoadShadowMapRenderTexture(SHADOW_MAP_RESOLUTION, SHADOW_MAP_RESOLUTION);
-        }
-
-        /// <summary>Loads static lights of the game</summary>
-        /// <param name="shader">Lighting shader to use for creation</param>
-        /// <returns>Array of static lights</returns>
-        private Light[] LoadLights(Shader shader)
-        {
-            Light[] lights = new Light[MAX_LIGHTS];
-            lights[0] = Rlights.CreateLight(
-                0,
-                LightType.Point,
-                new Vector3(20, 5, 20),
-                Vector3.Zero,
-                new Color(20, 20, 50, 255),
-                shader);
-
-            return lights;
+            Map = texture;
         }
 
         /// <summary>Loads a shadow map render texture based on the passed dimensions</summary>

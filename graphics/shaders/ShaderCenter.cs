@@ -6,6 +6,12 @@ namespace uniray_Project
 {
     public unsafe class ShaderCenter
     {
+        public const int SHADOW_MAP_RESOLUTION = 4096;
+
+        private int lightVPLoc;
+
+        private int shadowMapLoc;
+
         /// <summary>
         /// The outline shader
         /// </summary>
@@ -26,6 +32,10 @@ namespace uniray_Project
         /// The cubemap shader
         /// </summary>
         private Shader cubemapShader;
+
+        /// <summary>Ambient lighting shader</summary>
+        public Shader lightingShader;
+
         /// <summary>
         /// The skybox material
         /// </summary>
@@ -64,6 +74,47 @@ namespace uniray_Project
             // Load materials
             LoadMaterials();
         }
+
+        public void LoadLighting(Vector3 lightDirection, Color lightColor)
+        {
+            // Load shader
+            lightingShader = LoadShader("src/shaders/lighting.vs", "src/shaders/lighting.fs");
+            lightingShader.Locs[(int)ShaderLocationIndex.VectorView] = GetShaderLocation(lightingShader, "viewPos");
+
+            // Retrieve locations from shader code
+            int lightDirLoc = GetShaderLocation(lightingShader, "lightDir");
+            int lightColLoc = GetShaderLocation(lightingShader, "lightColor");
+            int ambientLoc = GetShaderLocation(lightingShader, "ambient");
+            lightVPLoc = GetShaderLocation(lightingShader, "lightVP");
+            shadowMapLoc = GetShaderLocation(lightingShader, "shadowMap");
+            int shadowMapResolutionLoc = GetShaderLocation(lightingShader, "shadowMapResolution");
+
+            // Define values
+            float[] ambient = new[] { 0.5f, 0.5f, 0.5f, 1.0f };
+            int shadowMapResolution = SHADOW_MAP_RESOLUTION;
+            Vector4 normalizedColor = ColorNormalize(lightColor);
+
+            // Set values at shader locations
+            SetShaderValue(lightingShader, lightDirLoc, &lightDirection, ShaderUniformDataType.Vec3);
+            SetShaderValue(lightingShader, lightColLoc, &normalizedColor, ShaderUniformDataType.Vec4);
+            SetShaderValue(lightingShader, ambientLoc, ambient, ShaderUniformDataType.Vec4);
+            SetShaderValue(lightingShader, shadowMapResolutionLoc, &shadowMapResolution, ShaderUniformDataType.Int);
+        }
+
+        public void SetLightMatrix(Matrix4x4 mvp)
+        {
+            SetShaderValueMatrix(lightingShader, lightVPLoc, mvp);
+        }
+
+        public void UpdateShadowMap(ShadowMap shadow)
+        {
+            Rlgl.EnableShader(lightingShader.Id);
+            int slot = 10;
+            Rlgl.ActiveTextureSlot(10);
+            Rlgl.EnableTexture(shadow.Map.Depth.Id);
+            Rlgl.SetUniform(shadowMapLoc, &slot, 4, 1);
+        }
+
         /// <summary>
         /// Load all the shaders
         /// </summary>
@@ -82,6 +133,7 @@ namespace uniray_Project
             cubemapShader = LoadShader("src/shaders/cubemap.vs", "src/shaders/cubemap.fs");
             SetShaderValue(cubemapShader, GetShaderLocation(cubemapShader, "equirectangularMap"), 0, ShaderUniformDataType.Int);
         }
+
         /// <summary>
         /// Load all the shader materials
         /// </summary>
