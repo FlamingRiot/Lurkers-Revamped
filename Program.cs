@@ -120,6 +120,18 @@ namespace Lurkers_revamped
             SetWindowState(ConfigFlags.ResizableWindow);
             SetWindowState(ConfigFlags.MaximizedWindow);
 
+            // Scene render texture
+            RenderTexture2D renderTexture = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
+
+            // Previous frame render texture
+            RenderTexture2D prevTexture = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
+
+            // Inverse scene render texture rectangle
+            Rectangle inverseSceneRectangle = new Rectangle(0, 0, GetScreenWidth(), -GetScreenHeight());
+
+            // Scene rectangle
+            Rectangle sceneRectangle = new Rectangle(0, 0, GetScreenWidth(), GetScreenHeight());
+
             // Set permanent informations of the screen according to the final screen size
             for (int i = 800; i >= 460; i -= 85)
             {
@@ -148,10 +160,7 @@ namespace Lurkers_revamped
 
                 // Update the camera
                 UpdateCamera(ref camera, ref cameraMotion, player);
-                
-                // Update lighting
-                BeginDrawing();
-
+               
                 Matrix4x4 lightView = new Matrix4x4();
                 Matrix4x4 lightProj = new Matrix4x4();
 
@@ -258,6 +267,9 @@ namespace Lurkers_revamped
 
                 // Update the screen center (info displayer)
                 screen.Tick();
+
+                // Render scene to texture
+                BeginTextureMode(renderTexture);
 
                 // Clear background every frame using white color
                 ClearBackground(Color.Gray);
@@ -383,6 +395,22 @@ namespace Lurkers_revamped
                 // End 3D mode context
                 EndMode3D();
 
+                EndTextureMode();
+
+                // Draw to the screen
+                BeginDrawing();
+
+                // Begin blur shader 
+                BeginShaderMode(shaders.MotionBlurShader);
+
+                // Set previous frame render texture
+                shaders.SetBlurTexture(prevTexture);
+
+                // Draw render texture to the screen
+                DrawTexturePro(renderTexture.Texture, inverseSceneRectangle, sceneRectangle, Vector2.Zero, 0, Color.White);
+
+                EndShaderMode();
+
                 // Draw screen infos
                 screen.DrawScreenInfos();
 #if DEBUG
@@ -409,6 +437,13 @@ namespace Lurkers_revamped
 
                 // End drawing context
                 EndDrawing();
+
+                // Draw to previous frame render texture
+                BeginTextureMode(prevTexture);
+
+                DrawTexturePro(renderTexture.Texture, inverseSceneRectangle, sceneRectangle, Vector2.Zero, 0, Color.White);
+
+                EndTextureMode();
 
                 // Reset the player's box
                 player.ResetBox();

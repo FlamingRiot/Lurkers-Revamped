@@ -15,6 +15,9 @@ namespace uniray_Project
         /// <summary>Shadow map location in lighting shader</summary>
         private int shadowMapLoc;
 
+        /// <summary>Location of the previous frame render texture in motion blur shader</summary>
+        private int prevTextureLoc;
+
         // ################### Shaders ###################
 
         /// <summary>Outline shader</summary>
@@ -31,6 +34,9 @@ namespace uniray_Project
 
         /// <summary>Ambient lighting shader</summary>
         public Shader LightingShader;
+
+        /// <summary>Motion blur shader</summary>
+        public Shader MotionBlurShader;
 
         // ################### Materials ###################
 
@@ -111,6 +117,17 @@ namespace uniray_Project
             // Load cubemap shader
             CubemapShader = LoadShader("src/shaders/cubemap.vs", "src/shaders/cubemap.fs");
             SetShaderValue(CubemapShader, GetShaderLocation(CubemapShader, "equirectangularMap"), 0, ShaderUniformDataType.Int);
+
+            // Load motion blur shader
+            MotionBlurShader = LoadShader("", "src/shaders/blur.fs");
+            prevTextureLoc = GetShaderLocation(MotionBlurShader, "prevFrame");
+            int blurAmountLoc = GetShaderLocation(MotionBlurShader, "blurAmount");
+            float blurAmount = 2f;
+            SetShaderValue(MotionBlurShader, blurAmountLoc, &blurAmount, ShaderUniformDataType.Float);
+
+            int chromaticAmountLoc = GetShaderLocation(MotionBlurShader, "chromaticAmount");
+            float chromaticAmount = 0.2f;
+            SetShaderValue(MotionBlurShader, chromaticAmountLoc, &chromaticAmount, ShaderUniformDataType.Float);
         }
 
         /// <summary>Loads every basic shader's material in shader center</summary>
@@ -213,6 +230,13 @@ namespace uniray_Project
         public void SetCubemap(Texture2D tex)
         {
             SetMaterialTexture(ref SkyboxMaterial, MaterialMapIndex.Cubemap, tex);
+        }
+
+        /// <summary>Set the previous frame texture to the motion blur shader</summary>
+        /// <param name="prevTexture">Previous frame texture to set</param>
+        public void SetBlurTexture(RenderTexture2D prevTexture)
+        {
+            SetShaderValueTexture(MotionBlurShader, prevTextureLoc, prevTexture.Texture);
         }
 
         /// <summary>Unloads all data storred in shader center</summary>
