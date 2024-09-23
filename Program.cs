@@ -218,6 +218,8 @@ namespace Lurkers_revamped
                                     Random r = new Random();
                                     // Play headshot sounds
                                     audio.PlaySound("headshot");
+                                    audio.StopSound("zombie_default");
+                                    audio.PlaySound("zombie_kill");
                                     // Add screen info for the headshot
                                     Vector2 pos = new Vector2(GetScreenWidth() - UITextures["headshot"].Width / 2 - 170, GetScreenHeight() - 285);
                                     screen.AddInfo(new TextureInfo(pos, UITextures["headshot"], GetTime(), 1f));
@@ -360,6 +362,9 @@ namespace Lurkers_revamped
 
                         // Move the zombie along its direction axis
                         zombie.Position += new Vector3(direction.X, 0, direction.Z);
+
+                        // Play zombie default running sound
+                        audio.PlaySoundLoop("zombie_default");
                     }
                 }
                 // Remove the zombie from the list if killed
