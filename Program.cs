@@ -499,11 +499,12 @@ namespace Lurkers_revamped
             // Adjust camera position and target
             if (IsKeyDown(KeyboardKey.W)) 
             {
-                movement += GetCameraForward(ref camera);
+                //movement += GetCameraForward(ref camera);
+                movement -= Vector3CrossProduct(GetCameraRight(ref camera), Vector3.UnitY);
             }
             if (IsKeyDown(KeyboardKey.S))
             {
-                movement -= GetCameraForward(ref camera);
+                movement += Vector3CrossProduct(GetCameraRight(ref camera), Vector3.UnitY);
             }
             if (IsKeyDown(KeyboardKey.D))
             {
