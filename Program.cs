@@ -5,6 +5,8 @@ using System.Numerics;
 using static UnirayEngine.UnirayEngine;
 using uniray_Project;
 using System.Text;
+using UnirayEngine;
+using System.Xml.Linq;
 
 namespace Lurkers_revamped
 {
@@ -72,6 +74,79 @@ namespace Lurkers_revamped
             // Load skybox
             Mesh skybox = RLoading.GenSkybox(shaders);
 
+            // SHADOW MAP ############################################
+
+            Shader shader = LoadShader(
+            "src/shaders/lighting.vs",
+            "src/shaders/lighting.fs"
+            );
+
+
+            // Récupérer les données essentielles pour le fonctionnement du shader
+            shader.Locs[(int)ShaderLocationIndex.VectorView] = GetShaderLocation(shader, "viewPos");
+
+            // Créer les points de lumière
+            Light[] lights = new Light[4];
+            lights[0] = Rlights.CreateLight(
+                0,
+                LightType.Point,
+                new Vector3(13.8f, 2.5f, -2.8f),
+                Raymath.Vector3Normalize(new Vector3(-0.35f, -2.0f, -0.35f)),
+                Color.Blue,
+                shader
+            );
+            lights[1] = Rlights.CreateLight(
+                1,
+                LightType.Point,
+                new Vector3(-50f, 25f, -50f),
+                Raymath.Vector3Normalize(new Vector3(0f, -1.0f, 1f)),
+                new Color(70, 25, 0, 255),
+                shader
+            );
+
+            // Définition du niveau de lumière ambient 
+            Vector3 lightDir = Raymath.Vector3Normalize(new Vector3(0.95f, -1.0f, 1.5f));
+            Vector3 lightPos = new Vector3(-20f, 20f, -50f);
+            Color lightColor = new Color(69, 15, 0, 255);
+            Vector4 lightColorNormalized = ColorNormalize(lightColor);
+
+
+            int lightDirLoc = GetShaderLocation(shader, "lightDir");
+            int lightColLoc = GetShaderLocation(shader, "lightColor");
+
+            SetShaderValue(shader, lightDirLoc, &lightDir, ShaderUniformDataType.Vec3);
+            SetShaderValue(shader, lightColLoc, &lightColorNormalized, ShaderUniformDataType.Vec4);
+
+            int ambientLoc = GetShaderLocation(shader, "ambient");
+            float[] ambient = new[] { 0.5f, 0.5f, 0.5f, 1.0f };
+            SetShaderValue(shader, ambientLoc, ambient, ShaderUniformDataType.Vec4);
+
+            int lightVPLoc = GetShaderLocation(shader, "lightVP");
+            int shadowMapLoc = GetShaderLocation(shader, "shadowMap");
+            int shadowMapResolution = 4096;
+            SetShaderValue(shader, GetShaderLocation(shader, "shadowMapResolution"), &shadowMapResolution, ShaderUniformDataType.Int);
+
+            foreach (UModel go in CurrentScene.GameObjects.Where(x => x is UModel))
+            {
+                go.SetShader(shader);
+            }
+
+            terrain.Material.Shader = shader;
+
+            RenderTexture2D shadowMap = LoadShadowMapRenderTexture(4096, 4096);
+
+            Camera3D lightCam = new Camera3D();
+            lightCam.Position = lightPos;
+            lightCam.Target = new Vector3(0, 0, 0);
+            lightCam.Projection = CameraProjection.Orthographic;
+            lightCam.Up = new Vector3(0f, 1f, 0f);
+            lightCam.FovY = 60f;
+
+            Ray lightRay = new Ray(lightCam.Position, lightCam.Target);
+
+
+
+            // ----------------------------------------
             // Load animation lists
             List<Animation> rifleAnims = RLoading.LoadAnimationList("src/animations/rifle.m3d");
             List<Animation> zombieAnims = RLoading.LoadAnimationList("src/animations/walker.m3d");
@@ -127,6 +202,79 @@ namespace Lurkers_revamped
 
                 // Update the camera
                 UpdateCamera(ref camera, ref cameraMotion, player);
+
+                // SHADOW MAP ######################################
+
+                // =========== Update =============
+
+                if (IsKeyDown(KeyboardKey.Left))
+                {
+                    lightCam.Position.X += 0.1f;
+                }
+                else if (IsKeyDown(KeyboardKey.Right))
+                {
+                    lightCam.Position.X -= 0.1f;
+                }
+                else if (IsKeyDown(KeyboardKey.Up))
+                {
+                    lightCam.Position.Y += 0.1f;
+                }
+                else if (IsKeyDown(KeyboardKey.Down))
+                {
+                    lightCam.Position.Y -= 0.1f;
+                }
+
+                lightRay.Direction = camera.Target;
+                lightRay.Position = lightCam.Position;
+
+                SetShaderValue(shader, lightDirLoc, lights[1].Target, ShaderUniformDataType.Vec3);
+                SetShaderValue(shader, lightColLoc, ColorNormalize(lights[1].Color), ShaderUniformDataType.Vec4);
+                BeginDrawing();
+
+                Matrix4x4 lightView = new Matrix4x4();
+                Matrix4x4 lightProj = new Matrix4x4();
+
+                BeginTextureMode(shadowMap);
+                ClearBackground(Color.White);
+                BeginMode3D(lightCam);
+                lightView = Rlgl.GetMatrixModelview();
+                lightProj = Rlgl.GetMatrixProjection();
+
+                // Draw here
+
+                DrawScene();
+
+                foreach (Zombie zombie in zombies)
+                {
+                    DrawModelEx(rigged[zombie.Type], zombie.Position, Vector3.UnitY, zombie.Angle, new Vector3(3.5f), Color.White);
+                }
+
+                DrawMesh(terrain.Mesh, terrain.Material, terrain.Transform);
+
+
+                EndMode3D();
+                EndTextureMode();
+
+                Matrix4x4 lightViewProj = Raymath.MatrixMultiply(lightView, lightProj);
+
+                ClearBackground(Color.RayWhite);
+
+                SetShaderValueMatrix(shader, lightVPLoc, lightViewProj);
+
+                Rlgl.EnableShader(shader.Id);
+                int slot = 10;
+                Rlgl.ActiveTextureSlot(10);
+                Rlgl.EnableTexture(shadowMap.Depth.Id);
+                Rlgl.SetUniform(shadowMapLoc, &slot, 4, 1);
+
+                SetShaderValue(
+                shader,
+                shader.Locs[(int)ShaderLocationIndex.VectorView],
+                camera.Position,
+                ShaderUniformDataType.Vec3
+                );
+
+                // #################################################
 
                 // Update the current animation of the player
                 switch (player.WeaponState)
@@ -196,14 +344,15 @@ namespace Lurkers_revamped
                 // Update the screen center (info displayer)
                 screen.Tick();
 
-                // Begin drawing context
-                BeginDrawing();
-
                 // Clear background every frame using white color
                 ClearBackground(Color.Gray);
 
                 // Begin 3D mode with the current scene's camera
                 BeginMode3D(camera);
+
+                DrawSphereWires(lightRay.Position, 2, 10, 10, Color.Red);
+
+                DrawRay(lightRay, Color.Red);
 
                 // Draw the external skybox 
                 Rlgl.DisableBackfaceCulling();
@@ -632,6 +781,38 @@ namespace Lurkers_revamped
                 -normalizedPos.X * (float)Math.Sin(alpha / RAD2DEG) + normalizedPos.Z * (float)Math.Cos(alpha / RAD2DEG)) * 3.5f + pos;
             // Return the newly calculated position
             return spacePos;
+        }
+
+        static RenderTexture2D LoadShadowMapRenderTexture(int width, int height)
+        {
+            RenderTexture2D target = new RenderTexture2D();
+
+            target.Id = Rlgl.LoadFramebuffer(width, height);
+            target.Texture.Width = width;
+            target.Texture.Height = height;
+
+            if (target.Id > 0)
+            {
+                Rlgl.EnableFramebuffer(target.Id);
+
+                target.Depth.Id = Rlgl.LoadTextureDepth(width, height, false);
+                target.Depth.Width = width;
+                target.Depth.Height = height;
+                target.Depth.Format = PixelFormat.CompressedPvrtRgba;
+                target.Depth.Mipmaps = 1;
+
+                Rlgl.FramebufferAttach(target.Id, target.Depth.Id, FramebufferAttachType.Depth, FramebufferAttachTextureType.Texture2D, 0);
+
+                if (Rlgl.FramebufferComplete(target.Id)) TraceLog(TraceLogLevel.Info, "FBO: [ID %i] Framebuffer object created successfully");
+
+                Rlgl.DisableFramebuffer();
+            }
+            else
+            {
+                TraceLog(TraceLogLevel.Info, "FBO: [ID %i] Framebuffer object can not be created");
+            }
+
+            return target;
         }
     }
 }
