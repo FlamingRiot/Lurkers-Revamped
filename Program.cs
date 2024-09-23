@@ -476,9 +476,8 @@ namespace Lurkers_revamped
         /// Update camera movement
         /// </summary>
         /// <param name="camera">The camera to update</param>
-        /// <param name="speed">The camera speed</param>
-        /// <param name="yaw">The camera yaw rotation</param>
-        /// <param name="pitch">The camera pithc rotation</param>
+        /// <param name="cameraMotion">The camera motion additional variables</param>
+        /// <param name="player">The player associated to the camera</param>
         static void UpdateCamera(ref Camera3D camera, ref CameraMotion cameraMotion, Player player)
         {
             // Calculate the camera rotation
@@ -526,7 +525,7 @@ namespace Lurkers_revamped
             if (Vector3Length(movement) > 0)
             {
                 // Normalize vector
-                movement = Vector3Normalize(movement) * Player.SPEED * player.MotionConstraint.Value;
+                movement = Vector3Normalize(movement) * player.SPEED * player.MotionConstraint.Value;
                 // Block movement according to the motion constraint
                 AddConstraintMovement(ref movement, player.MotionConstraint.Constraint);
                 // Limit the movement to X and Z axis and normalize
@@ -575,6 +574,16 @@ namespace Lurkers_revamped
                     player.MoveState = PlayerMoveState.Jumping;
                     player.VJump = Player.JUMP_FORCE;
                 }
+            }
+
+            // Sprinting event
+            if (IsKeyDown(KeyboardKey.LeftShift))
+            {
+                player.SPEED = 0.2f;
+            }
+            else if (!IsKeyDown(KeyboardKey.LeftShift))
+            {
+                player.SPEED = 0.1f;
             }
 
             // Shooting event

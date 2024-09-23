@@ -26,7 +26,7 @@ namespace uniray_Project
         public static readonly float JUMP_FORCE = 0.3f;
 
         /// <summary>Player's base movement speed</summary>
-        public static readonly float SPEED = 0.2f;
+        public float SPEED = 0.1f;
 
         /// <summary>
         /// The time delay for the player's actions
