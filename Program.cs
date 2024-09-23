@@ -51,7 +51,7 @@ namespace Lurkers_revamped
             string workdir = new string(dir);
             string newDir = workdir + "src\\textures\\materials\\";
             SetWorkdir(newDir);
-            //ChangeDirectory()
+
             // Load dictionary of utilities (weapons, meds, etc.)
             Dictionary<string, Model> utilities = RLoading.LoadUtilities();
 
