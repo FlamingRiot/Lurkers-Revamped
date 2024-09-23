@@ -18,6 +18,9 @@ namespace uniray_Project
         /// <summary>Location of the previous frame render texture in motion blur shader</summary>
         private int prevTextureLoc;
 
+        /// <summary>Location of the terrain boolean value in shader</summary>
+        private int isTerrainLoc;
+
         // ################### Shaders ###################
 
         /// <summary>Outline shader</summary>
@@ -70,6 +73,7 @@ namespace uniray_Project
             int ambientLoc = GetShaderLocation(LightingShader, "ambient");
             lightVPLoc = GetShaderLocation(LightingShader, "lightVP");
             shadowMapLoc = GetShaderLocation(LightingShader, "shadowMap");
+            isTerrainLoc = GetShaderLocation(LightingShader, "isTerrain");
             int shadowMapResolutionLoc = GetShaderLocation(LightingShader, "shadowMapResolution");
 
             // Define values
@@ -89,6 +93,11 @@ namespace uniray_Project
         public void UpdateLightMatrix(Matrix4x4 mvp)
         {
             SetShaderValueMatrix(LightingShader, lightVPLoc, mvp);
+        }
+
+        public void UpdateTiling(bool enabled)
+        {
+            SetShaderValue(LightingShader, isTerrainLoc, &enabled, ShaderUniformDataType.Int);
         }
 
         /// <summary>Updates shadow map to the shader</summary>

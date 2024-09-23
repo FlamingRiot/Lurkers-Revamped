@@ -286,8 +286,14 @@ namespace Lurkers_revamped
                 Rlgl.EnableBackfaceCulling();
                 Rlgl.EnableDepthMask();
 
+                // Set terrain tiling to true
+                shaders.UpdateTiling(true);
+
                 // Draw terrain
                 DrawMesh(terrain.Mesh, terrain.Material, terrain.Transform);
+
+                // Set terrain tiling to false
+                shaders.UpdateTiling(false);
 
                 // Check collisions between the player and the static objects
                 // Add current position
