@@ -4,10 +4,10 @@ using uniray_Project;
 using static Raylib_cs.Raylib;
 using System.Numerics;
 
-namespace Lurkers_revamped
+namespace uniray_Project
 {
     /// <summary>Loading instance used to centralize all the GPU loading actions provided by Raylib</summary>
-    public unsafe struct RLoading
+    public static unsafe class RLoading
     {
         /// <summary>Loads the rigged (animation-ready) complex character models</summary>
         /// <returns>The dictionary of rigged models</returns>
@@ -77,6 +77,34 @@ namespace Lurkers_revamped
                 list.Add(new Animation(animations[i]));
             }
             return list;
+        }
+
+        /// <summary>Loads all the sounds of the game</summary>
+        /// <returns>The list of loaded sounds</returns>
+        public static Dictionary<string, Sound> LoadSounds()
+        {
+            Dictionary<string, Sound> sounds = new()
+            {
+                { "rifleShoot", LoadSound("src/sounds/rifle/shoot.wav") },
+                { "headshot", LoadSound("src/sounds/rifle/headshot.wav") },
+                { "headshot_voice", LoadSound("src/sounds/headshot_voice.wav") },
+                { "zombie_default", LoadSound("src/sounds/zombie/zombie_default.wav") },
+                { "zombie_kill", LoadSound("src/sounds/zombie/zombie_kill.wav") },
+                { "zombie_herd", LoadSound("src/sounds/zombie/zombie_herd.wav") },
+                { "zombie_eating", LoadSound("src/sounds/zombie/zombie_eating.wav") },
+            };
+            return sounds;
+        }
+
+        /// <summary>Loads every music of the game</summary>
+        /// <returns>The list of loaded musics</returns>
+        public static Dictionary<string, Music> LoadMusics()
+        {
+            Dictionary<string, Music> musics = new()
+            {
+                {"ambience", LoadMusicStream("src/sounds/musics/ambience.mp3") }
+            };
+            return musics;
         }
 
         /// <summary>Loads the list of static boxes from the current scene's game objects</summary>

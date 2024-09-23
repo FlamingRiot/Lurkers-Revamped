@@ -15,36 +15,8 @@ namespace uniray_Project
         public AudioCenter()
         {
             InitAudioDevice();
-            sounds = LoadSounds();
-            musics = LoadMusics();  
-        }
-
-        /// <summary>Loads all the sounds of the game</summary>
-        /// <returns>The list of loaded sounds</returns>
-        private Dictionary<string, Sound> LoadSounds()
-        {
-            Dictionary<string, Sound> sounds = new()
-            {
-                { "rifleShoot", LoadSound("src/sounds/rifle/shoot.wav") },
-                { "headshot", LoadSound("src/sounds/rifle/headshot.wav") },
-                { "headshot_voice", LoadSound("src/sounds/headshot_voice.wav") },
-                { "zombie_default", LoadSound("src/sounds/zombie/zombie_default.wav") },
-                { "zombie_kill", LoadSound("src/sounds/zombie/zombie_kill.wav") },
-                { "zombie_herd", LoadSound("src/sounds/zombie/zombie_herd.wav") },
-                { "zombie_eating", LoadSound("src/sounds/zombie/zombie_eating.wav") },
-            };
-            return sounds;
-        }
-
-        /// <summary>Loads every music of the game</summary>
-        /// <returns>The list of loaded musics</returns>
-        private Dictionary<string, Music> LoadMusics()
-        {
-            Dictionary<string, Music> musics = new() 
-            {
-                {"ambience", LoadMusicStream("src/sounds/musics/ambience.mp3") }
-            };
-            return musics;
+            sounds = RLoading.LoadSounds();
+            musics = RLoading.LoadMusics();  
         }
 
         /// <summary>Plays a sound</summary>
