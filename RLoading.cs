@@ -136,7 +136,6 @@ namespace uniray_Project
                     box.Min += gos[i].Position;
                     box.Max += gos[i].Position;
 
-
                     boxes.Add(box);
                 }
             }
@@ -157,6 +156,7 @@ namespace uniray_Project
         }
 
         /// <summary>Generates the general skybox for the game</summary>
+        /// <param name="shaders">Shader center to use for loading shader interactions</param>
         /// <returns>The generated mesh corresponding to the skybox. Background texturing and loading is done as well</returns>
         public static Mesh GenSkybox(ShaderCenter shaders)
         {

@@ -4,6 +4,7 @@ using static Raylib_cs.Raylib;
 
 namespace uniray_Project
 {
+    /// <summary>Represents a ShaderCenter instance used to store shaders and relative data</summary>
     public unsafe class ShaderCenter
     {
         /// <summary>Light View-Projection matrix location in lighting shader</summary>
@@ -92,6 +93,8 @@ namespace uniray_Project
             SetShaderValueMatrix(LightingShader, lightVPLoc, mvp);
         }
 
+        /// <summary>Sends texture tiling update to lighting shader</summary>
+        /// <param name="enabled">Tiling update as a <see langword="bool">.</param>
         public void UpdateTiling(bool enabled)
         {
             SetShaderValue(LightingShader, isTerrainLoc, &enabled, ShaderUniformDataType.Int);
