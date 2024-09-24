@@ -75,7 +75,7 @@ namespace Lurkers_revamped
             Mesh skybox = RLoading.GenSkybox(shaders);
 
             // Load shadow map
-            ShadowMap shadowMap = new ShadowMap(LoadShadowMapRenderTexture(4096, 4096), new Vector3(-50.0f, 25.0f, -50.0f));
+            ShadowMap shadowMap = new ShadowMap(new Vector3(-50.0f, 25.0f, -50.0f), new Vector3(0.95f, -1.0f, 1.5f));
 
             // Load lighting and init shader
             shaders.LoadLighting(shadowMap.CameraView.Target, new Color(70, 25, 0, 255));

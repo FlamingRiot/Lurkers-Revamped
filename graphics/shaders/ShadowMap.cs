@@ -3,10 +3,11 @@ using System.Numerics;
 
 namespace uniray_Project
 {
+    /// <summary>Represents a Shadow Map object</summary>
     public class ShadowMap
     {
         /// <summary>Shadow map resolution</summary>
-        public const int SHADOW_MAP_RESOLUTION = 4096;
+        public static readonly int SHADOW_MAP_RESOLUTION = 4096;
 
         /// <summary>Maximum of rendered lights for shadowmap</summary>
         public const int MAX_LIGHTS = 4;
@@ -19,19 +20,19 @@ namespace uniray_Project
 
         /// <summary>Creates a shadow map object</summary>
         /// <param name="shader">Lighting shader to use</param>
-        public ShadowMap(RenderTexture2D texture, Vector3 position)
+        public ShadowMap(Vector3 position, Vector3 target)
         {
             // Load camera view
             CameraView = new Camera3D() {
                 Position = position,
-                Target = Raymath.Vector3Normalize(new Vector3(0.95f, -1.0f, 1.5f)),
+                Target = Raymath.Vector3Normalize(target),
                 Projection = CameraProjection.Orthographic,
                 Up = new Vector3(0f, 1f, 0f),
                 FovY = 60f
             };
 
             // Load shadow map
-            Map = texture;
+            Map = LoadShadowMapRenderTexture(SHADOW_MAP_RESOLUTION, SHADOW_MAP_RESOLUTION);
         }
 
         /// <summary>Loads a shadow map render texture based on the passed dimensions</summary>

@@ -6,9 +6,6 @@ namespace uniray_Project
 {
     public unsafe class ShaderCenter
     {
-        /// <summary>Base resolution for shadow map</summary>
-        public const int SHADOW_MAP_RESOLUTION = 4096;
-
         /// <summary>Light View-Projection matrix location in lighting shader</summary>
         private int lightVPLoc;
 
@@ -78,7 +75,7 @@ namespace uniray_Project
 
             // Define values
             float[] ambient = new[] { 0.5f, 0.5f, 0.5f, 1.0f };
-            int shadowMapResolution = SHADOW_MAP_RESOLUTION;
+            int shadowMapResolution = ShadowMap.SHADOW_MAP_RESOLUTION;
             Vector4 normalizedColor = ColorNormalize(lightColor);
 
             // Set values at shader locations
