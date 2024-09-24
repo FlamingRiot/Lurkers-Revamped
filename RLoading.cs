@@ -161,7 +161,7 @@ namespace uniray_Project
         public static Mesh GenSkybox(ShaderCenter shaders)
         {
             Mesh skybox = GenMeshCube(1, 1, 1);
-            Texture2D panorama = LoadTexture("src/textures/skyboxes/skybox.hdr");
+            Texture2D panorama = LoadTexture("src/textures/skyboxes/sunset_skybox.hdr");
             Texture2D cubemap = shaders.GenTexureCubemap(panorama, 256, PixelFormat.UncompressedR8G8B8A8);
             shaders.SetCubemap(cubemap);
             UnloadTexture(panorama);

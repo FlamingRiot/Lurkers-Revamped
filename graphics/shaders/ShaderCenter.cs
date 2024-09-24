@@ -131,7 +131,7 @@ namespace uniray_Project
             MotionBlurShader = LoadShader("", "src/shaders/blur.fs");
             prevTextureLoc = GetShaderLocation(MotionBlurShader, "prevFrame");
             int blurAmountLoc = GetShaderLocation(MotionBlurShader, "blurAmount");
-            float blurAmount = 2f;
+            float blurAmount = 1f;
             SetShaderValue(MotionBlurShader, blurAmountLoc, &blurAmount, ShaderUniformDataType.Float);
 
             int chromaticAmountLoc = GetShaderLocation(MotionBlurShader, "chromaticAmount");
