@@ -150,7 +150,7 @@ namespace Lurkers_revamped
             audio.SetMusicVolume("ambience", 1);
 
             // Set target FPS
-            //SetTargetFPS(60);
+            SetTargetFPS(60);
             DisableCursor();
             // Game Loop
             while (!WindowShouldClose())
@@ -177,9 +177,6 @@ namespace Lurkers_revamped
                 {
                     DrawModelEx(rigged[zombie.Type], zombie.Position, Vector3.UnitY, zombie.Angle, new Vector3(3.5f), Color.White);
                 }
-
-                DrawModel(utilities[player.CurrentWeapon.ModelID], new Vector3(camera.Position.X - GetCameraForward(ref camera).X / 3, camera.Position.Y - 0.2f, camera.Position.Z - GetCameraForward(ref camera).Z / 3), 3.5f, Color.White);
-
 
                 DrawMesh(terrain.Mesh, terrain.Material, terrain.Transform);
 

@@ -85,5 +85,5 @@ void main()
     finalColor += texelColor*(ambient/10.0)*colDiffuse;
 
     // Gamma correction
-    finalColor = pow(finalColor, vec4(1.0/1.6));
+    finalColor = pow(finalColor, vec4(1.0/1.9));
 }
