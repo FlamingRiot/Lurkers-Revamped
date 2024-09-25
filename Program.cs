@@ -44,7 +44,7 @@ namespace Lurkers_revamped
             camera.Projection = CameraProjection.Perspective;
             camera.FovY = 60f;
             // Additional camera motion data
-            CameraMotion cameraMotion = new CameraMotion();
+            CameraMotion cameraMotion = new CameraMotion(0.0006f, 10.0f, 0.1f);
 
             // Change the current directory so the embedded materials from the models can be loaded successfully
             sbyte* dir = GetApplicationDirectory();
@@ -160,6 +160,10 @@ namespace Lurkers_revamped
 
                 // Update the camera
                 UpdateCamera(ref camera, ref cameraMotion, player);
+
+                // Update the camera shake motion
+                cameraMotion.ShakeStart = camera.Position;
+                camera.Position = cameraMotion.Update(camera.Position, player.SPEED);
                
                 Matrix4x4 lightView = new Matrix4x4();
                 Matrix4x4 lightProj = new Matrix4x4();
@@ -263,7 +267,7 @@ namespace Lurkers_revamped
                 UpdateModelAnimation(utilities[player.CurrentWeapon.ModelID], player.CurrentAnimation.Anim, player.CurrentAnimation.UpdateFrame());
 
                 // Update the player event handler
-                TickPlayer(player, rifleAnims, ref crosshairColor, shaders);
+                TickPlayer(player, rifleAnims, ref crosshairColor, shaders, ref cameraMotion);
 
                 // Update the screen center (info displayer)
                 screen.Tick();
@@ -534,7 +538,9 @@ namespace Lurkers_revamped
                 AddConstraintMovement(ref movement, player.MotionConstraint.Constraint);
                 // Limit the movement to X and Z axis and normalize
                 movement = new Vector3(movement.X, 0.0f, movement.Z);
+                // Set camera shake
             }
+            else cameraMotion.Amplitude = 0.0006f;
 
             // Increment movement
             camera.Position += movement;
@@ -561,7 +567,7 @@ namespace Lurkers_revamped
         /// Tick the player events
         /// </summary>
         /// <param name="player">The player to check</param>
-        static void TickPlayer(Player player, List<Animation> anims, ref Color crosshairColor, ShaderCenter shaders)
+        static void TickPlayer(Player player, List<Animation> anims, ref Color crosshairColor, ShaderCenter shaders, ref CameraMotion cameraMotion)
         {
             // Manager input events
             // Reload event
@@ -584,10 +590,12 @@ namespace Lurkers_revamped
             if (IsKeyDown(KeyboardKey.LeftShift))
             {
                 player.SPEED = 0.2f;
+                cameraMotion.Amplitude = 0.006f;
             }
             else if (!IsKeyDown(KeyboardKey.LeftShift))
             {
                 player.SPEED = 0.1f;
+                cameraMotion.Amplitude = 0.003f;
             }
 
             // Shooting event
