@@ -19,6 +19,9 @@ namespace uniray_Project
         /// <summary>Location of the terrain boolean value in shader</summary>
         private int isTerrainLoc;
 
+        /// <summary>Location of the float time uniform in the blur post-processing shader</summary>
+        private int timeBlurLoc;
+
         // ################### Shaders ###################
 
         /// <summary>Outline shader</summary>
@@ -137,6 +140,10 @@ namespace uniray_Project
             int chromaticAmountLoc = GetShaderLocation(MotionBlurShader, "chromaticAmount");
             float chromaticAmount = 0.2f;
             SetShaderValue(MotionBlurShader, chromaticAmountLoc, &chromaticAmount, ShaderUniformDataType.Float);
+
+            timeBlurLoc = GetShaderLocation(MotionBlurShader, "time");
+            float time = (float)GetTime();
+            SetShaderValue(MotionBlurShader, timeBlurLoc, &time, ShaderUniformDataType.Float);
         }
 
         /// <summary>Loads every basic shader's material in shader center</summary>
@@ -246,6 +253,13 @@ namespace uniray_Project
         public void SetBlurTexture(RenderTexture2D prevTexture)
         {
             SetShaderValueTexture(MotionBlurShader, prevTextureLoc, prevTexture.Texture);
+        }
+
+        /// <summary>Sets the time variable to the motion blur shader</summary>
+        /// <param name="time">Updated time in seconds</param>
+        public void SetBlurTIme(float time)
+        {
+            SetShaderValue(MotionBlurShader, timeBlurLoc, &time, ShaderUniformDataType.Float);
         }
 
         /// <summary>Unloads all data storred in shader center</summary>

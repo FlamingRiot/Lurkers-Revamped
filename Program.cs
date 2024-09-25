@@ -412,6 +412,9 @@ namespace Lurkers_revamped
                 // Set previous frame render texture
                 shaders.SetBlurTexture(prevTexture);
 
+                // Set current time
+                shaders.SetBlurTIme((float)GetTime());
+
                 // Draw render texture to the screen
                 DrawTexturePro(renderTexture.Texture, inverseSceneRectangle, sceneRectangle, Vector2.Zero, 0, Color.White);
 
