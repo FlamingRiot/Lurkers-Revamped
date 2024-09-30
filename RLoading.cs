@@ -16,7 +16,10 @@ namespace uniray_Project
         {
             Dictionary<string, Model> rigged = new Dictionary<string, Model>()
             {
-                {"cop", LoadModel("../../models/cop.m3d") }
+                {"cop", LoadModel("../../models/cop.m3d") },
+                {"cop2", LoadModel("../../models/cop.m3d") },
+                {"cop3", LoadModel("../../models/cop.m3d") },
+                {"cop4", LoadModel("../../models/cop.m3d") },
             };
             // Return the dictionary
             return rigged;
@@ -36,6 +39,7 @@ namespace uniray_Project
                 {"inventory_case", LoadTexture("../inventory_case.png") },
                 {"crosshair", LoadTexture("../crosshair.png") },
                 {"inventory_case_selected", LoadTexture("../inventory_case_selected.png") },
+                {"lifebar", LoadTexture("../lifebar.png") }
             };
             // Return the dictionary
             return textures;
@@ -64,16 +68,16 @@ namespace uniray_Project
         /// <summary>Loads animation list from .m3d file</summary>
         /// <param name="animation">Relative path to the file containg the animations</param>
         /// <returns>The list of the animations contained in the file</returns>
-        public static List<Animation> LoadAnimationList(string animation)
+        public static List<ModelAnimation> LoadAnimationList(string animation)
         {
             // Load animations into the RAM from the m3d file
             int animCount = 0;
             ModelAnimation* animations = LoadModelAnimations(animation, ref animCount);
             // Create and fill animation list 
-            List<Animation> list = new List<Animation>();
+            List<ModelAnimation> list = new List<ModelAnimation>();
             for (int i = 0; i < animCount; i++)
             {
-                list.Add(new Animation(animations[i]));
+                list.Add(animations[i]);
             }
             return list;
         }

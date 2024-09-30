@@ -44,7 +44,7 @@ namespace uniray_Project.mechanics
         /// <summary>Creates a zombie and returns it.</summary>
         /// <param name="anim">Zombie animation.</param>
         /// <returns>Created zombie</returns>
-        public Zombie CreateZombie(Animation anim, Vector3 playerPosition)
+        public Zombie CreateZombie(ModelAnimation anim, Vector3 playerPosition)
         {
             // Randomize position
             Vector3 diff = Raymath.Vector3Normalize(Raymath.Vector3Subtract(playerPosition, Position));
@@ -58,7 +58,7 @@ namespace uniray_Project.mechanics
         /// <summary>Simulates a bullet collision on a spawner</summary>
         /// <param name="ray">Bullet ray</param>
         /// <param name="mesh">Mesh of the spawner</param>
-        /// <returns></returns>
+        /// <returns><see langword="true"/> if collision succeeds. <see langword="false"/> otherwise.</returns>
         public bool Shoot(Ray ray, Mesh mesh)
         {
             // Retrive collisiion informations

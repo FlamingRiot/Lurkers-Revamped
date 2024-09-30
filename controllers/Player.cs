@@ -18,7 +18,8 @@ namespace uniray_Project
     {
         Running,
         Jumping,
-        Crouch
+        Crouch,
+        Dying
     }
     public class Player
     {
@@ -36,6 +37,8 @@ namespace uniray_Project
         /// Player name
         /// </summary>
         private string name;
+
+        public int Frame;
         /// <summary>
         /// The y position of the player
         /// </summary>
@@ -71,7 +74,7 @@ namespace uniray_Project
         /// <summary>
         /// The currently displayed animation
         /// </summary>
-        private Animation currentAnimation;
+        private ModelAnimation currentAnimation;
         /// <summary>
         /// The amount of life the player
         /// </summary>
@@ -132,10 +135,19 @@ namespace uniray_Project
         /// The secondary state of the player
         /// </summary>
         public PlayerMoveState MoveState { get { return moveState; } set { moveState = value; } }
-        /// <summary>
-        /// The current amount of life the player has
-        /// </summary>
-        public int Life { get { return life; } set { life = value; } }
+
+        /// <summary>The current amount of life of the player</summary>
+        public int Life { get { return life; } 
+            set 
+            { 
+                life = value; 
+                if (life <= 0)
+                {
+                    Kill();
+                }
+            } 
+        }
+
         /// <summary>
         /// The y position of the player
         /// </summary>
@@ -163,7 +175,7 @@ namespace uniray_Project
         /// <summary>
         /// The currently displayed animation
         /// </summary>
-        public Animation CurrentAnimation { get { return currentAnimation; } set { currentAnimation = value; } }
+        public ModelAnimation CurrentAnimation { get { return currentAnimation; } set { currentAnimation = value; } }
         /// <summary>
         /// Player name
         /// </summary>
@@ -172,7 +184,7 @@ namespace uniray_Project
         /// Player constructor
         /// </summary>
         /// <param name="name">Player name</param>
-        public Player(string name, Weapon baseWeapon, Animation currentAnimation)
+        public Player(string name, Weapon baseWeapon, ModelAnimation currentAnimation)
         {
             this.name = name;
             // Init the inventory
@@ -198,6 +210,28 @@ namespace uniray_Project
             this.motionConstraint.Value = 1;
             this.motionConstraint.Constraint = new Vector3(1, 0, 1);
         }
+
+        /// <summary>Updates the frame of current animation.</summary>
+        public int UpdateFrame()
+        {
+            if (Frame == CurrentAnimation.FrameCount - 1)
+            {
+                Frame = 0;
+            }
+            else
+            {
+                Frame++;
+            }
+            return Frame;
+        }
+
+        /// <summary>Starts the dying animation of the player</summary>
+        public void Kill()
+        {
+            MoveState = PlayerMoveState.Dying;
+            Console.WriteLine("Player has been killed!");
+        }
+
         /// <summary>
         /// Add a weapon to the inventory of the player
         /// </summary>
