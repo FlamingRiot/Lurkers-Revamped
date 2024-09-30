@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
-using System.Reflection.Metadata.Ecma335;
+using static Raylib_cs.Raylib;
+using Lurkers_revamped;
 using Raylib_cs;
 
 namespace uniray_Project
@@ -18,7 +19,7 @@ namespace uniray_Project
         Killing
     }
 
-    public class Zombie
+    public unsafe class Zombie
     {
         /// <summary>
         /// The current health of the zombie
@@ -114,9 +115,26 @@ namespace uniray_Project
             currentAnimation = anim;
         }
 
-        public void Shoot()
+        public bool Shoot(Ray ray, Mesh mesh)
         {
+            // Calculates head bone position
+            Vector3 bonePos = Program.RotateNormalizedBone(CurrentAnimation.Anim.FramePoses[CurrentAnimation.Frame][5].Translation, Angle, Position);
+            // Checks collision for the zombie's head
+            RayCollision collisiion = GetRayCollisionSphere(ray, bonePos, 0.4f);
+            if (collisiion.Hit)
+            {
+                // Start death animation (random)
+                if (Random.Shared.Next(0, 2) == 1) State = ZombieState.Dying1;
+                else State = ZombieState.Dying2;
 
+                // Play headshot sounds
+                AudioCenter.PlaySound("headshot");
+                AudioCenter.StopSound("zombie_default");
+                AudioCenter.PlaySound("zombie_kill");
+
+                return true;
+            }
+            else return false;
         }
     }
 }

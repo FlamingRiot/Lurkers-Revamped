@@ -148,8 +148,8 @@ namespace Lurkers_revamped
             // Crosshair color variable
             Color crosshairColor = Color.White;
 
-            audio.PlayMusic("ambience");
-            audio.SetMusicVolume("ambience", 1);
+            AudioCenter.PlayMusic("ambience");
+            AudioCenter.SetMusicVolume("ambience", 1);
 
             // Set target FPS
             SetTargetFPS(60);
@@ -158,7 +158,7 @@ namespace Lurkers_revamped
             while (!WindowShouldClose())
             {
                 // Update music stream
-                audio.UpdateMusic("ambience");
+                AudioCenter.UpdateMusic("ambience");
 
                 // Update the camera
                 UpdateCamera(ref camera, ref cameraMotion, player);
@@ -217,29 +217,13 @@ namespace Lurkers_revamped
                         {
                             player.CurrentWeapon.ShootBullet(new Vector3(camera.Position.X, camera.Position.Y - 0.045f, camera.Position.Z) + GetCameraRight(ref camera) / 12, GetCameraForward(ref camera)); ;
                             // Play shooting sound
-                            audio.PlaySound("rifleShoot");
+                            AudioCenter.PlaySound("rifleShoot");
                             // Set crosshair color
                             crosshairColor = Color.Red;
                             // Check collision with zombies
                             foreach (Zombie zombie in zombies)
                             {
-                                // Calculate the position of the bone according to the rotation and scale of the model
-                                Vector3 bonePos = RotateNormalizedBone(zombie.CurrentAnimation.Anim.FramePoses[zombie.CurrentAnimation.Frame][5].Translation, zombie.Angle, zombie.Position);
-                                // Check collision between bullet and the zombie's head bone
-                                player.CurrentWeapon.bullets.Last().Collision = GetRayCollisionSphere(player.CurrentWeapon.bullets.Last().Ray, bonePos, 0.4f);
-                                // Check collsion details
-                                if (player.CurrentWeapon.bullets.Last().Collision.Hit)
-                                {
-                                    // Play headshot sounds
-                                    audio.PlaySound("headshot");
-                                    audio.StopSound("zombie_default");
-                                    audio.PlaySound("zombie_kill");
-                                    // Start death animation (random)
-                                    if (Random.Shared.Next(0, 2) == 1) zombie.State = ZombieState.Dying1;
-                                    else zombie.State = ZombieState.Dying2;
-                                    // Reset the collision variable
-                                    player.CurrentWeapon.bullets.Last().ResetCollision();
-                                }
+                                zombie.Shoot(player.CurrentWeapon.bullets.Last().Ray, rigged[zombie.Type].Meshes[0]);
                             }
                             // Check spawners
                             foreach (Spawner spawner in spawners)
@@ -388,7 +372,7 @@ namespace Lurkers_revamped
                         zombie.Position += new Vector3(direction.X, 0, direction.Z);
 
                         // Play zombie default running sound
-                        audio.PlaySoundLoop("zombie_default");
+                        AudioCenter.PlaySoundLoop("zombie_default");
                     }
                 }
                 // Remove the zombie from the list if killed
@@ -752,7 +736,7 @@ namespace Lurkers_revamped
         /// <param name="alpha"></param>
         /// <param name="pos"></param>
         /// <returns></returns>
-        static Vector3 RotateNormalizedBone(Vector3 normalizedPos, float alpha, Vector3 pos)
+        public static Vector3 RotateNormalizedBone(Vector3 normalizedPos, float alpha, Vector3 pos)
         {
             // Create the new vector according to the passed parameters 
             Vector3 spacePos = new Vector3(
