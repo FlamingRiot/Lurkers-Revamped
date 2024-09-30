@@ -28,8 +28,6 @@ namespace uniray_Project
         {
             Dictionary<string, Texture2D> textures = new Dictionary<string, Texture2D>()
             {
-                {"headshot", LoadTexture("../headshot.png") },
-                {"plus_coin", LoadTexture("../plus_coin.png") },
                 {"rifle_gray_splash", LoadTexture("../weapon_splashes/rifle_gray.png") },
                 {"rifle_green_splash", LoadTexture("../weapon_splashes/rifle_green.png") },
                 {"rifle_blue_splash", LoadTexture("../weapon_splashes/rifle_blue.png") },

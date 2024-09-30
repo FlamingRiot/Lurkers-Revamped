@@ -112,38 +112,44 @@ namespace Lurkers_revamped
             // Create list of zombies
             List<Zombie> zombies = new List<Zombie>()
             {
-                //new Zombie(new Vector3(-10, 0, 2), "cop", zombieAnims[8])
+                new Zombie(new Vector3(-10, 0, 2), "cop", zombieAnims[8])
             };
 
             // Load UI Fonts
             Font damageFont = LoadFont("src/fonts/damage.ttf");
+            Font chronoFont = LoadFont("src/fonts/Kanit-Bold.ttf");
+            SetTextureFilter(chronoFont.Texture, TextureFilter.Trilinear);
 
             // Set Window state when loading is done
             SetWindowState(ConfigFlags.ResizableWindow);
             SetWindowState(ConfigFlags.MaximizedWindow);
 
+            // Get window size
+            int width = GetScreenWidth();
+            int height = GetScreenHeight(); 
+
             // Scene render texture
-            RenderTexture2D renderTexture = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
+            RenderTexture2D renderTexture = LoadRenderTexture(width, height);
 
             // Previous frame render texture
-            RenderTexture2D prevTexture = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
+            RenderTexture2D prevTexture = LoadRenderTexture(width, height);
 
             // Inverse scene render texture rectangle
-            Rectangle inverseSceneRectangle = new Rectangle(0, 0, GetScreenWidth(), -GetScreenHeight());
+            Rectangle inverseSceneRectangle = new Rectangle(0, 0, width, -height);
 
             // Scene rectangle
-            Rectangle sceneRectangle = new Rectangle(0, 0, GetScreenWidth(), GetScreenHeight());
+            Rectangle sceneRectangle = new Rectangle(0, 0, width, height);
 
             // Set permanent informations of the screen according to the final screen size
             for (int i = 800; i >= 460; i -= 85)
             {
                 // Add the 5 inventory cases displayed on the right side of the screen
-                screen.AddInfo(new TextureInfo(new Vector2(GetScreenWidth() - 120, GetScreenHeight() - i), UITextures["inventory_case"], GetTime(), -1.0));
+                screen.AddInfo(new TextureInfo(new Vector2(width - 120, height - i), UITextures["inventory_case"], GetTime(), -1.0));
             }
 
             // Add current weapon splash
-            screen.AddInfo(new TextureInfo(new Vector2(GetScreenWidth() - 120, GetScreenHeight() - 800), UITextures["rifle_gray_splash"], GetTime(), -1.0));
-            screen.AddInfo(new TextureInfo(new Vector2(GetScreenWidth() - 120, GetScreenHeight() - (800 - (player.InventorySize) * 85)), UITextures["rifle_green_splash"], GetTime(), -1.0));
+            screen.AddInfo(new TextureInfo(new Vector2(width - 120, height - 800), UITextures["rifle_gray_splash"], GetTime(), -1.0));
+            screen.AddInfo(new TextureInfo(new Vector2(width - 120, height - (800 - (player.InventorySize) * 85)), UITextures["rifle_green_splash"], GetTime(), -1.0));
 
             // Crosshair color variable
             Color crosshairColor = Color.White;
@@ -287,13 +293,14 @@ namespace Lurkers_revamped
                 // Set terrain tiling to false
                 shaders.UpdateTiling(false);
 
-                // Draw spawners wave quad
+                /* // Draw spawners wave quad
                 BeginShaderMode(shaders.WaveShader);
                 foreach (Spawner spawner in spawners)
                 {
                     DrawMesh(Spawner.WaveQuad, shaders.WaveMaterial, spawner.Transform);
                 }
                 EndShaderMode();
+                */
 
                 // Check collisions between the player and the static objects
                 // Add current position
@@ -352,6 +359,14 @@ namespace Lurkers_revamped
                                 zombie.CurrentAnimation.Frame = 0;
                             }
                             break;
+                        case ZombieState.Attacking:
+                            zombie.CurrentAnimation = zombieAnims[2];
+                            if (Math.Abs(Vector3Subtract(camera.Position, zombie.Position).Length()) > 5)
+                            {
+                                zombie.State = ZombieState.Running;
+                                zombie.CurrentAnimation.Frame = 0;
+                            }
+                            break;
                     }
 #if DEBUG
                     // Debug bone drawing
@@ -380,7 +395,14 @@ namespace Lurkers_revamped
                         zombie.Angle = alpha;
 
                         // Move the zombie along its direction axis
-                        zombie.Position += new Vector3(direction.X, 0, direction.Z);
+                        if (Math.Abs(Vector3Subtract(camera.Position, zombie.Position).Length()) > 5)
+                        {
+                            zombie.Position += new Vector3(direction.X, 0, direction.Z);
+                        }
+                        else
+                        {
+                            zombie.State = ZombieState.Attacking;
+                        }
 
                         // Play zombie default running sound
                         AudioCenter.PlaySoundLoop("zombie_default");
@@ -450,9 +472,7 @@ namespace Lurkers_revamped
                 // Reset the player's box
                 player.ResetBox();
             }
-            CloseWindow();
-
-            // Unload all ressources that ARE NOT from Uniray
+            CloseWindow();            // Unload all ressources that ARE NOT from Uniray
             foreach (KeyValuePair<string, Model> utilitesList in utilities)
             {
                 for (int i = 0; i < utilitesList.Value.MaterialCount; i++)
@@ -467,6 +487,8 @@ namespace Lurkers_revamped
             }
             // Unload shaders
             shaders.UnloadShaderCenter();
+
+
         }
         /// <summary>
         /// Update camera movement

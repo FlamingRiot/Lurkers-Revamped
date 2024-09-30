@@ -66,7 +66,7 @@ namespace uniray_Project.mechanics
             if (collision.Hit)
             {
                 Health -= 25;
-                CurrentScene.GameObjects[RessourceIndex].Position -= Vector3.UnitY * 0.5f;
+                //CurrentScene.GameObjects[RessourceIndex].Position -= Vector3.UnitY * 0.5f;
                 // Destroy crystal if health = 0
                 if (Health <= 0)
                 {
