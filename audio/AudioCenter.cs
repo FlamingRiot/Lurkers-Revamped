@@ -11,12 +11,12 @@ namespace uniray_Project
         /// <summary>Dictionary of musics</summary>
         private static Dictionary<string, Music> musics;
 
-        /// <summary>AudioCenter constructor</summary>
-        public AudioCenter()
+        /// <summary>Loads every sound and musics of the game</summary>
+        public static void Init()
         {
             InitAudioDevice();
             sounds = RLoading.LoadSounds();
-            musics = RLoading.LoadMusics();  
+            musics = RLoading.LoadMusics();
         }
 
         /// <summary>Plays a sound</summary>

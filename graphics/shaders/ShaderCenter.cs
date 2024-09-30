@@ -25,6 +25,9 @@ namespace uniray_Project
         /// <summary>Location of the float time uniform in the blur post-processing shader</summary>
         private int timeBlurLoc;
 
+        /// <summary>Location of the float time uniform in the wave quad shader</summary>
+        private int timeWaveLoc;
+
         // ################### Shaders ###################
 
         /// <summary>Outline shader</summary>
@@ -42,6 +45,9 @@ namespace uniray_Project
         /// <summary>Motion blur shader</summary>
         public Shader MotionBlurShader;
 
+        /// <summary>Wave quad shader</summary>
+        public Shader WaveShader;
+
         // ################### Materials ###################
 
         /// <summary>Skybox material</summary>
@@ -49,6 +55,9 @@ namespace uniray_Project
 
         /// <summary>The material used for the outline shader</summary>
         public Material OutlineMaterial;
+
+        /// <summary>The material used for the spawner's wave quads</summary>
+        public Material WaveMaterial;
 
         /// <summary>ShaderCenter constructor</summary>
         public ShaderCenter()
@@ -142,6 +151,10 @@ namespace uniray_Project
             timeBlurLoc = GetShaderLocation(MotionBlurShader, "time");
             float time = (float)GetTime();
             SetShaderValue(MotionBlurShader, timeBlurLoc, &time, ShaderUniformDataType.Float);
+
+            // Load wave quad shader
+            WaveShader = LoadShader("src/shaders/WaveQuad.vs", "src/shaders/WaveQuad.fs");
+
         }
 
         /// <summary>Loads every basic shader's material in shader center</summary>
@@ -154,6 +167,10 @@ namespace uniray_Project
             // Init the skybox material
             SkyboxMaterial = LoadMaterialDefault();
             SkyboxMaterial.Shader = SkyboxShader;
+
+            // Init the Wave Quad material
+            WaveMaterial = LoadMaterialDefault();
+            WaveMaterial.Shader = WaveShader;
         }
 
         /// <summary>Generates cubemap according to the passed HDR texture</summary>
@@ -255,9 +272,10 @@ namespace uniray_Project
 
         /// <summary>Sets the time variable to the motion blur shader</summary>
         /// <param name="time">Updated time in seconds</param>
-        public void SetBlurTIme(float time)
+        public void UpdateTime(float time)
         {
             SetShaderValue(MotionBlurShader, timeBlurLoc, &time, ShaderUniformDataType.Float);
+            SetShaderValue(WaveShader, timeWaveLoc, &time, ShaderUniformDataType.Float);
         }
 
         /// <summary>Unloads all data storred in shader center</summary>

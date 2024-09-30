@@ -28,7 +28,7 @@ namespace Lurkers_revamped
             InitEngine();
 
             // Init Audio Center
-            AudioCenter audio = new AudioCenter();
+            AudioCenter.Init();
 
             // Init screen center
             ScreenCenter screen = new ScreenCenter();
@@ -112,7 +112,7 @@ namespace Lurkers_revamped
             // Create list of zombies
             List<Zombie> zombies = new List<Zombie>()
             {
-                new Zombie(new Vector3(-10, 0, 2), "cop", zombieAnims[8])
+                //new Zombie(new Vector3(-10, 0, 2), "cop", zombieAnims[8])
             };
 
             // Load UI Fonts
@@ -228,7 +228,10 @@ namespace Lurkers_revamped
                             // Check spawners
                             foreach (Spawner spawner in spawners)
                             {
-                                spawner.Shoot(player.CurrentWeapon.bullets.Last().Ray, GetRessourceModel("crystal").Meshes[0]);
+                                if (spawner.Shoot(player.CurrentWeapon.bullets.Last().Ray, GetRessourceModel("crystal").Meshes[0]))
+                                {
+                                    //zombies.Add(spawner.CreateZombie(zombieAnims[8], camera.Position));
+                                }
                             }
                             
                             player.CurrentWeapon.bullets.RemoveAt(0);
@@ -283,6 +286,14 @@ namespace Lurkers_revamped
 
                 // Set terrain tiling to false
                 shaders.UpdateTiling(false);
+
+                // Draw spawners wave quad
+                BeginShaderMode(shaders.WaveShader);
+                foreach (Spawner spawner in spawners)
+                {
+                    DrawMesh(Spawner.WaveQuad, shaders.WaveMaterial, spawner.Transform);
+                }
+                EndShaderMode();
 
                 // Check collisions between the player and the static objects
                 // Add current position
@@ -379,12 +390,6 @@ namespace Lurkers_revamped
                 if (killIndex != -1)
                 {
                     zombies.RemoveAt(killIndex);
-
-                    // Spawn a new zombie (debug sandbox only)
-                    Random r = new Random();
-
-                    Zombie zombzomb = new Zombie(new Vector3(r.Next(-50, 50), 0, r.Next(-50, 50)), "cop", zombieAnims[8]);
-                    zombies.Add(zombzomb);
                 }
 
                 // End 3D mode context
@@ -402,7 +407,7 @@ namespace Lurkers_revamped
                 shaders.SetBlurTexture(prevTexture);
 
                 // Set current time
-                shaders.SetBlurTIme((float)GetTime());
+                shaders.UpdateTime((float)GetTime());
 
                 // Draw render texture to the screen
                 DrawTexturePro(renderTexture.Texture, inverseSceneRectangle, sceneRectangle, Vector2.Zero, 0, Color.White);
@@ -416,7 +421,6 @@ namespace Lurkers_revamped
                 // Debug positions
                 DrawText("Position: " + camera.Position.ToString() +
                     "\nJump Force: " + player.VJump +
-                    "\nFrame: " + zombies.First().CurrentAnimation.Frame +
                     "\nInventory Index: " + player.InventoryIndex +
                     "\nWeapon Level: " + player.CurrentWeapon.Level +
                     "\nCamera Target:" + camera.Target.ToString() +

@@ -6,6 +6,9 @@ namespace uniray_Project.mechanics
 {
     public class Spawner
     {
+        /// <summary>Quad used to render the wave</summary>
+        public static Mesh WaveQuad = GenMeshPlane(10, 10, 1, 1);
+
         private int RessourceIndex;
 
         /// <summary>Position of the spawner.</summary>
@@ -41,10 +44,11 @@ namespace uniray_Project.mechanics
         /// <summary>Creates a zombie and returns it.</summary>
         /// <param name="anim">Zombie animation.</param>
         /// <returns>Created zombie</returns>
-        public Zombie CreateZombie(Animation anim)
+        public Zombie CreateZombie(Animation anim, Vector3 playerPosition)
         {
             // Randomize position
-            Vector3 position = Position + new Vector3((float)Random.Shared.NextDouble() * 2.5f, 0, (float)Random.Shared.NextDouble() * 2.5f);
+            Vector3 diff = Raymath.Vector3Normalize(Raymath.Vector3Subtract(playerPosition, Position));
+            Vector3 position = new Vector3(Position.X + diff.X * 10, 0, Position.Z + diff.Z * 10);
             // Create zombie
             Zombie zombzomb = new Zombie(position, "cop", anim);
             // Return zombie
@@ -61,7 +65,8 @@ namespace uniray_Project.mechanics
             RayCollision collision = GetRayCollisionMesh(ray, mesh, Transform);
             if (collision.Hit)
             {
-                Health -= 100;
+                Health -= 25;
+                CurrentScene.GameObjects[RessourceIndex].Position -= Vector3.UnitY * 0.5f;
                 // Destroy crystal if health = 0
                 if (Health <= 0)
                 {

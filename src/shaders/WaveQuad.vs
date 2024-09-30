@@ -8,13 +8,13 @@ uniform mat4 mvp;
 
 out vec3 fragPosition;
 out vec3 fragNormal;
-out vec2 uv;
+out vec2 fragTexCoord;
 
 void main()
 {
 	fragPosition = vertexPosition;
 	fragNormal = vertexNormal;
-	uv = vertexTexCoord * 20;
+	fragTexCoord = vertexTexCoord;
 
 	gl_Position = mvp*vec4(vertexPosition, 1.0);
 }
