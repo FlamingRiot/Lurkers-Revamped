@@ -1,8 +1,9 @@
 ﻿using Raylib_cs;
 using UnirayEngine;
-using uniray_Project;
+using static UnirayEngine.UnirayEngine;
 using static Raylib_cs.Raylib;
 using System.Numerics;
+using uniray_Project.mechanics;
 
 namespace uniray_Project
 {
@@ -141,6 +142,17 @@ namespace uniray_Project
             }
             // Return all the models
             return boxes;
+        }
+
+        /// <summary>Loads spawners positon from game data</summary>
+        /// <returns>List of spawners</returns>
+        public static List<Spawner> LoadSpawners()
+        {
+            List<Spawner> spawners = new List<Spawner>();
+            foreach (UModel go in CurrentScene.GameObjects.Where(x => x is UModel).Where(x => ((UModel)x).ModelID == "crystal")){
+                spawners.Add(new Spawner(go.Position, go.Transform, 5, 7, CurrentScene.GameObjects.IndexOf(go)));
+            }
+            return spawners;
         }
 
         /// <summary>Generates the base terrain for the game</summary>

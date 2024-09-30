@@ -3,10 +3,10 @@ using static Raylib_cs.Raylib;
 using static Raylib_cs.Raymath;
 using System.Numerics;
 using static UnirayEngine.UnirayEngine;
+using UnirayEngine;
 using uniray_Project;
 using System.Text;
-using UnirayEngine;
-using System.Xml.Linq;
+using uniray_Project.mechanics;
 
 namespace Lurkers_revamped
 {
@@ -69,7 +69,9 @@ namespace Lurkers_revamped
 
             // Load terrain
             Terrain terrain = RLoading.GenTerrain();
-            terrain.SetShader(shaders.TilingShader);
+
+            // Load spawners
+            List<Spawner> spawners = RLoading.LoadSpawners();
 
             // Load skybox
             Mesh skybox = RLoading.GenSkybox(shaders);
@@ -228,22 +230,21 @@ namespace Lurkers_revamped
                                 // Check collsion details
                                 if (player.CurrentWeapon.bullets.Last().Collision.Hit)
                                 {
-
-                                    Random r = new Random();
                                     // Play headshot sounds
                                     audio.PlaySound("headshot");
                                     audio.StopSound("zombie_default");
                                     audio.PlaySound("zombie_kill");
-                                    // Add screen info for the headshot
-                                    Vector2 pos = new Vector2(GetScreenWidth() - UITextures["headshot"].Width / 2 - 170, GetScreenHeight() - 285);
-                                    screen.AddInfo(new TextureInfo(pos, UITextures["headshot"], GetTime(), 1f));
-                                    screen.AddInfo(new TextureInfo(new Vector2(pos.X + UITextures["headshot"].Width - 100, pos.Y + UITextures["headshot"].Height - 100), UITextures["plus_coin"], GetTime(), 1f));
                                     // Start death animation (random)
-                                    if (r.Next(0, 2) == 1) zombie.State = ZombieState.Dying1;
+                                    if (Random.Shared.Next(0, 2) == 1) zombie.State = ZombieState.Dying1;
                                     else zombie.State = ZombieState.Dying2;
                                     // Reset the collision variable
                                     player.CurrentWeapon.bullets.Last().ResetCollision();
                                 }
+                            }
+                            // Check spawners
+                            foreach (Spawner spawner in spawners)
+                            {
+                                spawner.Shoot(player.CurrentWeapon.bullets.Last().Ray, GetRessourceModel("crystal").Meshes[0]);
                             }
                             
                             player.CurrentWeapon.bullets.RemoveAt(0);

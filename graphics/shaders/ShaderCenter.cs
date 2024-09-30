@@ -1,4 +1,5 @@
-﻿using Raylib_cs;
+﻿using Examples.Shared;
+using Raylib_cs;
 using System.Numerics;
 using static Raylib_cs.Raylib;
 
@@ -7,6 +8,8 @@ namespace uniray_Project
     /// <summary>Represents a ShaderCenter instance used to store shaders and relative data</summary>
     public unsafe class ShaderCenter
     {
+        public const int MAX_STATIC_LIGHTS = 4;
+
         /// <summary>Light View-Projection matrix location in lighting shader</summary>
         private int lightVPLoc;
 
@@ -26,9 +29,6 @@ namespace uniray_Project
 
         /// <summary>Outline shader</summary>
         public Shader OutlineShader;
-        
-        /// <summary>The texture-tiling shader for the terrain</summary>
-        public Shader TilingShader;
 
         /// <summary>Skybox shader</summary>
         public Shader SkyboxShader;
@@ -119,8 +119,6 @@ namespace uniray_Project
         {
             // Load outline shader
             OutlineShader = LoadShader("src/shaders/outline.vs", "src/shaders/outline.fs");
-            // Load tiling shader
-            TilingShader = LoadShader("src/shaders/tiling.vs", "src/shaders/tiling.fs");
             // Load skybox shader
             SkyboxShader = LoadShader("src/shaders/skybox.vs", "src/shaders/skybox.fs");
             SetShaderValue(SkyboxShader, GetShaderLocation(SkyboxShader, "environmentMap"), (int)MaterialMapIndex.Cubemap, ShaderUniformDataType.Int);
@@ -275,8 +273,8 @@ namespace uniray_Project
             UnloadShader(SkyboxShader);
             UnloadShader(CubemapShader);
             UnloadShader(OutlineShader);
-            UnloadShader(TilingShader);
             UnloadShader(LightingShader);
+            UnloadShader(MotionBlurShader);
         }
 
         /// <summary>Unloads every material storred in shader center</summary>

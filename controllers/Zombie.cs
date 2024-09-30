@@ -80,6 +80,11 @@ namespace uniray_Project
         /// The position of the zombie extracted from the matrix
         /// </summary>
         public Vector3 Position { get { return new Vector3(transform.M14, transform.M24, transform.M34); } set { transform.M14 = value.X;transform.M24 = value.Y; transform.M34 = value.Z; } }
+        
+        /// <summary>Creates a zombie.</summary>
+        /// <param name="position">Positon of the zombie.</param>
+        /// <param name="type">Type of the zombie (what model to use).</param>
+        /// <param name="anim">Starting animation to use for the zombie.</param>
         public Zombie(Vector3 position, string type, Animation anim)
         {
             // Define position
@@ -103,10 +108,15 @@ namespace uniray_Project
             }
 
             // Set default state
-            this.state = ZombieState.Running;
+            state = ZombieState.Running;
 
             // Set current animation of the zombie
-            this.currentAnimation = anim;
+            currentAnimation = anim;
+        }
+
+        public void Shoot()
+        {
+
         }
     }
 }
