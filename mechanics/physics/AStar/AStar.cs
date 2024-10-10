@@ -65,6 +65,7 @@ namespace AStar
                         if (!openSet.Contains(neighbour))
                         {
                             openSet.Add(neighbour); 
+                            openSet.UpdateItem(neighbour);
                         }
                     }
                 }
