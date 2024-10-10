@@ -7,6 +7,7 @@ using UnirayEngine;
 using uniray_Project;
 using System.Text;
 using uniray_Project.mechanics;
+using AStar;
 
 namespace Lurkers_revamped
 {
@@ -69,6 +70,9 @@ namespace Lurkers_revamped
 
             // Load terrain
             Terrain terrain = RLoading.GenTerrain();
+
+            // Load A* Grid
+            Grid aStarGrid = new Grid(Vector3.Zero, new Vector2(120), 0.5f, staticBoxes);
 
             // Load spawners
             List<Spawner> spawners = RLoading.LoadSpawners();
@@ -316,6 +320,9 @@ namespace Lurkers_revamped
 #if DEBUG
                 // Draw player's bounding box
                 DrawBoundingBox(player.Box, Color.Red);
+
+                // Draw node map
+                aStarGrid.DrawNodeMap();
 #endif
                 // Draw the gameobjects of the environment (from Uniray)
                 DrawScene();
