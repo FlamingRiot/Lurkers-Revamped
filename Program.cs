@@ -72,7 +72,7 @@ namespace Lurkers_revamped
             Terrain terrain = RLoading.GenTerrain();
 
             // Load A* Grid
-            Grid aStarGrid = new Grid(Vector3.Zero, new Vector2(120), 0.5f, staticBoxes);
+            AStar.AStar aStar = new(new Grid(Vector3.Zero, new Vector2(120), 0.5f, staticBoxes));
 
             // Load spawners
             List<Spawner> spawners = RLoading.LoadSpawners();
@@ -120,9 +120,9 @@ namespace Lurkers_revamped
             List<Zombie> zombies = new List<Zombie>()
             {
                 new Zombie(new Vector3(-10, 0, 2), "cop", zombieAnims[8]),
-                new Zombie(new Vector3(10, 0, 2), "cop2", zombieAnims[8]),
+                /*new Zombie(new Vector3(10, 0, 2), "cop2", zombieAnims[8]),
                 new Zombie(new Vector3(2, 0, -10), "cop3", zombieAnims[8]),
-                new Zombie(new Vector3(2, 0, 10), "cop4", zombieAnims[8])
+                new Zombie(new Vector3(2, 0, 10), "cop4", zombieAnims[8])*/
             };
 
             // Load UI Fonts
@@ -168,7 +168,7 @@ namespace Lurkers_revamped
             AudioCenter.SetMusicVolume("ambience", 1);
 
             // Set target FPS
-            SetTargetFPS(60);
+            //SetTargetFPS(60);
             DisableCursor();
             // Game Loop
             while (!WindowShouldClose())
@@ -322,8 +322,10 @@ namespace Lurkers_revamped
                 DrawBoundingBox(player.Box, Color.Red);
 
                 // Draw node map
-                aStarGrid.DrawNodeMap();
+                aStar.Grid.DrawNodeMap();
 #endif
+                aStar.FindPath(zombies[0].Position, camera.Position);
+
                 // Draw the gameobjects of the environment (from Uniray)
                 DrawScene();
 
