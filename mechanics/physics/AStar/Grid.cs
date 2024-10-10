@@ -40,6 +40,12 @@ namespace AStar
             nodes = CreateGrid(obstacles);
         }
 
+        /// <summary>Maximum size of the grid</summary>
+        public int MaxSize
+        {
+            get { return (int)GridSize.X * (int)GridSize.Y; }
+        }
+
         /// <summary>Creates a <see cref="Grid"/> object and instanciate array of <see cref="Node"/>.</summary>
         /// <returns>The array of <see cref="Node"/> clearly defined.</returns>
         private Node[,] CreateGrid(List<BoundingBox> obstacles)

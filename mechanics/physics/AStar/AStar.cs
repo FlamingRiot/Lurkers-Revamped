@@ -23,7 +23,7 @@ namespace AStar
             Node startNode = Grid.GetWorldToNode(startPos);
             Node targetNode = Grid.GetWorldToNode(targetPos);
 
-            List<Node> openSet = new List<Node>();
+            Heap<Node> openSet = new Heap<Node>(Grid.MaxSize);
             HashSet<Node> closedSet = new HashSet<Node>();
 
             // Initialize set with genesis node
@@ -32,16 +32,7 @@ namespace AStar
             // Algorithm search loop
             while (openSet.Count > 0)
             {
-                Node currentNode = openSet[0];
-                for (int i = 1; i < openSet.Count; i++)
-                {
-                    if (openSet[i].FCost < currentNode.FCost || openSet[i].FCost == currentNode.FCost && openSet[i].HCost < currentNode.HCost)
-                    {
-                        currentNode = openSet[i];
-                    }
-                }
-
-                openSet.Remove(currentNode);
+                Node currentNode = openSet.RemoveFirst();
                 closedSet.Add(currentNode);
 
                 // Check if the path has been found

@@ -3,7 +3,7 @@
 namespace AStar
 {
     /// <summary>Represents a <see cref="Node"/> object of the A* algorithm.</summary>
-    public class Node
+    public class Node : IHeapItem<Node>
     {
         /// <summary>Define if the node is obstructed.</summary>
         public bool Walkable;
@@ -34,6 +34,24 @@ namespace AStar
             Walkable = _walkable;
             Position = _position;
             GridPosition = _gridPosition;
+        }
+
+        /// <summary>Heap index of the node</summary>
+        public int HeapIndex { get; set; }
+
+        public int CompareTo(Node? item)
+        {
+            if (item != null)
+            {
+                int compare = FCost.CompareTo(item.FCost);
+                if (compare == 0)
+                {
+                    compare = HCost.CompareTo(item.HCost);
+                }
+                return -compare;
+
+            }
+            return 0;
         }
     }
 }
