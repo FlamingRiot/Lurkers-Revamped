@@ -8,11 +8,17 @@ namespace AStar
         /// <summary>Grid of the algorithm instance.</summary>
         public Grid Grid;
 
+        // Sets of opened and closed nodes
+        private Heap<Node> openSet;
+        private HashSet<Node> closedSet;
+
         /// <summary>Creates a <see cref="AStar"/> object.</summary>
         /// <param name="grid">Grid of the algorithm.</param>
         public AStar(Grid grid)
         {
             Grid = grid;
+            openSet = new Heap<Node>(Grid.MaxSize);
+            closedSet = new HashSet<Node>();
         }
 
         /// <summary>Finds the shortest path from a <see cref="Node"/> to another.</summary>
@@ -23,8 +29,8 @@ namespace AStar
             Node startNode = Grid.GetWorldToNode(startPos);
             Node targetNode = Grid.GetWorldToNode(targetPos);
 
-            Heap<Node> openSet = new Heap<Node>(Grid.MaxSize);
-            HashSet<Node> closedSet = new HashSet<Node>();
+            openSet.Clear();
+            closedSet.Clear();
 
             // Initialize set with genesis node
             openSet.Add(startNode);

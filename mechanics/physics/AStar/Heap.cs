@@ -35,6 +35,12 @@
             currentItemCount++;
         }
 
+        /// <summary>Clears the items of the heap.</summary>
+        public void Clear()
+        {
+            currentItemCount = 0;
+        }
+
         /// <summary>Removes and returns the first item <see cref="T"/> of the heap.</summary>
         /// <returns>The first item <see cref="T"/> of the heap.</returns>
         public T RemoveFirst()
@@ -62,7 +68,14 @@
         /// <returns><see langword="true"/> if the heap contains the item <see cref="T"/>. <see langword="false"/> otherwise.</returns>
         public bool Contains(T item)
         {
-            return Equals(items[item.HeapIndex], item);
+            if (item.HeapIndex < currentItemCount)
+            {
+                return Equals(items[item.HeapIndex], item);
+            }
+            else
+            {
+                return false;
+            }
         }
 
         // ------------------------------------------------------------------------
