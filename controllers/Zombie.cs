@@ -54,6 +54,8 @@ namespace uniray_Project
         /// <summary>The zombie's player detection ray.</summary>
         public Ray VisionRay { get { return ray; } set { ray = value; } }
 
+        public Vector3 Direction { get; set; }
+
         /// <summary>The position of the zombie as a <see cref="Vector3"/>, extracted from a <see cref="Matrix4x4"/>.</summary>
         public Vector3 Position 
         { 
@@ -110,6 +112,8 @@ namespace uniray_Project
 
             // Set current animation of the zombie
             currentAnimation = anim;
+
+            Direction = Vector3.Zero;
         }
 
         /// <summary>Updates the frame of current animation.</summary>

@@ -390,7 +390,8 @@ namespace Lurkers_revamped
                     if (zombie.State == ZombieState.Running)
                     {
                         // Calculate angle rotation angle of the zombie
-                        float angle = (float)Math.Atan2(camera.Position.Z - zombie.Position.Z, camera.Position.X - zombie.Position.X);
+                        float angle = (float)Math.Atan2(aStar.Grid.Path[0].Position.Y - zombie.Position.Z, aStar.Grid.Path[0].Position.X - zombie.Position.X);
+                        //float angle = (float)Math.Atan2(camera.Position.Z - zombie.Position.Z, camera.Position.X - zombie.Position.X);
                         zombie.Angle = (-angle * RAD2DEG) + 90;
 
                         // Calculate movement
