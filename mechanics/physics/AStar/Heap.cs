@@ -147,9 +147,7 @@
             items[itemA.HeapIndex] = itemB;
             items[itemB.HeapIndex] = itemA;
             // Swap heap indexes
-            int itemAIndex = itemA.HeapIndex;
-            itemA.HeapIndex = itemB.HeapIndex;
-            itemB.HeapIndex = itemAIndex;
+            (itemA.HeapIndex, itemB.HeapIndex) = (itemB.HeapIndex, itemA.HeapIndex);
         }
     }
 }

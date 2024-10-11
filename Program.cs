@@ -385,36 +385,19 @@ namespace Lurkers_revamped
                             }
                             break;
                     }
-#if DEBUG
-                    // Debug bone drawing
-                    Vector3 posA = RotateNormalizedBone(zombie.CurrentAnimation.FramePoses[zombie.Frame][5].Translation, zombie.Angle, zombie.Position);
-#endif
+
                     // Move and rotate the zombie if running
                     if (zombie.State == ZombieState.Running)
                     {
-                        // Define origin vector of the rotation
-                        Vector3 origin = Vector3.UnitZ;
-                        // Define direction of the rotation
-                        Vector3 direction = Vector3Normalize(Vector3Subtract(camera.Position, zombie.Position)) * 0.1f;
+                        // Calculate angle rotation angle of the zombie
+                        float angle = (float)Math.Atan2(camera.Position.Z - zombie.Position.Z, camera.Position.X - zombie.Position.X);
+                        zombie.Angle = (-angle * RAD2DEG) + 90;
 
-                        // Calculate cosine of the angle
-                        float angle = (Vector3DotProduct(origin, direction)) / (Vector3Length(origin) * Vector3Length(direction));
-                        // Calculate the angle from the cosine
-                        float alpha = (float)Math.Acos(angle) * RAD2DEG;
-
-                        // Reverse angle if needed
-                        if (camera.Position.X < zombie.Position.X)
+                        // Calculate movement
+                        if (Math.Abs(Vector3Subtract(camera.Position, zombie.Position).Length()) > 5) 
                         {
-                            alpha = -alpha;
-                        }
-
-                        // Set the rotation of the zombie
-                        zombie.Angle = alpha;
-
-                        // Move the zombie along its direction axis
-                        if (Math.Abs(Vector3Subtract(camera.Position, zombie.Position).Length()) > 5)
-                        {
-                            zombie.Position += new Vector3(direction.X, 0, direction.Z);
+                            zombie.X += MathF.Cos(angle) * Zombie.SPEED * GetFrameTime();
+                            zombie.Z += MathF.Sin(angle) * Zombie.SPEED * GetFrameTime();
                         }
                         else
                         {

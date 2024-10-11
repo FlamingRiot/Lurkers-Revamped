@@ -20,6 +20,8 @@ namespace uniray_Project
     /// <summary>Represents an instance of a <see cref="Zombie"/> object.</summary>
     public unsafe class Zombie
     {
+        public const float SPEED = 5f;
+
         private int health;
         private string type;
         private float angle;
@@ -53,8 +55,30 @@ namespace uniray_Project
         public Ray VisionRay { get { return ray; } set { ray = value; } }
 
         /// <summary>The position of the zombie as a <see cref="Vector3"/>, extracted from a <see cref="Matrix4x4"/>.</summary>
-        public Vector3 Position { get { return new Vector3(transform.M14, transform.M24, transform.M34); } set { transform.M14 = value.X;transform.M24 = value.Y; transform.M34 = value.Z; } }
-        
+        public Vector3 Position 
+        { 
+            get { return new Vector3(transform.M14, transform.M24, transform.M34); } 
+            set { transform.M14 = value.X;transform.M24 = value.Y; transform.M34 = value.Z; } 
+        }
+
+        public float X
+        {
+            get { return transform.M14; }
+            set { transform.M14 = value; }
+        }
+
+        public float Y
+        {
+            get { return transform.M24; }
+            set { transform.M24 = value; }
+        }
+
+        public float Z
+        {
+            get { return transform.M34; }
+            set { transform.M34 = value; }
+        }
+
         /// <summary>Creates a zombie.</summary>
         /// <param name="position">Positon of the zombie.</param>
         /// <param name="type">Type of the zombie (what model to use).</param>
