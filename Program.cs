@@ -115,14 +115,15 @@ namespace Lurkers_revamped
             Player player = new Player("Anonymous254", new Weapon("Lambert Niv. 1", "rifle", 50, 1), rifleAnims[1]);
             // (Debug) Add a second weapon to the inventory of the player
             player.AddWeapon(new Weapon("Lambert Niv. 2", "rifle", 50, 2));
+            Vector3 radioPosition = Vector3.Zero;
 
             // Create list of zombies
             List<Zombie> zombies = new List<Zombie>()
             {
                 new Zombie(new Vector3(-10, 0, 2), "cop", zombieAnims[8]),
-                /*new Zombie(new Vector3(10, 0, 2), "cop2", zombieAnims[8]),
+                new Zombie(new Vector3(10, 0, 2), "cop2", zombieAnims[8]),
                 new Zombie(new Vector3(2, 0, -10), "cop3", zombieAnims[8]),
-                new Zombie(new Vector3(2, 0, 10), "cop4", zombieAnims[8])*/
+                new Zombie(new Vector3(2, 0, 10), "cop4", zombieAnims[8])
             };
 
             // Load UI Fonts
@@ -177,7 +178,7 @@ namespace Lurkers_revamped
                 AudioCenter.UpdateMusic("ambience");
 
                 // Update the camera
-                UpdateCamera(ref camera, ref cameraMotion, player);
+                UpdateCamera(ref camera, ref cameraMotion, player, ref radioPosition);
 
                 // Update the camera shake motion
                 cameraMotion.ShakeStart = camera.Position;
@@ -506,7 +507,7 @@ namespace Lurkers_revamped
         /// <param name="camera">The camera to update</param>
         /// <param name="cameraMotion">The camera motion additional variables</param>
         /// <param name="player">The player associated to the camera</param>
-        static void UpdateCamera(ref Camera3D camera, ref CameraMotion cameraMotion, Player player)
+        static void UpdateCamera(ref Camera3D camera, ref CameraMotion cameraMotion, Player player, ref Vector3 radioPosition)
         {
             // Calculate the camera rotation
             Vector2 mouse = GetMouseDelta();
@@ -548,6 +549,26 @@ namespace Lurkers_revamped
             {
                 if (cameraMotion.SideShake < 0.0f) cameraMotion.SideShake += 0.01f;
                 else if (cameraMotion.SideShake > 0.0f) cameraMotion.SideShake -= 0.01f;
+            }
+            if (IsKeyPressed(KeyboardKey.E))
+            {
+                foreach (UModel radio in CurrentScene.GameObjects.Where(x => x is UModel).Where(x => ((UModel)x).ModelID == "radio"))
+                {
+                    radioPosition = radio.Position;
+                    if (Vector3Distance(radioPosition, camera.Position) <= 3){
+                        AudioCenter.PlayMusic("lerob");
+                        AudioCenter.SetMusicVolume("lerob", 8);
+                        AudioCenter.PlaySound("radio");
+                        AudioCenter.SetSoundVolume("radio", 10);
+                    }
+                }
+            }
+            if (AudioCenter.IsMusicPlaying("lerob"))
+            {
+                AudioCenter.UpdateMusic("lerob");
+                float volume = 20 - Vector3Distance(radioPosition, camera.Position);
+                volume = Clamp(volume, 0f, 8f);
+                AudioCenter.SetMusicVolume("lerob", volume);
             }
 
             // Final movement transformations

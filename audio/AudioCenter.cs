@@ -57,12 +57,36 @@ namespace uniray_Project
             UpdateMusicStream(musics[key]);
         }
 
+        /// <summary>Checks if a music is already playing.</summary>
+        /// <param name="key">Key of the music to check.</param>
+        /// <returns><see langword="true"/> if the music is indeed playing. <see langword="false"/> otherwise.</returns>
+        public static bool IsMusicPlaying(string key)
+        {
+            return IsMusicStreamPlaying(musics[key]);
+        }
+
         /// <summary>Sets music volume</summary>
         /// <param name="key">Dictionary key of the music</param>
         /// <param name="volume">Volume to set</param>
         public static void SetMusicVolume(string key, float volume)
         {
             Raylib.SetMusicVolume(musics[key], volume);
+        }
+
+        /// <summary>Sets music pitch</summary>
+        /// <param name="key">Dictionary key of the music</param>
+        /// <param name="volume">Pitch to set</param>
+        public static void SetMusicPitch(string key, float pitch)
+        {
+            Raylib.SetMusicPitch(musics[key], pitch);
+        }
+
+        /// <summary>Sets sound volume</summary>
+        /// <param name="key">Dictionary key of the sound</param>
+        /// <param name="volume">Volume to set</param>
+        public static void SetSoundVolume(string key, float volume)
+        {
+            Raylib.SetSoundVolume(sounds[key], volume);
         }
     }
 }

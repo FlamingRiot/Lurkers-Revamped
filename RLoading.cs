@@ -95,6 +95,7 @@ namespace uniray_Project
                 { "zombie_kill", LoadSound("src/sounds/zombie/zombie_kill.wav") },
                 { "zombie_herd", LoadSound("src/sounds/zombie/zombie_herd.wav") },
                 { "zombie_eating", LoadSound("src/sounds/zombie/zombie_eating.wav") },
+                { "radio", LoadSound("src/sounds/radio.wav") },
             };
             return sounds;
         }
@@ -105,7 +106,8 @@ namespace uniray_Project
         {
             Dictionary<string, Music> musics = new()
             {
-                {"ambience", LoadMusicStream("src/sounds/musics/ambience.mp3") }
+                {"ambience", LoadMusicStream("src/sounds/musics/ambience.mp3") }, 
+                {"lerob", LoadMusicStream("src/sounds/musics/lerob.mp3") } 
             };
             return musics;
         }
