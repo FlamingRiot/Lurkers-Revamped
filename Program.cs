@@ -324,7 +324,11 @@ namespace Lurkers_revamped
                 // Draw node map
                 aStar.Grid.DrawNodeMap();
 #endif
-                aStar.FindPath(zombies[0].Position, camera.Position);
+                // Find path 
+                if (aStar.Grid.GetWorldToNode(camera.Position).Walkable)
+                {
+                    aStar.FindPath(zombies[0].Position, camera.Position);
+                }
 
                 // Draw the gameobjects of the environment (from Uniray)
                 DrawScene();
@@ -387,7 +391,7 @@ namespace Lurkers_revamped
                     }
 
                     // Move and rotate the zombie if running
-                    if (zombie.State == ZombieState.Running)
+                    if (zombie.State == ZombieState.Running && aStar.Grid.Path.Count != 0)
                     {
                         // Calculate angle rotation angle of the zombie
                         float angle = (float)Math.Atan2(aStar.Grid.Path[0].Position.Y - zombie.Position.Z, aStar.Grid.Path[0].Position.X - zombie.Position.X);
