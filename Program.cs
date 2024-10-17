@@ -2,8 +2,8 @@
 using static Raylib_cs.Raylib;
 using static Raylib_cs.Raymath;
 using System.Numerics;
-using static UnirayEngine.UnirayEngine;
-using UnirayEngine;
+using Uniray_Engine;
+using static Uniray_Engine.UnirayEngine;
 using uniray_Project;
 using System.Text;
 using uniray_Project.mechanics;
@@ -245,7 +245,7 @@ namespace Lurkers_revamped
                             // Check spawners
                             foreach (Spawner spawner in spawners)
                             {
-                                if (spawner.Shoot(player.CurrentWeapon.bullets.Last().Ray, GetRessourceModel("crystal").Meshes[0]))
+                                if (spawner.Shoot(player.CurrentWeapon.bullets.Last().Ray, UnirayEngine.Ressource.GetModel("crystal").Meshes[0]))
                                 {
                                     //zombies.Add(spawner.CreateZombie(zombieAnims[8], camera.Position));
                                 }

@@ -1,6 +1,6 @@
 ﻿using Raylib_cs;
-using UnirayEngine;
-using static UnirayEngine.UnirayEngine;
+using Uniray_Engine;
+using static Uniray_Engine.UnirayEngine;
 using static Raylib_cs.Raylib;
 using System.Numerics;
 using uniray_Project.mechanics;
