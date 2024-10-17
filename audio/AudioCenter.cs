@@ -30,7 +30,7 @@ namespace uniray_Project
         /// <param name="key">Dictionary key of the sound</param>
         public static void PlaySoundLoop(string key)
         {
-            if (!IsSoundPlaying(sounds[key]))
+            if (!Raylib.IsSoundPlaying(sounds[key]))
             {
                 Raylib.PlaySound(sounds[key]);
             }
@@ -63,6 +63,14 @@ namespace uniray_Project
         public static bool IsMusicPlaying(string key)
         {
             return IsMusicStreamPlaying(musics[key]);
+        }
+
+        /// <summary>Checks if a sound is already playing.</summary>
+        /// <param name="key">Key of the sound to check.</param>
+        /// <returns><see langword="true"/> if the sound is indeed playing. <see langword="false"/> otherwise.</returns>
+        public static bool IsSoundPlaying(string key)
+        {
+            return Raylib.IsSoundPlaying(sounds[key]);
         }
 
         /// <summary>Sets music volume</summary>

@@ -29,114 +29,55 @@ namespace uniray_Project
         /// <summary>Player's base movement speed</summary>
         public float SPEED = 0.1f;
 
-        /// <summary>
-        /// The time delay for the player's actions
-        /// </summary>
-        private double actionDelay;
-        /// <summary>
-        /// Player name
-        /// </summary>
-        private string name;
-
-        public int Frame;
-        /// <summary>
-        /// The y position of the player
-        /// </summary>
-        private float yPos;
-        /// <summary>
-        /// The y collision ray of the player
-        /// </summary>
-        private Ray ray;
-        /// <summary>
-        /// The ray collision of the player
-        /// </summary>
-        private RayCollision rayCollision;
-        /// <summary>
-        /// Bouding box of the player
-        /// </summary>
-        private BoundingBox box;
-        /// <summary>
-        /// Motion constraint of the player
-        /// </summary>
-        private MotionConstraint motionConstraint;
-        /// <summary>
-        /// The inventory of the player
-        /// </summary>
-        private List<Weapon> inventory;
-        /// <summary>
-        /// The index in the inventory of the active weapon
-        /// </summary>
-        private int inventoryIndex;
-        /// <summary>
-        /// The currently held weapon of the player
-        /// </summary>
-        private Weapon currentWeapon;
-        /// <summary>
-        /// The currently displayed animation
-        /// </summary>
-        private ModelAnimation currentAnimation;
-        /// <summary>
-        /// The amount of life the player
-        /// </summary>
+        /// <summary>Player amount of life</summary>
         private int life;
-        /// <summary>
-        /// The current state of the player
-        /// </summary>
-        private PlayerWeaponState weaponState;
-        /// <summary>
-        /// The secondary state of the player
-        /// </summary>
-        private PlayerMoveState moveState;
-        /// <summary>
-        /// The velocity of the player's jump
-        /// </summary>
-        private float vJump;
-        /// <summary>
-        /// The current state of the player
-        /// </summary>
-        public PlayerWeaponState WeaponState { get { return weaponState; } set { weaponState = value; } }
-        /// <summary>
-        /// The collision of the player ray
-        /// </summary>
-        public RayCollision RayCollision { get { return rayCollision; } set { rayCollision = value; } }
-        /// <summary>
-        /// Motion constraint of the player
-        /// </summary>
-        public MotionConstraint MotionConstraint { get { return motionConstraint; } set { motionConstraint = value; } }
-        /// <summary>
-        /// The hit attribute of the rayCollision object
-        /// </summary>
-        public bool CollisionHit { get { return rayCollision.Hit; } set { rayCollision.Hit = value; } }
-        /// <summary>
-        /// The ray of the player
-        /// </summary>
-        public Ray Ray { get { return ray; } set { ray = value; } }
-        /// <summary>
-        /// The direction of the ray
-        /// </summary>
-        public Vector3 RayDirection { get { return ray.Direction; } set { ray.Direction = value; } }
-        /// <summary>
-        /// The position of the ray
-        /// </summary>
-        public Vector3 RayPosition { get { return ray.Position; } set { ray.Position = value; } }
-        /// <summary>
-        /// Min value of the player's bounding box
-        /// </summary>
-        public Vector3 MinBox { get { return box.Min; } set { box.Min = value; } }
-        /// <summary>
-        /// Max value of the player's bounding box
-        /// </summary>
-        public Vector3 MaxBox { get { return box.Max; } set { box.Max = value; } }
-        /// <summary>
-        /// The player's bounding box
-        /// </summary>
-        public BoundingBox Box { get { return box; } }
-        /// <summary>
-        /// The secondary state of the player
-        /// </summary>
-        public PlayerMoveState MoveState { get { return moveState; } set { moveState = value; } }
 
-        /// <summary>The current amount of life of the player</summary>
+        /// <summary>Time delay for player action.</summary>
+        public double ActionDelay;
+
+        /// <summary>Player name.</summary>
+        public string Name;
+
+        /// <summary>Current animation frame.</summary>
+        public int Frame;
+
+        /// <summary>Y position of the player.</summary>
+        public float YPos;
+        
+        /// <summary>Ray of the player.</summary>
+        public Ray Ray;
+
+        /// <summary>Collision ray of the player.</summary>
+        public RayCollision RayCollision;
+
+        /// <summary>Player bounding box.</summary>
+        public BoundingBox Box;
+
+        /// <summary>Player motion constraint.</summary>
+        public MotionConstraint MotionConstraint;
+
+        /// <summary>Player inventory.</summary>
+        public List<Weapon> Inventory;
+
+        /// <summary>Inventory index.</summary>
+        public int InventoryIndex;
+
+        /// <summary>Currently held weapon.</summary>
+        public Weapon CurrentWeapon;
+
+        /// <summary>Currently displayed animation.</summary>
+        public ModelAnimation CurrentAnimation;
+
+        /// <summary>Player current weapon state.</summary>
+        public PlayerWeaponState WeaponState;
+
+        /// <summary>Player current move state.</summary>
+        public PlayerMoveState MoveState;
+
+        /// <summary>Player jump velocity.</summary>
+        public float VJump;
+
+        /// <summary>Current amount of life.</summary>
         public int Life { get { return life; } 
             set 
             { 
@@ -148,67 +89,38 @@ namespace uniray_Project
             } 
         }
 
-        /// <summary>
-        /// The y position of the player
-        /// </summary>
-        public float YPos { get { return yPos; } set { yPos = value; } }
-        /// <summary>
-        /// The inventory index of the active weapon
-        /// </summary>
-        public int InventoryIndex { get { return inventoryIndex; } set { inventoryIndex = value; } }
-        /// <summary>
-        /// The size of the inventory (starting from 0)
-        /// </summary>
-        public int InventorySize { get { return inventory.Count - 1; } }
-        /// <summary>
-        /// The time delay for the player's actions
-        /// </summary>
-        public double ActionDelay { get { return actionDelay; } set { actionDelay = value; } }
-        /// <summary>
-        /// The velocity of the player's jump
-        /// </summary>
-        public float VJump { get { return vJump; } set { vJump = value; } }
-        /// <summary>
-        /// The currently held weapon of the player
-        /// </summary>
-        public Weapon CurrentWeapon { get { return currentWeapon; } set { currentWeapon = value; } }
-        /// <summary>
-        /// The currently displayed animation
-        /// </summary>
-        public ModelAnimation CurrentAnimation { get { return currentAnimation; } set { currentAnimation = value; } }
-        /// <summary>
-        /// Player name
-        /// </summary>
-        public string Name { get { return name; } set { name = value; } }
+        /// <summary>Inventory size starting from 0</summary>
+        public int InventorySize { get { return Inventory.Count - 1; } }
+
         /// <summary>
         /// Player constructor
         /// </summary>
         /// <param name="name">Player name</param>
         public Player(string name, Weapon baseWeapon, ModelAnimation currentAnimation)
         {
-            this.name = name;
+            Name = name;
             // Init the inventory
-            inventory = new List<Weapon>();
+            Inventory = new List<Weapon>();
             // Set player life
             life = 100;
             // Set the weapon to non when the player spawns
-            currentWeapon = baseWeapon;
-            inventory.Add(currentWeapon);
+            CurrentWeapon = baseWeapon;
+            Inventory.Add(CurrentWeapon);
             InventoryIndex = 0;
             // Set the player state
             WeaponState = PlayerWeaponState.Idle;
             // Set player current animation
-            this.currentAnimation = currentAnimation;
+            CurrentAnimation = currentAnimation;
             // Set player ray direction
-            RayDirection = -Vector3.UnitY;
+            Ray.Direction = -Vector3.UnitY;
 
             // Set the player's default Bounding box dimensions
-            MaxBox = new Vector3(0.5f, 0, 0.5f);
-            MinBox = new Vector3(-0.5f, -3, -0.5f);
+            Box.Max = new Vector3(0.5f, 0, 0.5f);
+            Box.Min = new Vector3(-0.5f, -3, -0.5f);
 
             // Set default motion constraint
-            this.motionConstraint.Value = 1;
-            this.motionConstraint.Constraint = new Vector3(1, 0, 1);
+            MotionConstraint.Value = 1;
+            MotionConstraint.Constraint = new Vector3(1, 0, 1);
         }
 
         /// <summary>Updates the frame of current animation.</summary>
@@ -238,7 +150,7 @@ namespace uniray_Project
         /// <param name="weapon">Weapon of the player</param>
         public void AddWeapon(Weapon weapon)
         {
-            inventory.Add(weapon);
+            Inventory.Add(weapon);
         }
         /// <summary>
         /// Set the current weapon of the player
@@ -247,7 +159,7 @@ namespace uniray_Project
         public void SetCurrentWeapon(int index)
         {
             InventoryIndex = index;
-            CurrentWeapon = inventory[InventoryIndex];
+            CurrentWeapon = Inventory[InventoryIndex];
         }
         /// <summary>
         /// Reset the box's dimensions
@@ -255,8 +167,8 @@ namespace uniray_Project
         public void ResetBox()
         {
             // Set the player's default Bounding box dimensions
-            MaxBox = new Vector3(0.5f, 0, 0.5f);
-            MinBox = new Vector3(-0.5f, -3, -0.5f);
+            Box.Max = new Vector3(0.5f, 0, 0.5f);
+            Box.Min = new Vector3(-0.5f, -3, -0.5f);
         }
         /// <summary>
         /// Calculate motion constraint of the player
@@ -265,7 +177,7 @@ namespace uniray_Project
         /// <param name="box">Bounding box to calculate with</param>
         public void CalculateMotionConstraint(Vector3 target, BoundingBox box, Vector3 position)
         {
-            this.motionConstraint.Calculate(target, box, position);
+            MotionConstraint.Calculate(target, box, position);
         }
     }
 }

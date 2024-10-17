@@ -117,6 +117,10 @@ namespace Lurkers_revamped
             player.AddWeapon(new Weapon("Lambert Niv. 2", "rifle", 50, 2));
             Vector3 radioPosition = Vector3.Zero;
 
+            // Init task manager
+            TaskManager.LoadTasks();
+            TaskManager.Active = true;
+
             // Create list of zombies
             List<Zombie> zombies = new List<Zombie>()
             {
@@ -240,7 +244,13 @@ namespace Lurkers_revamped
                             // Check collision with zombies
                             foreach (Zombie zombie in zombies)
                             {
-                                zombie.Shoot(player.CurrentWeapon.bullets.Last().Ray, rigged[zombie.Type].Meshes[0]);
+                                if (zombie.Shoot(player.CurrentWeapon.bullets.Last().Ray, rigged[zombie.Type].Meshes[0]))
+                                {
+                                    if (TaskManager.IsActive(1)) TaskManager.UpdateTask(1, 1);
+                                    if (TaskManager.IsActive(3)) TaskManager.UpdateTask(3, 1);
+                                    if (TaskManager.IsActive(5)) TaskManager.UpdateTask(5, 1);
+                                    if (TaskManager.IsActive(7)) TaskManager.UpdateTask(7, 1);
+                                }
                             }
                             // Check spawners
                             foreach (Spawner spawner in spawners)
@@ -248,6 +258,7 @@ namespace Lurkers_revamped
                                 if (spawner.Shoot(player.CurrentWeapon.bullets.Last().Ray, UnirayEngine.Ressource.GetModel("crystal").Meshes[0]))
                                 {
                                     //zombies.Add(spawner.CreateZombie(zombieAnims[8], camera.Position));
+                                    if (TaskManager.IsActive(2) && spawner.Destroyed) TaskManager.UpdateTask(2, 1);
                                 }
                             }
                             
@@ -273,6 +284,11 @@ namespace Lurkers_revamped
 
                 // Update the player event handler
                 TickPlayer(player, rifleAnims, ref crosshairColor, shaders, ref cameraMotion);
+
+                if (IsKeyPressed(KeyboardKey.Tab))
+                {
+                    TaskManager.Active = !TaskManager.Active;
+                }
 
                 // Update the screen center (info displayer)
                 screen.Tick();
@@ -315,8 +331,8 @@ namespace Lurkers_revamped
 
                 // Check collisions between the player and the static objects
                 // Add current position
-                player.MinBox += camera.Position;
-                player.MaxBox += camera.Position;
+                player.Box.Min += camera.Position;
+                player.Box.Max += camera.Position;
                 CheckCollisionPlayer(player.Box, staticBoxes, player, camera);
 #if DEBUG
                 // Draw player's bounding box
@@ -382,7 +398,11 @@ namespace Lurkers_revamped
                         case ZombieState.Attacking:
                             zombie.CurrentAnimation = zombieAnims[2];
                             zombie.UpdateFrame();
-                            if (zombie.Frame == 90) player.Life -= 10;
+                            if (zombie.Frame == 90)
+                            {
+                                player.Life -= 10;
+                                TaskManager.UpdateTask(8, 10);
+                            }
                             if (Math.Abs(Vector3Subtract(camera.Position, zombie.Position).Length()) > 5)
                             {
                                 zombie.State = ZombieState.Running;
@@ -445,6 +465,9 @@ namespace Lurkers_revamped
 
                 // Draw screen infos
                 screen.DrawScreenInfos();
+
+                // Draw tasks manager
+                TaskManager.Update();
 #if DEBUG
 
                 // Debug positions
@@ -560,6 +583,22 @@ namespace Lurkers_revamped
                         AudioCenter.SetMusicVolume("lerob", 8);
                         AudioCenter.PlaySound("radio");
                         AudioCenter.SetSoundVolume("radio", 10);
+                        if (TaskManager.IsActive(4)) TaskManager.CloseTask(4);
+                    }
+                }
+
+                foreach (UModel phone in CurrentScene.GameObjects.Where(x => x is UModel).Where(x => ((UModel)x).ModelID == "phone"))
+                {
+                    if (Vector3Distance(phone.Position, camera.Position) <= 5) 
+                    {
+                        if (!AudioCenter.IsSoundPlaying("rick") && !AudioCenter.IsSoundPlaying("daryl"))
+                        {
+                            AudioCenter.PlaySound("radio");
+                            int rand = Random.Shared.Next(0, 2);
+                            if (rand == 1) AudioCenter.PlaySound("rick");
+                            else AudioCenter.PlaySound("daryl");
+                        }
+                        if (TaskManager.IsActive(0)) TaskManager.UpdateTask(0, 1);
                     }
                 }
             }

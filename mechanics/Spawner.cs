@@ -26,6 +26,8 @@ namespace uniray_Project.mechanics
         /// <summary>Health of the spawner.</summary>
         public int Health;
 
+        public bool Destroyed;
+
         /// <summary>Creates a spawner object.</summary>
         /// <param name="position">Position of the spawner.</param>
         /// <param name="spawnRate">Spawn rate of the spawner</param>
@@ -84,6 +86,7 @@ namespace uniray_Project.mechanics
         public void Destroy()
         {
             CurrentScene.GameObjects.RemoveAt(RessourceIndex);
+            Destroyed = true;
         }
     }
 }

@@ -96,6 +96,8 @@ namespace uniray_Project
                 { "zombie_herd", LoadSound("src/sounds/zombie/zombie_herd.wav") },
                 { "zombie_eating", LoadSound("src/sounds/zombie/zombie_eating.wav") },
                 { "radio", LoadSound("src/sounds/radio.wav") },
+                { "rick", LoadSound("src/sounds/rick.wav") },
+                { "daryl", LoadSound("src/sounds/daryl.wav") },
             };
             return sounds;
         }
