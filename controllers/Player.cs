@@ -1,6 +1,7 @@
 ﻿using System.Numerics;
 using Raylib_cs;
 using Lurkers_revamped;
+using System.Diagnostics;
 
 namespace uniray_Project
 {
@@ -43,6 +44,10 @@ namespace uniray_Project
 
         /// <summary>Y position of the player.</summary>
         public float YPos;
+
+        public bool BLOODY;
+
+        public Stopwatch Watch;
         
         /// <summary>Ray of the player.</summary>
         public Ray Ray;
@@ -121,6 +126,9 @@ namespace uniray_Project
             // Set default motion constraint
             MotionConstraint.Value = 1;
             MotionConstraint.Constraint = new Vector3(1, 0, 1);
+
+            // Init watch
+            Watch = new Stopwatch();
         }
 
         /// <summary>Updates the frame of current animation.</summary>

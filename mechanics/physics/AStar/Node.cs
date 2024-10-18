@@ -8,6 +8,9 @@ namespace AStar
         /// <summary>Define if the node is obstructed.</summary>
         public bool Walkable;
 
+        /// <summary>Define if the node is obstructed.</summary>
+        public readonly bool HARD_NODE;
+
         /// <summary>World position of the node.</summary>
         public Vector2 Position;
 
@@ -31,6 +34,7 @@ namespace AStar
         /// <param name="_position">World position of the node.</param>
         public Node(bool _walkable, Vector2 _position, Vector2 _gridPosition)
         {
+            HARD_NODE = !_walkable;
             Walkable = _walkable;
             Position = _position;
             GridPosition = _gridPosition;

@@ -23,7 +23,7 @@ namespace uniray_Project
     {
         public const float SPEED = 5f;
 
-        public const float ROTATION_SPEED = 2f;
+        public const float ROTATION_SPEED = 3f;
 
         private int health;
         private string type;
@@ -163,6 +163,8 @@ namespace uniray_Project
                 AudioCenter.PlaySound("headshot");
                 AudioCenter.StopSound("zombie_default");
                 AudioCenter.PlaySound("zombie_kill");
+
+                Frame = 0;
 
                 return true;
             }

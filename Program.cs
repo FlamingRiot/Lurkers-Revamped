@@ -178,7 +178,7 @@ namespace Lurkers_revamped
             while (!WindowShouldClose())
             {
                 // Update the camera
-                UpdateCamera(ref camera, ref cameraMotion, player, ref radioPosition);
+                UpdateCamera(ref camera, ref cameraMotion, player, ref radioPosition, zombies);
 
                 // Update the camera shake motion
                 cameraMotion.ShakeStart = camera.Position;
@@ -400,6 +400,9 @@ namespace Lurkers_revamped
                                 zombie.Frame = 0;
                             }
                             break;
+                        case ZombieState.Idle:
+                            zombie.CurrentAnimation = zombieAnims[6];
+                            break;
                     }
 
                     // Move and rotate the zombie if running
@@ -416,7 +419,10 @@ namespace Lurkers_revamped
                         List<Node> neighbours = aStar.Grid.GetNeighbours(currentNode);
                         if (zombie.PreviousNodes[0].Position != neighbours[0].Position)
                         {
-                            zombie.PreviousNodes.ForEach(x => x.Walkable = true);
+                            zombie.PreviousNodes.ForEach(x =>
+                            {
+                                if (!x.HARD_NODE) x.Walkable = true;
+                            });
                             zombie.PreviousNodes = neighbours;
                         }
                         else
@@ -477,6 +483,24 @@ namespace Lurkers_revamped
                 DrawTexturePro(renderTexture.Texture, inverseSceneRectangle, sceneRectangle, Vector2.Zero, 0, Color.White);
 
                 EndShaderMode();
+
+                // Manage blood screen
+                if (player.BLOODY)
+                {
+                    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), new Color(112, 1, 9, (int)Clamp((float)player.Watch.Elapsed.TotalSeconds * 100, 0, 90)));
+                    // Check if time's up
+                    if (player.Watch.Elapsed.TotalSeconds > 10)
+                    {
+                        player.Watch.Restart();
+                        player.BLOODY = false;
+                        AudioCenter.PlaySound("blood");
+                        zombies.ForEach(x => x.State = ZombieState.Running);
+                    }
+                }
+                else if (!player.BLOODY && player.Watch.IsRunning)
+                {
+                    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), new Color(112, 1, 9, (int)Clamp(90 / ((float)player.Watch.Elapsed.TotalSeconds * 100), 0, 90)));
+                }
 
                 // Draw screen infos
                 screen.DrawScreenInfos();
@@ -545,7 +569,7 @@ namespace Lurkers_revamped
         /// <param name="camera">The camera to update</param>
         /// <param name="cameraMotion">The camera motion additional variables</param>
         /// <param name="player">The player associated to the camera</param>
-        static void UpdateCamera(ref Camera3D camera, ref CameraMotion cameraMotion, Player player, ref Vector3 radioPosition)
+        static void UpdateCamera(ref Camera3D camera, ref CameraMotion cameraMotion, Player player, ref Vector3 radioPosition, List<Zombie> zombies)
         {
             // Calculate the camera rotation
             Vector2 mouse = GetMouseDelta();
@@ -590,6 +614,7 @@ namespace Lurkers_revamped
             }
             if (IsKeyPressed(KeyboardKey.E))
             {
+                // Secret radio
                 foreach (UModel radio in CurrentScene.GameObjects.Where(x => x is UModel).Where(x => ((UModel)x).ModelID == "radio"))
                 {
                     radioPosition = radio.Position;
@@ -601,7 +626,7 @@ namespace Lurkers_revamped
                         if (TaskManager.IsActive(4)) TaskManager.CloseTask(4);
                     }
                 }
-
+                // Phone booths
                 foreach (UModel phone in CurrentScene.GameObjects.Where(x => x is UModel).Where(x => ((UModel)x).ModelID == "phone"))
                 {
                     if (Vector3Distance(phone.Position, camera.Position) <= 5) 
@@ -614,6 +639,22 @@ namespace Lurkers_revamped
                             else AudioCenter.PlaySound("daryl");
                         }
                         if (TaskManager.IsActive(0)) TaskManager.UpdateTask(0, 1);
+                    }
+                }
+                // Dead bodies
+                foreach (UModel body in CurrentScene.GameObjects.Where(x => x is UModel).Where(x => ((UModel)x).ModelID == "dead_body"))
+                {
+                    if (Vector3Distance(body.Position, camera.Position) <= 5)
+                    {
+                        AudioCenter.PlaySound("blood");
+                        player.BLOODY = true;
+                        player.Watch.Restart();
+                        foreach (Zombie zombie in zombies) 
+                        {
+                            zombie.State = ZombieState.Idle;
+                            zombie.Angle = Random.Shared.Next(0, 360);
+                        }
+                        if (TaskManager.IsActive(6)) TaskManager.CloseTask(6);
                     }
                 }
             }
@@ -687,11 +728,15 @@ namespace Lurkers_revamped
             {
                 player.SPEED = 0.2f;
                 cameraMotion.Amplitude = 0.006f;
+                AudioCenter.StopSound("walking");
+                AudioCenter.PlaySoundLoop("running");
             }
             else if (!IsKeyDown(KeyboardKey.LeftShift))
             {
                 player.SPEED = 0.1f;
                 cameraMotion.Amplitude = 0.003f;
+                AudioCenter.StopSound("running");
+                AudioCenter.PlaySoundLoop("walking");
             }
 
             // Shooting event
@@ -856,38 +901,6 @@ namespace Lurkers_revamped
                 -normalizedPos.X * (float)Math.Sin(alpha / RAD2DEG) + normalizedPos.Z * (float)Math.Cos(alpha / RAD2DEG)) * 3.5f + pos;
             // Return the newly calculated position
             return spacePos;
-        }
-
-        static RenderTexture2D LoadShadowMapRenderTexture(int width, int height)
-        {
-            RenderTexture2D target = new RenderTexture2D();
-
-            target.Id = Rlgl.LoadFramebuffer(width, height);
-            target.Texture.Width = width;
-            target.Texture.Height = height;
-
-            if (target.Id > 0)
-            {
-                Rlgl.EnableFramebuffer(target.Id);
-
-                target.Depth.Id = Rlgl.LoadTextureDepth(width, height, false);
-                target.Depth.Width = width;
-                target.Depth.Height = height;
-                target.Depth.Format = PixelFormat.CompressedPvrtRgba;
-                target.Depth.Mipmaps = 1;
-
-                Rlgl.FramebufferAttach(target.Id, target.Depth.Id, FramebufferAttachType.Depth, FramebufferAttachTextureType.Texture2D, 0);
-
-                if (Rlgl.FramebufferComplete(target.Id)) TraceLog(TraceLogLevel.Info, "FBO: [ID %i] Framebuffer object created successfully");
-
-                Rlgl.DisableFramebuffer();
-            }
-            else
-            {
-                TraceLog(TraceLogLevel.Info, "FBO: [ID %i] Framebuffer object can not be created");
-            }
-
-            return target;
         }
     }
 }

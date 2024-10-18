@@ -90,7 +90,6 @@ namespace uniray_Project
             {
                 { "rifleShoot", LoadSound("src/sounds/rifle/shoot.wav") },
                 { "headshot", LoadSound("src/sounds/rifle/headshot.wav") },
-                { "headshot_voice", LoadSound("src/sounds/headshot_voice.wav") },
                 { "zombie_default", LoadSound("src/sounds/zombie/zombie_default.wav") },
                 { "zombie_kill", LoadSound("src/sounds/zombie/zombie_kill.wav") },
                 { "zombie_herd", LoadSound("src/sounds/zombie/zombie_herd.wav") },
@@ -98,6 +97,9 @@ namespace uniray_Project
                 { "radio", LoadSound("src/sounds/radio.wav") },
                 { "rick", LoadSound("src/sounds/rick.wav") },
                 { "daryl", LoadSound("src/sounds/daryl.wav") },
+                { "walking", LoadSound("src/sounds/player/walking.wav") },
+                { "running", LoadSound("src/sounds/player/running.wav") },
+                { "blood", LoadSound("src/sounds/blood.wav") },
             };
             return sounds;
         }
