@@ -168,10 +168,6 @@ namespace Lurkers_revamped
 
             // Crosshair color variable
             Color crosshairColor = Color.White;
-
-            AudioCenter.PlayMusic("ambience");
-            AudioCenter.SetMusicVolume("ambience", 1);
-
             
 			// Set target FPS
 #if !DEBUG
@@ -181,9 +177,6 @@ namespace Lurkers_revamped
             // Game Loop
             while (!WindowShouldClose())
             {
-                // Update music stream
-                AudioCenter.UpdateMusic("ambience");
-
                 // Update the camera
                 UpdateCamera(ref camera, ref cameraMotion, player, ref radioPosition);
 
@@ -417,16 +410,17 @@ namespace Lurkers_revamped
                     // Move and rotate the zombie if running
                     if (zombie.State == ZombieState.Running && aStar.Grid.Path.Count != 0)
                     {
-                        // Calculate angle rotation angle of the zombie
-                        float angle = (float)Math.Atan2(aStar.Grid.Path[0].Position.Y - zombie.Position.Z, aStar.Grid.Path[0].Position.X - zombie.Position.X);
-                        //float angle = (float)Math.Atan2(camera.Position.Z - zombie.Position.Z, camera.Position.X - zombie.Position.X);
-                        zombie.Angle = (-angle * RAD2DEG) + 90;
+                        Vector2 direction = Vector2Normalize(aStar.Grid.Path[1].Position - aStar.Grid.Path[0].Position);
+                        zombie.TargetAngle = MathF.Atan2(-direction.Y, direction.X) * RAD2DEG + 90;
+                        // Correct angle
+                        if (zombie.TargetAngle - zombie.Angle > 180) zombie.TargetAngle -= 360;
+                        zombie.Angle = Lerp(zombie.Angle, zombie.TargetAngle, Zombie.ROTATION_SPEED * GetFrameTime());
 
                         // Calculate movement
-                        if (Math.Abs(Vector3Subtract(camera.Position, zombie.Position).Length()) > 5) 
+                        if (Math.Abs(Vector3Subtract(camera.Position, zombie.Position).Length()) > 5)
                         {
-                            zombie.X += MathF.Cos(angle) * Zombie.SPEED * GetFrameTime();
-                            zombie.Z += MathF.Sin(angle) * Zombie.SPEED * GetFrameTime();
+                            zombie.X += MathF.Cos((zombie.Angle - 90) * DEG2RAD) * Zombie.SPEED * GetFrameTime();
+                            zombie.Z -= MathF.Sin((zombie.Angle - 90) * DEG2RAD) * Zombie.SPEED * GetFrameTime();
                         }
                         else
                         {

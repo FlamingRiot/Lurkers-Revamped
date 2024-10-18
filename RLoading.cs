@@ -108,7 +108,6 @@ namespace uniray_Project
         {
             Dictionary<string, Music> musics = new()
             {
-                {"ambience", LoadMusicStream("src/sounds/musics/ambience.mp3") }, 
                 {"lerob", LoadMusicStream("src/sounds/musics/lerob.mp3") } 
             };
             return musics;

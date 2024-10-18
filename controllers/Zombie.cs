@@ -22,6 +22,8 @@ namespace uniray_Project
     {
         public const float SPEED = 5f;
 
+        public const float ROTATION_SPEED = 2f;
+
         private int health;
         private string type;
         private float angle;
@@ -29,6 +31,8 @@ namespace uniray_Project
         private ModelAnimation currentAnimation;
         private Ray ray;
         private ZombieState state;
+
+        public float TargetAngle;
 
         /// <summary>The current health of the zombie.</summary>
         public int Frame;
