@@ -172,9 +172,12 @@ namespace Lurkers_revamped
             AudioCenter.PlayMusic("ambience");
             AudioCenter.SetMusicVolume("ambience", 1);
 
-            // Set target FPS
-            //SetTargetFPS(60);
-            DisableCursor();
+            
+			// Set target FPS
+#if !DEBUG
+			SetTargetFPS(60);
+#endif
+			DisableCursor();
             // Game Loop
             while (!WindowShouldClose())
             {
