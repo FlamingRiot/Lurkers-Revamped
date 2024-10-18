@@ -46,13 +46,13 @@ namespace uniray_Project.mechanics
         /// <summary>Creates a zombie and returns it.</summary>
         /// <param name="anim">Zombie animation.</param>
         /// <returns>Created zombie</returns>
-        public Zombie CreateZombie(ModelAnimation anim, Vector3 playerPosition)
+        public Zombie CreateZombie(ModelAnimation anim, Vector3 playerPosition, string zombieType)
         {
             // Randomize position
             Vector3 diff = Raymath.Vector3Normalize(Raymath.Vector3Subtract(playerPosition, Position));
             Vector3 position = new Vector3(Position.X + diff.X * 10, 0, Position.Z + diff.Z * 10);
             // Create zombie
-            Zombie zombzomb = new Zombie(position, "cop", anim);
+            Zombie zombzomb = new Zombie(position, zombieType, anim);
             // Return zombie
             return zombzomb;
         }

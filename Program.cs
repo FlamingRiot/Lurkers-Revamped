@@ -119,7 +119,7 @@ namespace Lurkers_revamped
 
             // Init task manager
             TaskManager.LoadTasks();
-            TaskManager.Active = true;
+            TaskManager.Active = false;
 
             // Create list of zombies
             List<Zombie> zombies = new List<Zombie>()
@@ -129,6 +129,7 @@ namespace Lurkers_revamped
                 new Zombie(new Vector3(2, 0, -10), "cop3", zombieAnims[8]),
                 new Zombie(new Vector3(2, 0, -5), "cop4", zombieAnims[8])
             };
+            List<string> _freeZombies = new List<string>();
 
             // Load UI Fonts
             Font damageFont = LoadFont("src/fonts/damage.ttf");
@@ -253,7 +254,11 @@ namespace Lurkers_revamped
                             {
                                 if (spawner.Shoot(player.CurrentWeapon.bullets.Last().Ray, UnirayEngine.Ressource.GetModel("crystal").Meshes[0]))
                                 {
-                                    //zombies.Add(spawner.CreateZombie(zombieAnims[8], camera.Position));
+                                    if (zombies.Count < 4 && _freeZombies.Count != 0)
+                                    {
+                                        zombies.Add(spawner.CreateZombie(zombieAnims[8], camera.Position, _freeZombies.First()));
+                                        _freeZombies.RemoveAt(0);
+                                    }
                                     if (TaskManager.IsActive(2) && spawner.Destroyed) TaskManager.UpdateTask(2, 1);
                                 }
                             }
@@ -315,15 +320,6 @@ namespace Lurkers_revamped
 
                 // Set terrain tiling to false
                 shaders.UpdateTiling(false);
-
-                /* // Draw spawners wave quad
-                BeginShaderMode(shaders.WaveShader);
-                foreach (Spawner spawner in spawners)
-                {
-                    DrawMesh(Spawner.WaveQuad, shaders.WaveMaterial, spawner.Transform);
-                }
-                EndShaderMode();
-                */
 
                 // Check collisions between the player and the static objects
                 // Add current position
@@ -459,6 +455,7 @@ namespace Lurkers_revamped
                 // Remove the zombie from the list if killed
                 if (killIndex != -1)
                 {
+                    _freeZombies.Add(zombies[killIndex].Type);
                     zombies.RemoveAt(killIndex);
                 }
 
