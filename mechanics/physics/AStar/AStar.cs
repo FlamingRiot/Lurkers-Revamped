@@ -24,7 +24,7 @@ namespace AStar
         /// <summary>Finds the shortest path from a <see cref="Node"/> to another.</summary>
         /// <param name="startPos">Starting position.</param>
         /// <param name="targetPos">Target position.</param>
-        public void FindPath(Vector3 startPos, Vector3 targetPos)
+        public void FindPath(Vector3 startPos, Vector3 targetPos, List<Node> path)
         {
             Node startNode = Grid.GetWorldToNode(startPos);
             Node targetNode = Grid.GetWorldToNode(targetPos);
@@ -44,7 +44,7 @@ namespace AStar
                 // Check if the path has been found
                 if (currentNode.Position == targetNode.Position)
                 {
-                    RetracePath(startNode, targetNode);
+                    RetracePath(startNode, targetNode, path);
                     return;
                 }
 
@@ -75,9 +75,9 @@ namespace AStar
         /// <summary>Retraces a path according to the parents of the nodes.</summary>
         /// <param name="startNode">Starting node.</param>
         /// <param name="targetNode">Target node.</param>
-        private void RetracePath(Node startNode, Node targetNode)
+        private void RetracePath(Node startNode, Node targetNode, List<Node> path)
         {
-            List<Node> path = new List<Node>();
+            path.Clear();
             Node currentNode = targetNode;
 
             while (currentNode != startNode)
@@ -87,8 +87,6 @@ namespace AStar
             }
 
             path.Reverse();
-
-            Grid.Path = path;
         }
 
         /// <summary>Returns the distance between two nodes according to their costs.</summary>

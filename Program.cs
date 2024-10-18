@@ -127,7 +127,7 @@ namespace Lurkers_revamped
                 new Zombie(new Vector3(-10, 0, 2), "cop", zombieAnims[8]),
                 new Zombie(new Vector3(10, 0, 2), "cop2", zombieAnims[8]),
                 new Zombie(new Vector3(2, 0, -10), "cop3", zombieAnims[8]),
-                new Zombie(new Vector3(2, 0, 10), "cop4", zombieAnims[8])
+                new Zombie(new Vector3(2, 0, -5), "cop4", zombieAnims[8])
             };
 
             // Load UI Fonts
@@ -337,11 +337,6 @@ namespace Lurkers_revamped
                 // Draw node map
                 aStar.Grid.DrawNodeMap();
 #endif
-                // Find path 
-                if (aStar.Grid.GetWorldToNode(camera.Position).Walkable)
-                {
-                    aStar.FindPath(zombies[0].Position, camera.Position);
-                }
 
                 // Draw the gameobjects of the environment (from Uniray)
                 DrawScene();
@@ -408,24 +403,35 @@ namespace Lurkers_revamped
                     }
 
                     // Move and rotate the zombie if running
-                    if (zombie.State == ZombieState.Running && aStar.Grid.Path.Count != 0)
+                    if (zombie.State == ZombieState.Running)
                     {
-                        Vector2 direction = Vector2Normalize(aStar.Grid.Path[1].Position - aStar.Grid.Path[0].Position);
-                        zombie.TargetAngle = MathF.Atan2(-direction.Y, direction.X) * RAD2DEG + 90;
-                        // Correct angle
-                        if (zombie.TargetAngle - zombie.Angle > 180) zombie.TargetAngle -= 360;
-                        zombie.Angle = Lerp(zombie.Angle, zombie.TargetAngle, Zombie.ROTATION_SPEED * GetFrameTime());
-
-                        // Calculate movement
-                        if (Math.Abs(Vector3Subtract(camera.Position, zombie.Position).Length()) > 5)
+                        // Find path 
+                        if (aStar.Grid.GetWorldToNode(camera.Position).Walkable)
                         {
-                            zombie.X += MathF.Cos((zombie.Angle - 90) * DEG2RAD) * Zombie.SPEED * GetFrameTime();
-                            zombie.Z -= MathF.Sin((zombie.Angle - 90) * DEG2RAD) * Zombie.SPEED * GetFrameTime();
+                           aStar.FindPath(zombie.Position, camera.Position, zombie.Path);
                         }
-                        else
+                        aStar.Grid.DrawPath(zombie.Path);
+
+                        if (zombie.Path.Count != 0)
                         {
-                            zombie.State = ZombieState.Attacking;
-                            if (zombie.Frame != 0) { zombie.Frame = 0; }
+                            // Calculate rotation and movement
+                            Vector2 direction = Vector2Normalize(zombie.Path[1].Position - zombie.Path[0].Position);
+                            zombie.TargetAngle = MathF.Atan2(-direction.Y, direction.X) * RAD2DEG + 90;
+                            // Correct angle
+                            if (zombie.TargetAngle - zombie.Angle > 180) zombie.TargetAngle -= 360;
+                            zombie.Angle = Lerp(zombie.Angle, zombie.TargetAngle, Zombie.ROTATION_SPEED * GetFrameTime());
+
+                            // Calculate movement
+                            if (Math.Abs(Vector3Subtract(camera.Position, zombie.Position).Length()) > 5)
+                            {
+                                zombie.X += MathF.Cos((zombie.Angle - 90) * DEG2RAD) * Zombie.SPEED * GetFrameTime();
+                                zombie.Z -= MathF.Sin((zombie.Angle - 90) * DEG2RAD) * Zombie.SPEED * GetFrameTime();
+                            }
+                            else
+                            {
+                                zombie.State = ZombieState.Attacking;
+                                if (zombie.Frame != 0) { zombie.Frame = 0; }
+                            }
                         }
 
                         // Play zombie default running sound

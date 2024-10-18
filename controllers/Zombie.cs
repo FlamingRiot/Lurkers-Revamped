@@ -2,6 +2,7 @@
 using static Raylib_cs.Raylib;
 using Lurkers_revamped;
 using Raylib_cs;
+using AStar;
 
 namespace uniray_Project
 {
@@ -33,6 +34,8 @@ namespace uniray_Project
         private ZombieState state;
 
         public float TargetAngle;
+
+        public List<Node> Path;
 
         /// <summary>The current health of the zombie.</summary>
         public int Frame;
@@ -118,6 +121,8 @@ namespace uniray_Project
             currentAnimation = anim;
 
             Direction = Vector3.Zero;
+
+            Path = new List<Node>();
         }
 
         /// <summary>Updates the frame of current animation.</summary>

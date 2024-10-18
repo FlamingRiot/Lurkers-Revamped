@@ -18,9 +18,6 @@ namespace AStar
         /// <summary>Radius of a single node.</summary>
         public float NodeRadius;
 
-        /// <summary>The found path for the grid</summary>
-        public List<Node>? Path;
-
         private Node[,] nodes;
         private float nodeDiameter;
 
@@ -135,14 +132,16 @@ namespace AStar
                     {
                         Raylib.DrawPlane(new Vector3(nodes[x, y].Position.X, 0.1f, nodes[x, y].Position.Y), new Vector2(nodeDiameter), Color.Red);
                     }
-                    if (Path is not null)
-                    {
-                        if (Path.Contains(nodes[x, y]))
-                        {
-                            Raylib.DrawPlane(new Vector3(nodes[x, y].Position.X, 0.2f, nodes[x, y].Position.Y), new Vector2(nodeDiameter), Color.Blue);
-                        }
-                    }
+                    
                 }
+            }
+        }
+
+        public void DrawPath(List<Node> path)
+        {
+            for (int i = 0; i < path.Count; i++) 
+            {
+                Raylib.DrawPlane(new Vector3(path[i].Position.X, 0.2f, path[i].Position.Y), new Vector2(nodeDiameter), Color.Blue);
             }
         }
     }
