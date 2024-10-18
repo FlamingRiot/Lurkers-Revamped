@@ -623,7 +623,7 @@ namespace Lurkers_revamped
                         AudioCenter.SetMusicVolume("lerob", 8);
                         AudioCenter.PlaySound("radio");
                         AudioCenter.SetSoundVolume("radio", 10);
-                        if (TaskManager.IsActive(4)) TaskManager.CloseTask(4);
+                        if (TaskManager.IsActive(4)) TaskManager.UpdateTask(4, 1);
                     }
                 }
                 // Phone booths
@@ -654,7 +654,7 @@ namespace Lurkers_revamped
                             zombie.State = ZombieState.Idle;
                             zombie.Angle = Random.Shared.Next(0, 360);
                         }
-                        if (TaskManager.IsActive(6)) TaskManager.CloseTask(6);
+                        if (TaskManager.IsActive(6)) TaskManager.UpdateTask(6, 1);
                     }
                 }
             }

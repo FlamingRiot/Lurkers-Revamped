@@ -1,6 +1,7 @@
 ﻿using Raylib_cs;
 using System.Numerics;
 using Uniray_Engine;
+using uniray_Project;
 
 namespace Lurkers_revamped
 {
@@ -11,6 +12,8 @@ namespace Lurkers_revamped
         private static List<Task> _tasks = new List<Task>();
 
         private static List<Task> _closedTasks = new List<Task>();
+
+        private static Dictionary<double[], Task> _transitTasks = new Dictionary<double[], Task>();
 
         public static List<Task> OpenTasks = new List<Task>();
 
@@ -62,6 +65,38 @@ namespace Lurkers_revamped
                     Raylib.DrawRectangle(60, yPos + 60, (410 / OpenTasks[i].Amount) * OpenTasks[i].Progression, 5, new Color(36, 210, 255, 220));
                 }
             }
+            else
+            {
+
+            }
+            int index = 0;
+            foreach (KeyValuePair<double[], Task> task in _transitTasks)
+            {
+                int yPos = 70 + index * 90;
+
+                // Calculate horizontal delta
+                float deltaTime = (float)(Raylib.GetTime() - task.Key[1]);
+                int xPos = 0;
+                if (deltaTime < 4)
+                {
+                    xPos = (int)Raymath.Clamp((float)(-450 + deltaTime * 500), -450, 40);
+                    task.Key[0] = Raylib.GetTime();
+                }
+                else
+                {
+                    xPos = -(int)((Raylib.GetTime() - task.Key[0]) * 500);
+                    if (xPos < -450)
+                    {
+                        _closedTasks.Add(task.Value);
+                        _transitTasks.Remove(task.Key);
+                        break;
+                    }
+                }
+                Raylib.DrawRectangleRounded(new Rectangle(xPos, yPos, 450, 80), 0.1f, 20, Color);
+                Raylib.DrawTextPro(font, task.Value.Description, new Vector2(xPos + 10, yPos + 10), Vector2.Zero, 0, 23, 1, Color.White);
+                Raylib.DrawRectangle(xPos + 20, yPos + 60, 410, 5, new Color(6, 30, 90, 140));
+                Raylib.DrawRectangle(xPos + 20, yPos + 60, (410 / task.Value.Amount) * task.Value.Progression, 5, new Color(36, 210, 255, 220));
+            }
         }
 
         /// <summary>Closes an open task and add a new one.</summary>
@@ -70,8 +105,10 @@ namespace Lurkers_revamped
         {
             OpenTasks.Where(x => x.ID == id).ToList().ForEach(x =>
             {
-                _closedTasks.Add(x);
+                //_closedTasks.Add(x);
+                _transitTasks.Add(new[] {0, Raylib.GetTime()} , x);
                 OpenTasks.Remove(x);
+                AudioCenter.PlaySound("task_complete");
             });
 
             // Add new task
@@ -80,7 +117,10 @@ namespace Lurkers_revamped
                 do
                 {
                     Task task = _tasks[Random.Shared.Next(0, _tasks.Count)];
-                    if (!OpenTasks.Contains(task) && !_closedTasks.Contains(task)) OpenTasks.Add(task);
+                    if (!OpenTasks.Contains(task) && !_closedTasks.Contains(task))
+                    {
+                        OpenTasks.Add(task);
+                    }
                 } while (OpenTasks.Count < 3);
             }
         }

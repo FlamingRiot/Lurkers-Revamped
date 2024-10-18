@@ -100,6 +100,8 @@ namespace uniray_Project
                 { "walking", LoadSound("src/sounds/player/walking.wav") },
                 { "running", LoadSound("src/sounds/player/running.wav") },
                 { "blood", LoadSound("src/sounds/blood.wav") },
+                { "task_received", LoadSound("src/sounds/task_received.wav") },
+                { "task_complete", LoadSound("src/sounds/task_complete.wav") },
             };
             return sounds;
         }
