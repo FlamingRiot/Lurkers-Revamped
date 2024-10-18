@@ -8,6 +8,7 @@ using uniray_Project;
 using System.Text;
 using uniray_Project.mechanics;
 using AStar;
+using uniray_Project.graphics;
 
 namespace Lurkers_revamped
 {
@@ -169,18 +170,24 @@ namespace Lurkers_revamped
 
             // Crosshair color variable
             Color crosshairColor = Color.White;
-            
-			// Set target FPS
-#if !DEBUG
+
+            // Set target FPS
 			SetTargetFPS(60);
-#endif
+            // Start Menu
+            Menu.Init();
+            Menu.Show(skybox, shaders, terrain);
+
+            // Show cutscene
+
 			DisableCursor();
             // Game Loop
             while (!WindowShouldClose())
             {
                 // Update the camera
-                UpdateCamera(ref camera, ref cameraMotion, player, ref radioPosition, zombies);
-
+                if (!TaskManager.Active)
+                {
+                    UpdateCamera(ref camera, ref cameraMotion, player, ref radioPosition, zombies);
+                }
                 // Update the camera shake motion
                 cameraMotion.ShakeStart = camera.Position;
                 camera.Position = cameraMotion.Update(camera.Position, player.SPEED);
@@ -284,11 +291,21 @@ namespace Lurkers_revamped
                 UpdateModelAnimation(utilities[player.CurrentWeapon.ModelID], player.CurrentAnimation, player.UpdateFrame());
 
                 // Update the player event handler
-                TickPlayer(player, rifleAnims, ref crosshairColor, shaders, ref cameraMotion);
+                if (!TaskManager.Active) TickPlayer(player, rifleAnims, ref crosshairColor, shaders, ref cameraMotion);
 
                 if (IsKeyPressed(KeyboardKey.Tab))
                 {
-                    TaskManager.Active = !TaskManager.Active;
+                    if (!TaskManager.Active)
+                    {
+                        TaskManager.Active = true;
+                        cameraMotion.Amplitude = 0;
+                        EnableCursor();
+                    }
+                    else
+                    {
+                        TaskManager.Active = false;
+                        DisableCursor();
+                    }
                 }
 
                 // Update the screen center (info displayer)
@@ -354,7 +371,7 @@ namespace Lurkers_revamped
                     DrawModelEx(rigged[zombie.Type], zombie.Position, Vector3.UnitY, zombie.Angle, new Vector3(3.5f), Color.White);
 
                     // Update the zombie model according to its state 
-                    UpdateModelAnimation(rigged[zombie.Type], zombie.CurrentAnimation, zombie.UpdateFrame());
+                    if (!TaskManager.Active) UpdateModelAnimation(rigged[zombie.Type], zombie.CurrentAnimation, zombie.UpdateFrame());
                     switch (zombie.State)
                     {
                         case ZombieState.Running:
@@ -402,7 +419,7 @@ namespace Lurkers_revamped
                     }
 
                     // Move and rotate the zombie if running
-                    if (zombie.State == ZombieState.Running)
+                    if (zombie.State == ZombieState.Running && !TaskManager.Active)
                     {
                         // Find path 
                         if (aStar.Grid.GetWorldToNode(camera.Position).Walkable)
@@ -502,6 +519,16 @@ namespace Lurkers_revamped
                 // Draw screen infos
                 screen.DrawScreenInfos();
 
+                // Draw current inventory case
+                DrawTexture(UITextures["inventory_case_selected"], GetScreenWidth() - 121, GetScreenHeight() - (800 - (player.InventoryIndex) * 85) - 1, Color.White);
+
+                // Draw crosshair
+                DrawTexture(UITextures["crosshair"], GetScreenWidth() / 2 - UITextures["crosshair"].Width / 2, GetScreenHeight() / 2 - UITextures["crosshair"].Height / 2, crosshairColor);
+
+                // Draw lifebar
+                DrawRectangleGradientH(180, height - 140, (int)(2.4f * player.Life), 15, Color.Lime, Color.Green);
+                DrawTexture(UITextures["lifebar"], 50, height - 250, Color.White);
+
                 // Draw tasks manager
                 TaskManager.Update();
 #if DEBUG
@@ -518,17 +545,6 @@ namespace Lurkers_revamped
 
                 DrawFPS(0, 0);
 #endif
-
-                // Draw current inventory case
-                DrawTexture(UITextures["inventory_case_selected"], GetScreenWidth() - 121, GetScreenHeight() - (800 - (player.InventoryIndex) * 85) - 1, Color.White);
-
-                // Draw crosshair
-                DrawTexture(UITextures["crosshair"], GetScreenWidth() / 2 - UITextures["crosshair"].Width / 2, GetScreenHeight() / 2 - UITextures["crosshair"].Height / 2, crosshairColor);
-
-                // Draw lifebar
-                DrawRectangleGradientH(180, height -140, (int)(2.4f * player.Life), 15, Color.Lime, Color.Green);
-                DrawTexture(UITextures["lifebar"], 50, height - 250, Color.White);
-
                 // End drawing context
                 EndDrawing();
 

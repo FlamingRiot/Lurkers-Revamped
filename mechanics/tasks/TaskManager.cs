@@ -2,13 +2,12 @@
 using System.Numerics;
 using Uniray_Engine;
 using uniray_Project;
+using uniray_Project.graphics;
 
 namespace Lurkers_revamped
 {
     public class TaskManager
     {
-        private static Texture2D _button = Raylib.LoadTexture("src/textures/button.png");
-
         public static Color Color;
 
         private static List<Task> _tasks = new List<Task>();
@@ -66,6 +65,7 @@ namespace Lurkers_revamped
                     Raylib.DrawRectangle(60, yPos + 60, 410, 5, new Color(6, 30, 90, 140));
                     Raylib.DrawRectangle(60, yPos + 60, (410 / OpenTasks[i].Amount) * OpenTasks[i].Progression, 5, new Color(36, 210, 255, 220));
                 }
+                Menu.ShowPause();
             }
             int index = 0;
             foreach (KeyValuePair<double[], Task> task in _transitTasks)
