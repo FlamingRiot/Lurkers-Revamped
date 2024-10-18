@@ -412,6 +412,18 @@ namespace Lurkers_revamped
                         }
                         aStar.Grid.DrawPath(zombie.Path);
 
+                        Node currentNode = aStar.Grid.GetWorldToNode(zombie.Position);
+                        List<Node> neighbours = aStar.Grid.GetNeighbours(currentNode);
+                        if (zombie.PreviousNodes[0].Position != neighbours[0].Position)
+                        {
+                            zombie.PreviousNodes.ForEach(x => x.Walkable = true);
+                            zombie.PreviousNodes = neighbours;
+                        }
+                        else
+                        {
+                            zombie.PreviousNodes.ForEach(x => x.Walkable = false);
+                        }
+
                         if (zombie.Path.Count != 0)
                         {
                             // Calculate rotation and movement

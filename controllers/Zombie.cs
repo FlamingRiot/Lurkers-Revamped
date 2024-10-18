@@ -37,6 +37,8 @@ namespace uniray_Project
 
         public List<Node> Path;
 
+        public List<Node> PreviousNodes;
+
         /// <summary>The current health of the zombie.</summary>
         public int Frame;
 
@@ -123,6 +125,8 @@ namespace uniray_Project
             Direction = Vector3.Zero;
 
             Path = new List<Node>();
+
+            PreviousNodes = new List<Node>() { new Node(true, Vector2.Zero, Vector2.Zero)};
         }
 
         /// <summary>Updates the frame of current animation.</summary>
