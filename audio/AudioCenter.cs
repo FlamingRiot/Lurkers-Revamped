@@ -1,4 +1,5 @@
 ﻿using Raylib_cs;
+using System.Data;
 using static Raylib_cs.Raylib;
 namespace uniray_Project
 {
@@ -17,6 +18,8 @@ namespace uniray_Project
             InitAudioDevice();
             sounds = RLoading.LoadSounds();
             musics = RLoading.LoadMusics();
+            // Volume modifications
+            AdjustVolumes();
         }
 
         /// <summary>Plays a sound</summary>
@@ -104,6 +107,12 @@ namespace uniray_Project
         public static void SetSoundVolume(string key, float volume)
         {
             Raylib.SetSoundVolume(sounds[key], volume);
+        }
+
+        /// <summary>Adjusts the volumes of each different musics and sounds.</summary>
+        private static void AdjustVolumes()
+        {
+            SetSoundVolume("player_hit", 8);
         }
     }
 }

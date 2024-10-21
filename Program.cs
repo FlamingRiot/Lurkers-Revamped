@@ -426,6 +426,9 @@ namespace Lurkers_revamped
                             zombie.UpdateFrame();
                             if (zombie.Frame == 90)
                             {
+                                // Play harm sound
+                                AudioCenter.SetSoundPitch("player_hit", (float)(Random.Shared.NextDouble() * 1.5));
+                                AudioCenter.PlaySound("player_hit");
                                 player.Life -= 10;
                                 DrawRectangle(0, 0, ScreenWidth, ScreenHeight, Color.Red);
                                 TaskManager.UpdateTask(8, 10);
