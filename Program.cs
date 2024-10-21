@@ -267,8 +267,8 @@ namespace Lurkers_revamped
                             {
                                 if (spawner.Shoot(player.CurrentWeapon.bullets.Last().Ray, UnirayEngine.Ressource.GetModel("crystal").Meshes[0]))
                                 {
-                                    // Play sound
-                                    AudioCenter.SetSoundVolume("crystal_hit", 15);
+                                    // Play randomly pitched hit sound
+                                    AudioCenter.SetSoundVolume("crystal_hit", 12);
                                     AudioCenter.SetSoundPitch("crystal_hit", (float)(Random.Shared.NextDouble() * 3));
                                     AudioCenter.PlaySound("crystal_hit");
                                     if (zombies.Count < 4 && _freeZombies.Count != 0)
@@ -278,10 +278,16 @@ namespace Lurkers_revamped
                                     }
                                     if (spawner.Destroyed)
                                     {
-                                        // Play sound
+                                        // Play destruction sound
+                                        AudioCenter.SetSoundVolume("crystal_destroyed", 12);
                                         AudioCenter.PlaySound("crystal_destroyed");
                                         // Update task if active
                                         if (TaskManager.IsActive(2)) TaskManager.UpdateTask(2, 1);
+
+                                        // Update other spawners index
+                                        spawners.Remove(spawner);
+                                        spawners.ForEach(x => x.RessourceIndex--);
+                                        break;
                                     }
                                 }
                             }
