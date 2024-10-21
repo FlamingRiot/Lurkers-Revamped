@@ -89,6 +89,15 @@ namespace uniray_Project
             Raylib.SetMusicPitch(musics[key], pitch);
         }
 
+        /// <summary>Sets music pitch</summary>
+        /// <param name="key">Dictionary key of the music</param>
+        /// <param name="volume">Pitch to set</param>
+        public static void SetSoundPitch(string key, float pitch)
+        {
+            Raylib.SetSoundPitch(sounds[key], pitch);
+        }
+
+
         /// <summary>Sets sound volume</summary>
         /// <param name="key">Dictionary key of the sound</param>
         /// <param name="volume">Volume to set</param>

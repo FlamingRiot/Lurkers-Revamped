@@ -103,6 +103,9 @@ namespace uniray_Project
                 { "blood", LoadSound("src/sounds/blood.wav") },
                 { "task_received", LoadSound("src/sounds/task_received.wav") },
                 { "task_complete", LoadSound("src/sounds/task_complete.wav") },
+                { "player_hit", LoadSound("src/sounds/player/player_hit.wav") },
+                { "crystal_hit", LoadSound("src/sounds/crystal/crystal_hit.wav") },
+                { "crystal_destroyed", LoadSound("src/sounds/crystal/crystal_destroyed.wav") },
             };
             return sounds;
         }

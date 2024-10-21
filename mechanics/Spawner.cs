@@ -9,8 +9,6 @@ namespace uniray_Project.mechanics
         /// <summary>Quad used to render the wave</summary>
         public static Mesh WaveQuad = GenMeshPlane(10, 10, 1, 1);
 
-        private int RessourceIndex;
-
         /// <summary>Position of the spawner.</summary>
         public Vector3 Position;
 
@@ -25,6 +23,9 @@ namespace uniray_Project.mechanics
 
         /// <summary>Health of the spawner.</summary>
         public int Health;
+
+        /// <summary>Index of the spawner in both ressources ans static boxes</summary>
+        public int RessourceIndex;
 
         public bool Destroyed;
 
@@ -68,7 +69,6 @@ namespace uniray_Project.mechanics
             if (collision.Hit)
             {
                 Health -= 25;
-                //CurrentScene.GameObjects[RessourceIndex].Position -= Vector3.UnitY * 0.5f;
                 // Destroy crystal if health = 0
                 if (Health <= 0 && !Destroyed)
                 {

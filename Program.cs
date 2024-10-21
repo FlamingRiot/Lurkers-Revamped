@@ -267,12 +267,22 @@ namespace Lurkers_revamped
                             {
                                 if (spawner.Shoot(player.CurrentWeapon.bullets.Last().Ray, UnirayEngine.Ressource.GetModel("crystal").Meshes[0]))
                                 {
+                                    // Play sound
+                                    AudioCenter.SetSoundVolume("crystal_hit", 15);
+                                    AudioCenter.SetSoundPitch("crystal_hit", (float)(Random.Shared.NextDouble() * 3));
+                                    AudioCenter.PlaySound("crystal_hit");
                                     if (zombies.Count < 4 && _freeZombies.Count != 0)
                                     {
                                         zombies.Add(spawner.CreateZombie(zombieAnims[8], camera.Position, _freeZombies.First()));
                                         _freeZombies.RemoveAt(0);
                                     }
-                                    if (TaskManager.IsActive(2) && spawner.Destroyed) TaskManager.UpdateTask(2, 1);
+                                    if (spawner.Destroyed)
+                                    {
+                                        // Play sound
+                                        AudioCenter.PlaySound("crystal_destroyed");
+                                        // Update task if active
+                                        if (TaskManager.IsActive(2)) TaskManager.UpdateTask(2, 1);
+                                    }
                                 }
                             }
                             
@@ -411,6 +421,7 @@ namespace Lurkers_revamped
                             if (zombie.Frame == 90)
                             {
                                 player.Life -= 10;
+                                DrawRectangle(0, 0, ScreenWidth, ScreenHeight, Color.Red);
                                 TaskManager.UpdateTask(8, 10);
                             }
                             if (Math.Abs(Vector3Subtract(camera.Position, zombie.Position).Length()) > 5)
