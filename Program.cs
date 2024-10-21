@@ -9,11 +9,17 @@ using System.Text;
 using uniray_Project.mechanics;
 using AStar;
 using uniray_Project.graphics;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Lurkers_revamped
 {
     public unsafe class Program
     {
+        public static double GameStartTime;
+        // Window size global variables
+        public static int ScreenWidth;
+        public static int ScreenHeight;
+        public static Vector2 ScreenSize;
         public  static void Main(string[] args)
         {
             // Init splash window
@@ -142,31 +148,32 @@ namespace Lurkers_revamped
             SetWindowState(ConfigFlags.MaximizedWindow);
 
             // Get window size
-            int width = GetScreenWidth();
-            int height = GetScreenHeight(); 
+            ScreenWidth = GetScreenWidth();
+            ScreenHeight = GetScreenHeight(); 
+            ScreenSize = new Vector2(GetScreenWidth(), GetScreenHeight());
 
             // Scene render texture
-            RenderTexture2D renderTexture = LoadRenderTexture(width, height);
+            RenderTexture2D renderTexture = LoadRenderTexture(ScreenWidth, ScreenHeight);
 
             // Previous frame render texture
-            RenderTexture2D prevTexture = LoadRenderTexture(width, height);
+            RenderTexture2D prevTexture = LoadRenderTexture(ScreenWidth, ScreenHeight);
 
             // Inverse scene render texture rectangle
-            Rectangle inverseSceneRectangle = new Rectangle(0, 0, width, -height);
+            Rectangle inverseSceneRectangle = new Rectangle(0, 0, ScreenWidth, -ScreenHeight);
 
             // Scene rectangle
-            Rectangle sceneRectangle = new Rectangle(0, 0, width, height);
+            Rectangle sceneRectangle = new Rectangle(0, 0, ScreenWidth, ScreenHeight);
 
             // Set permanent informations of the screen according to the final screen size
             for (int i = 800; i >= 460; i -= 85)
             {
                 // Add the 5 inventory cases displayed on the right side of the screen
-                screen.AddInfo(new TextureInfo(new Vector2(width - 120, height - i), UITextures["inventory_case"], GetTime(), -1.0));
+                screen.AddInfo(new TextureInfo(new Vector2(ScreenWidth - 120, ScreenHeight - i), UITextures["inventory_case"], GetTime(), -1.0));
             }
 
             // Add current weapon splash
-            screen.AddInfo(new TextureInfo(new Vector2(width - 120, height - 800), UITextures["rifle_gray_splash"], GetTime(), -1.0));
-            screen.AddInfo(new TextureInfo(new Vector2(width - 120, height - (800 - (player.InventorySize) * 85)), UITextures["rifle_green_splash"], GetTime(), -1.0));
+            screen.AddInfo(new TextureInfo(new Vector2(ScreenWidth - 120, ScreenHeight - 800), UITextures["rifle_gray_splash"], GetTime(), -1.0));
+            screen.AddInfo(new TextureInfo(new Vector2(ScreenWidth - 120, ScreenHeight - (800 - (player.InventorySize) * 85)), UITextures["rifle_green_splash"], GetTime(), -1.0));
 
             // Crosshair color variable
             Color crosshairColor = Color.White;
@@ -176,9 +183,8 @@ namespace Lurkers_revamped
             // Start Menu
             Menu.Init();
             Menu.Show(skybox, shaders, terrain);
-
-            // Show cutscene
-
+            // Get starting time
+            GameStartTime = GetTime();
 			DisableCursor();
             // Game Loop
             while (!WindowShouldClose())
@@ -526,11 +532,14 @@ namespace Lurkers_revamped
                 DrawTexture(UITextures["crosshair"], GetScreenWidth() / 2 - UITextures["crosshair"].Width / 2, GetScreenHeight() / 2 - UITextures["crosshair"].Height / 2, crosshairColor);
 
                 // Draw lifebar
-                DrawRectangleGradientH(180, height - 140, (int)(2.4f * player.Life), 15, Color.Lime, Color.Green);
-                DrawTexture(UITextures["lifebar"], 50, height - 250, Color.White);
+                DrawRectangleGradientH(180, ScreenHeight - 140, (int)(2.4f * player.Life), 15, Color.Lime, Color.Green);
+                DrawTexture(UITextures["lifebar"], 50, ScreenHeight - 250, Color.White);
 
                 // Draw tasks manager
                 TaskManager.Update();
+
+                // Draw Gradient at the start
+                if (GameStartTime + Cutscene.GRADIENT_TIME > GetTime()) Cutscene.Gradient(Color.Black);
 #if DEBUG
 
                 // Debug positions

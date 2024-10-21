@@ -19,17 +19,17 @@ namespace uniray_Project.graphics
 
         private static Rectangle inverseSceneRectangle;
 
-        private static Texture2D _button;
-
         private static Rectangle _playButton;
 
         private static Rectangle _quitButton;
 
-        private static Font _font;
-
         public static int Width;
 
-        public static int Height;   
+        public static int Height;
+
+        public static Font Font;
+
+        public static Font SecondaryFont;
         public static void Init()
         {
             Width = GetScreenWidth();
@@ -53,9 +53,8 @@ namespace uniray_Project.graphics
             _renderTexture = LoadRenderTexture(Width, Height);
             _prevTexture = LoadRenderTexture(Width, Height);
 
-            _button = LoadTexture("src/textures/button.png");
-
-            _font = LoadFont("src/fonts/Kanit-Bold.ttf");
+            Font = LoadFont("src/fonts/tasks.ttf");
+            SecondaryFont = LoadFont("src/fonts/OpenSans-Medium.ttf");
 
             _enabled = true;
         }
@@ -105,15 +104,18 @@ namespace uniray_Project.graphics
                 DrawRectangleRoundedLines(_playButton, 0.2f, 20, 3, new Color(158, 158, 158, 240));
                 DrawRectangleRoundedLines(_quitButton, 0.2f, 20, 3, new Color(158, 158, 158, 240));
                 // Draw text
-                Vector2 textSize = MeasureTextEx(_font, "Play", 40, 1);
-                DrawTextPro(_font, "Play", _playButton.Position + _playButton.Size / 2 - textSize / 2, Vector2.Zero, 0, 40, 1, Color.White);
-                DrawTextPro(_font, "Quit", _quitButton.Position + _quitButton.Size / 2 - textSize / 2, Vector2.Zero, 0, 40, 1, Color.White);
+                Vector2 textSize = MeasureTextEx(Font, "Play", 30, 1);
+                DrawTextPro(Font, "Play", _playButton.Position + _playButton.Size / 2 - textSize / 2, Vector2.Zero, 0, 30, 1, Color.White);
+                DrawTextPro(Font, "Quit", _quitButton.Position + _quitButton.Size / 2 - textSize / 2, Vector2.Zero, 0, 30, 1, Color.White);
                 EndDrawing();
                 // Draw to previous frame render texture
                 BeginTextureMode(_prevTexture);
                 DrawTexturePro(_renderTexture.Texture, inverseSceneRectangle, sceneRectangle, Vector2.Zero, 0, Color.White);
                 EndTextureMode();
             }
+
+            // Show Cutscene
+            Cutscene.Show(_renderTexture.Texture, sceneRectangle, inverseSceneRectangle);
         }
         
         public static void ShowPause()
@@ -125,8 +127,8 @@ namespace uniray_Project.graphics
                 if (Hover(_quitButton)) Environment.Exit(0);
             }
             DrawRectangleRoundedLines(_quitButton, 0.2f, 20, 3, new Color(158, 158, 158, 240));
-            Vector2 textSize = MeasureTextEx(_font, "Play", 40, 1);
-            DrawTextPro(_font, "Quit", _quitButton.Position + _quitButton.Size / 2 - textSize / 2, Vector2.Zero, 0, 40, 1, Color.White);
+            Vector2 textSize = MeasureTextEx(Font, "Play", 30, 1);
+            DrawTextPro(Font, "Quit", _quitButton.Position + _quitButton.Size / 2 - textSize / 2, Vector2.Zero, 0, 30, 1, Color.White);
         }
 
         public static bool Hover(Rectangle rectangle)

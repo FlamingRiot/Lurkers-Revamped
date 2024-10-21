@@ -3,7 +3,7 @@ using Raylib_cs;
 using System.Numerics;
 using static Raylib_cs.Raylib;
 
-namespace uniray_Project
+namespace uniray_Project.graphics
 {
     /// <summary>Represents a ShaderCenter instance used to store shaders and relative data</summary>
     public unsafe class ShaderCenter
