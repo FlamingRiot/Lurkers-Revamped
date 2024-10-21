@@ -470,6 +470,11 @@ namespace Lurkers_revamped
                                 if (zombie.Frame != 0) { zombie.Frame = 0; }
                             }
                         }
+                        // Map outsider check
+                        if (zombie.Path.Count > 75)
+                        {
+                            zombie.State = ZombieState.Dying1;
+                        }
 
                         // Play zombie default running sound
                         AudioCenter.PlaySoundLoop("zombie_default");

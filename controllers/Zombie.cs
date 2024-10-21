@@ -23,7 +23,7 @@ namespace uniray_Project
     {
         public const float SPEED = 5f;
 
-        public const float ROTATION_SPEED = 3f;
+        public const float ROTATION_SPEED = 4f;
 
         private int health;
         private string type;
