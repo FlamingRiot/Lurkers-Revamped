@@ -149,8 +149,10 @@ namespace uniray_Project
         /// <returns><see langword="true"/> if collision succeeds. <see langword="false"/> otherwise.</returns>
         public bool Shoot(Ray ray, Mesh mesh)
         {
+            // Clamp frame to avoid OutsideOfArray exception
+            int _frame = (int)Raymath.Clamp(Frame, 0, CurrentAnimation.FrameCount - 1);
             // Calculates head bone position
-            Vector3 bonePos = Program.RotateNormalizedBone(CurrentAnimation.FramePoses[Frame][5].Translation, Angle, Position);
+            Vector3 bonePos = Program.RotateNormalizedBone(CurrentAnimation.FramePoses[_frame][5].Translation, Angle, Position);
             // Checks collision for the zombie's head
             RayCollision collisiion = GetRayCollisionSphere(ray, bonePos, 0.4f);
             if (collisiion.Hit)
