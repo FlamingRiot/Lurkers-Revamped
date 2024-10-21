@@ -106,6 +106,10 @@ namespace uniray_Project
                 { "player_hit", LoadSound("src/sounds/player/player_hit.wav") },
                 { "crystal_hit", LoadSound("src/sounds/crystal/crystal_hit.wav") },
                 { "crystal_destroyed", LoadSound("src/sounds/crystal/crystal_destroyed.wav") },
+                { "distant_explosions", LoadSound("src/sounds/cutscene/distant_explosions.wav") },
+                { "distant_shooting", LoadSound("src/sounds/cutscene/distant_shooting.wav") },
+                { "stirred_crowd", LoadSound("src/sounds/cutscene/stirred_crowd.wav") },
+                { "rick_cutscene", LoadSound("src/sounds/cutscene/rick_cutscene.wav") },
             };
             return sounds;
         }

@@ -8,12 +8,13 @@ namespace uniray_Project.graphics
     public class Cutscene
     {
         public const double GRADIENT_TIME = 1.2;
-        public const double LENGTH = 6.22;
+        public const double LENGTH = 15;
         private static double _start;
         private static int TipFontSize = 26;
 
         private static double _gradientStart;
         private static double _gradientEnd;
+        private static float _audioGradient;
         public static void Show(Texture2D background, Rectangle sceneRectangle, Rectangle inverseSceneRectangle)
         {
             _gradientStart = 0.0;
@@ -54,6 +55,29 @@ namespace uniray_Project.graphics
                 (float)GRADIENT_TIME);
             int alpha = (int)(255 / (GRADIENT_TIME / delta));
             color.A = (byte)alpha;
+
+            // Play background sounds when pitch black
+            if (alpha == 255)
+            {
+                if (!AudioCenter.IsSoundPlaying("rick_cutscene") && GetTime() < _start + 2) AudioCenter.PlaySound("rick_cutscene");
+                if (GetTime() > _start + 7 && GetTime() < _start + 8)
+                {
+                    if (!AudioCenter.IsSoundPlaying("distant_explosions"))
+                    {
+                        AudioCenter.PlaySound("distant_explosions");
+                        AudioCenter.PlaySound("distant_shooting");
+                        AudioCenter.PlaySound("stirred_crowd");
+                    }
+
+                    // Manage audio gradient at the start
+                    _audioGradient += 0.05f;
+                    _audioGradient = Raymath.Clamp(_audioGradient, 0, 0.5f);
+                    AudioCenter.SetSoundVolume("distant_explosions", _audioGradient);
+                    AudioCenter.SetSoundVolume("distant_shooting", _audioGradient);
+                    AudioCenter.SetSoundVolume("stirred_crowd", _audioGradient);
+                }
+            }
+
             // Draw gradient
             DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), color);
             Vector2 textSize = MeasureTextEx(Menu.SecondaryFont, "Tip: Press TAB to see your tasks", TipFontSize, 1);

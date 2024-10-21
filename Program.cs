@@ -46,7 +46,7 @@ namespace Lurkers_revamped
 
             // Define 3D camera
             Camera3D camera = new Camera3D();
-            camera.Position = new Vector3(9.0f, 3.0f, -15.0f);
+            camera.Position = new Vector3(-52.0f, 3.0f, -16.0f);
             camera.Target = new Vector3(3.0f, 3.0f, 0.0f);
             camera.Up = Vector3.UnitY;
             camera.Projection = CameraProjection.Perspective;
@@ -426,9 +426,6 @@ namespace Lurkers_revamped
                             zombie.UpdateFrame();
                             if (zombie.Frame == 90)
                             {
-                                // Play harm sound
-                                AudioCenter.SetSoundPitch("player_hit", (float)(Random.Shared.NextDouble() * 1.5));
-                                AudioCenter.PlaySound("player_hit");
                                 player.Life -= 10;
                                 DrawRectangle(0, 0, ScreenWidth, ScreenHeight, Color.Red);
                                 TaskManager.UpdateTask(8, 10);
@@ -452,7 +449,7 @@ namespace Lurkers_revamped
                         {
                            aStar.FindPath(zombie.Position, camera.Position, zombie.Path);
                         }
-                        aStar.Grid.DrawPath(zombie.Path);
+                        // aStar.Grid.DrawPath(zombie.Path);
 
                         Node currentNode = aStar.Grid.GetWorldToNode(zombie.Position);
                         List<Node> neighbours = aStar.Grid.GetNeighbours(currentNode);
