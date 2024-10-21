@@ -86,7 +86,7 @@ namespace AStar
         public Node GetWorldToNode(Vector3 position)
         {
             Vector2 percent = new Vector2((position.X + WorldSize.X / 2) / WorldSize.X, (position.Z + WorldSize.Y / 2) / WorldSize.Y);
-            percent = Raymath.Vector2ClampValue(percent, 0, 1);
+            percent = Raymath.Vector2Clamp(percent, Vector2.Zero, Vector2.One);
             int x = (int)Math.Round(MathF.Round(GridSize.X - 1) * percent.X);
             int y = (int)Math.Round(MathF.Round(GridSize.Y - 1) * percent.Y);
             return nodes[x, y];
