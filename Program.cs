@@ -284,8 +284,16 @@ namespace Lurkers_revamped
                                         if (TaskManager.IsActive(2)) TaskManager.UpdateTask(2, 1);
 
                                         // Update other spawners index
+                                        staticBoxes.RemoveAt(spawner.RessourceIndex);
                                         spawners.Remove(spawner);
-                                        spawners.ForEach(x => x.RessourceIndex--);
+                                        // Switch ressource index with existing spawners
+                                        spawners.ForEach(x =>
+                                        {
+                                            if (spawner.RessourceIndex < x.RessourceIndex)
+                                            {
+                                                (x.RessourceIndex, spawner.RessourceIndex) = (spawner.RessourceIndex, x.RessourceIndex);
+                                            }
+                                        });
                                         break;
                                     }
                                 }
