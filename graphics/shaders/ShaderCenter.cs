@@ -3,7 +3,7 @@ using Raylib_cs;
 using System.Numerics;
 using static Raylib_cs.Raylib;
 
-namespace uniray_Project.graphics
+namespace Lurkers_revamped
 {
     /// <summary>Represents a ShaderCenter instance used to store shaders and relative data</summary>
     public unsafe class ShaderCenter
@@ -59,6 +59,10 @@ namespace uniray_Project.graphics
         /// <summary>The material used for the spawner's wave quads</summary>
         public Material WaveMaterial;
 
+        // ################### Meshes ###################
+
+        public Mesh Skybox;
+
         /// <summary>ShaderCenter constructor</summary>
         public ShaderCenter()
         {
@@ -66,6 +70,8 @@ namespace uniray_Project.graphics
             LoadShaders();
             // Load materials
             LoadMaterials();
+            // Generate meshes
+            Skybox = GenSkybox();
         }
 
         /// <summary>Loads lighting shader and assigns required values</summary>
@@ -171,6 +177,20 @@ namespace uniray_Project.graphics
             // Init the Wave Quad material
             WaveMaterial = LoadMaterialDefault();
             WaveMaterial.Shader = WaveShader;
+        }
+
+        /// <summary>Generates the general skybox for the game</summary>
+        /// <param name="shaders">Shader center to use for loading shader interactions</param>
+        /// <returns>The generated mesh corresponding to the skybox. Background texturing and loading is done as well</returns>
+        private Mesh GenSkybox()
+        {
+            Mesh skybox = GenMeshCube(1, 1, 1);
+            Texture2D panorama = LoadTexture("src/textures/skyboxes/sunset_skybox.hdr");
+            Texture2D cubemap = GenTexureCubemap(panorama, 256, PixelFormat.UncompressedR8G8B8A8);
+            SetCubemap(cubemap);
+            UnloadTexture(panorama);
+
+            return skybox;
         }
 
         /// <summary>Generates cubemap according to the passed HDR texture</summary>

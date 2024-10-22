@@ -3,7 +3,7 @@ using Raylib_cs;
 using System.Numerics;
 using static Raylib_cs.Raylib;
 
-namespace uniray_Project.graphics
+namespace Lurkers_revamped
 {
     public class Menu
     {

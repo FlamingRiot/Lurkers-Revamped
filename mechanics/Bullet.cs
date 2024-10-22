@@ -1,7 +1,7 @@
 ﻿using Raylib_cs;
 using System.Numerics;
 
-namespace uniray_Project
+namespace Lurkers_revamped
 {
     public class Bullet
     {

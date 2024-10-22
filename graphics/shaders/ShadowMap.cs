@@ -1,7 +1,7 @@
 ﻿using Raylib_cs;
 using System.Numerics;
 
-namespace uniray_Project
+namespace Lurkers_revamped
 {
     /// <summary>Represents a Shadow Map object</summary>
     public class ShadowMap

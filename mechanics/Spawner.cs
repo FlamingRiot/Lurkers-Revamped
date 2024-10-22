@@ -2,7 +2,7 @@
 using Raylib_cs;using System.Numerics;
 using static Uniray_Engine.UnirayEngine;
 
-namespace uniray_Project.mechanics
+namespace Lurkers_revamped
 {
     public class Spawner
     {

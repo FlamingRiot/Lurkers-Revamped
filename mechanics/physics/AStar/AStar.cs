@@ -1,20 +1,20 @@
 ﻿using System.Numerics;
 
-namespace AStar
+namespace Astar
 {
     /// <summary>Represents an instance of the A* algorithm.</summary>
-    public class AStar
+    public static class AStar
     {
         /// <summary>Grid of the algorithm instance.</summary>
-        public Grid Grid;
+        public static Grid Grid = new Grid();
 
         // Sets of opened and closed nodes
-        private Heap<Node> openSet;
-        private HashSet<Node> closedSet;
+        private static Heap<Node> openSet = new Heap<Node>(Grid.MaxSize);
+        private static HashSet<Node> closedSet = new HashSet<Node>();
 
-        /// <summary>Creates a <see cref="AStar"/> object.</summary>
-        /// <param name="grid">Grid of the algorithm.</param>
-        public AStar(Grid grid)
+        /// <summary>Loads the grid for the A* algorithm.</summary>
+        /// <param name="grid">The grid to use.</param>
+        public static void Load(Grid grid)
         {
             Grid = grid;
             openSet = new Heap<Node>(Grid.MaxSize);
@@ -24,7 +24,7 @@ namespace AStar
         /// <summary>Finds the shortest path from a <see cref="Node"/> to another.</summary>
         /// <param name="startPos">Starting position.</param>
         /// <param name="targetPos">Target position.</param>
-        public void FindPath(Vector3 startPos, Vector3 targetPos, List<Node> path)
+        public static void FindPath(Vector3 startPos, Vector3 targetPos, List<Node> path)
         {
             Node startNode = Grid.GetWorldToNode(startPos);
             Node targetNode = Grid.GetWorldToNode(targetPos);
@@ -75,7 +75,7 @@ namespace AStar
         /// <summary>Retraces a path according to the parents of the nodes.</summary>
         /// <param name="startNode">Starting node.</param>
         /// <param name="targetNode">Target node.</param>
-        private void RetracePath(Node startNode, Node targetNode, List<Node> path)
+        private static void RetracePath(Node startNode, Node targetNode, List<Node> path)
         {
             path.Clear();
             Node currentNode = targetNode;
@@ -93,7 +93,7 @@ namespace AStar
         /// <param name="node1">Node A to check.</param>
         /// <param name="node2">Node B to check.</param>
         /// <returns>The calculated distance.</returns>
-        private int GetDistance(Node node1, Node node2)
+        private static int GetDistance(Node node1, Node node2)
         {
             int distX = Math.Abs((int)node1.GridPosition.X - (int)node2.GridPosition.X);
             int distY = Math.Abs((int)node1.GridPosition.Y - (int)node2.GridPosition.Y);

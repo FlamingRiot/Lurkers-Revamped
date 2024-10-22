@@ -1,16 +1,15 @@
 ﻿using Raylib_cs;
-using System.Data;
 using static Raylib_cs.Raylib;
-namespace uniray_Project
+namespace Lurkers_revamped
 {
     /// <summary>Represents an audio managment instance</summary>
     public class AudioCenter
     {
         /// <summary>Dictionary of sounds</summary>
-        private static Dictionary<string, Sound> sounds;
+        private static Dictionary<string, Sound> sounds = new Dictionary<string, Sound>();
 
         /// <summary>Dictionary of musics</summary>
-        private static Dictionary<string, Music> musics;
+        private static Dictionary<string, Music> musics = new Dictionary<string, Music>();
 
         /// <summary>Loads every sound and musics of the game</summary>
         public static void Init()

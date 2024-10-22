@@ -3,10 +3,8 @@ using Uniray_Engine;
 using static Uniray_Engine.UnirayEngine;
 using static Raylib_cs.Raylib;
 using System.Numerics;
-using uniray_Project.mechanics;
-using uniray_Project.graphics;
 
-namespace uniray_Project
+namespace Lurkers_revamped
 {
     /// <summary>Loading instance used to centralize all the GPU loading actions provided by Raylib</summary>
     public static unsafe class RLoading
@@ -128,8 +126,9 @@ namespace uniray_Project
         /// <summary>Loads the list of static boxes from the current scene's game objects</summary>
         /// <param name="gos">The game objects to use to load the static bounding-boxes</param>
         /// <returns>The list of bounding boxes corresponding to the passed game objects</returns>
-        public static List<BoundingBox> LoadStaticBoxes(List<GameObject3D> gos)
+        public static List<BoundingBox> LoadStaticBoxes()
         {
+            List<GameObject3D> gos = CurrentScene.GameObjects;
             List<BoundingBox> boxes = new List<BoundingBox>();
             
             for (int i = 0; i < gos.Count; i++)
@@ -182,20 +181,6 @@ namespace uniray_Project
             Matrix4x4 transform = Raymath.MatrixScale(250, 250, 250);
 
             return new Terrain(mesh, mat, transform);
-        }
-
-        /// <summary>Generates the general skybox for the game</summary>
-        /// <param name="shaders">Shader center to use for loading shader interactions</param>
-        /// <returns>The generated mesh corresponding to the skybox. Background texturing and loading is done as well</returns>
-        public static Mesh GenSkybox(ShaderCenter shaders)
-        {
-            Mesh skybox = GenMeshCube(1, 1, 1);
-            Texture2D panorama = LoadTexture("src/textures/skyboxes/sunset_skybox.hdr");
-            Texture2D cubemap = shaders.GenTexureCubemap(panorama, 256, PixelFormat.UncompressedR8G8B8A8);
-            shaders.SetCubemap(cubemap);
-            UnloadTexture(panorama);
-
-            return skybox;
         }
     }
 }

@@ -1,10 +1,8 @@
 ﻿using System.Numerics;
 using Raylib_cs;
-using Lurkers_revamped;
 using System.Diagnostics;
-using AStar;
 
-namespace uniray_Project
+namespace Lurkers_revamped
 {
     public enum PlayerWeaponState
     {
@@ -150,7 +148,6 @@ namespace uniray_Project
         public void Kill()
         {
             MoveState = PlayerMoveState.Dying;
-            Console.WriteLine("Player has been killed!");
         }
 
         /// <summary>

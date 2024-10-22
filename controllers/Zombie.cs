@@ -1,10 +1,9 @@
 ﻿using System.Numerics;
 using static Raylib_cs.Raylib;
-using Lurkers_revamped;
 using Raylib_cs;
-using AStar;
+using Astar;
 
-namespace uniray_Project
+namespace Lurkers_revamped
 {
     /// <summary>Zombie action state system.</summary>
     public enum ZombieState
@@ -171,6 +170,16 @@ namespace uniray_Project
                 return true;
             }
             else return false;
+        }
+
+        /// <summary>Calculates and returns the exact position of the zombie's head bone.</summary>
+        /// <returns>The 3D vector of the zombie's head bone.</returns>
+        public Vector3 GetHeadPosition()
+        {
+            // Clamp frame to avoid OutsideOfArray exception
+            int _frame = (int)Raymath.Clamp(Frame, 0, CurrentAnimation.FrameCount - 1);
+            // Calculates head bone position
+            return Program.RotateNormalizedBone(CurrentAnimation.FramePoses[_frame][5].Translation, Angle, Position);
         }
     }
 }

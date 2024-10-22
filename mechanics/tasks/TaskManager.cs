@@ -1,8 +1,6 @@
 ﻿using Raylib_cs;
 using System.Numerics;
 using Uniray_Engine;
-using uniray_Project;
-using uniray_Project.graphics;
 
 namespace Lurkers_revamped
 {

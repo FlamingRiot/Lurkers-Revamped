@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace AStar
+namespace Astar
 {
     /// <summary>Represents a <see cref="Node"/> object of the A* algorithm.</summary>
     public class Node : IHeapItem<Node>

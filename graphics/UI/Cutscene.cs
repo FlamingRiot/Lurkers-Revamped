@@ -1,9 +1,8 @@
 ﻿using static Raylib_cs.Raylib;
 using Raylib_cs;
 using System.Numerics;
-using Lurkers_revamped;
 
-namespace uniray_Project.graphics
+namespace Lurkers_revamped
 {
     public class Cutscene
     {

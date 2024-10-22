@@ -1,4 +1,4 @@
-﻿namespace AStar
+﻿namespace Astar
 {
     /// <summary>Implements heap items conditions.</summary>
     /// <typeparam name="T">Type of the item.</typeparam>

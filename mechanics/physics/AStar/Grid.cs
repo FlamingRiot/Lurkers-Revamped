@@ -1,7 +1,7 @@
 ﻿using Raylib_cs;
 using System.Numerics;
 
-namespace AStar
+namespace Astar
 {
     /// <summary>Represents a <see cref="Grid"/> object of the A* algorithm.</summary>
     public class Grid
@@ -20,6 +20,11 @@ namespace AStar
 
         private Node[,] nodes;
         private float nodeDiameter;
+
+        public Grid() 
+        { 
+            nodes = new Node[0, 0];
+        }
 
         /// <summary>Creates a <see cref="Grid"/> object.</summary>
         /// <param name="center">3D center of the grid.</param>
