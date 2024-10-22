@@ -9,7 +9,6 @@ using System.Text;
 using uniray_Project.mechanics;
 using AStar;
 using uniray_Project.graphics;
-using System.Security.Cryptography.X509Certificates;
 
 namespace Lurkers_revamped
 {
@@ -500,6 +499,14 @@ namespace Lurkers_revamped
                 // Remove the zombie from the list if killed
                 if (killIndex != -1)
                 {
+                    // Remove unused security perimeter
+                    Node currentNode = aStar.Grid.GetWorldToNode(zombies[killIndex].Position);
+                    List<Node> neighbours = aStar.Grid.GetNeighbours(currentNode);
+                    neighbours.ForEach(node =>
+                    {
+                        if (!node.HARD_NODE) node.Walkable = true;
+                    });
+
                     _freeZombies.Add(zombies[killIndex].Type);
                     zombies.RemoveAt(killIndex);
                 }
