@@ -77,6 +77,12 @@ namespace uniray_Project.graphics
                     AudioCenter.SetSoundVolume("stirred_crowd", _audioGradient);
                 }
             }
+            // Dev bypass
+            if (IsKeyPressed(KeyboardKey.R))
+            {
+                _gradientStart = 0.001f;
+                _gradientEnd = GetTime();
+            }
 
             // Draw gradient
             DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), color);
