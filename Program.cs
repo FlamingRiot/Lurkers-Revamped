@@ -268,7 +268,7 @@ namespace Lurkers_revamped
                                 {
                                     // Play randomly pitched hit sound
                                     AudioCenter.SetSoundVolume("crystal_hit", 12);
-                                    AudioCenter.SetSoundPitch("crystal_hit", (float)(Random.Shared.NextDouble() * 3));
+                                    AudioCenter.SetSoundPitch("crystal_hit", Clamp((float)(Random.Shared.NextDouble() * 3), 1.5f, 3f));
                                     AudioCenter.PlaySound("crystal_hit");
                                     if (zombies.Count < 4 && _freeZombies.Count != 0)
                                     {
