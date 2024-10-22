@@ -551,7 +551,10 @@ namespace Lurkers_revamped
                         player.Watch.Restart();
                         player.BLOODY = false;
                         AudioCenter.PlaySound("blood");
-                        zombies.ForEach(x => x.State = ZombieState.Running);
+                        zombies.ForEach(x => 
+                        {
+                            if (x.State != ZombieState.Dying1 && x.State != ZombieState.Dying2) x.State = ZombieState.Running;
+                        });
                     }
                 }
                 else if (!player.BLOODY && player.Watch.IsRunning)
