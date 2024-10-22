@@ -3,61 +3,18 @@ using Raylib_cs;
 
 namespace uniray_Project
 {
-    public class ScreenCenter
+    /// <summary>Represents an instance of a <see cref="ScreenCenter"/> object.</summary>
+    public static class ScreenCenter
     {
-        /// <summary>
-        /// List of infos displayed on the screen
-        /// </summary>
-        private List<ScreenInfo> infos;
-        /// <summary>
-        /// The list of the index to remove when out of the foreach loop
-        /// </summary>
-        private List<int> removeIndexes;
-        /// <summary>
-        /// ScreenCenter constructor
-        /// </summary>
-        public ScreenCenter()
-        {
-            infos = new List<ScreenInfo>();
-            removeIndexes = new List<int>();
-        }
-        /// <summary>
-        /// Tick the screen center
-        /// </summary>
-        public void Tick()
-        {
-            // Check all the infos time
-            foreach (ScreenInfo info in infos)
-            {
-                if (info.Cooldown != -1.0)
-                {
-                    if (Raylib.GetTime() - info.Start >= info.Cooldown)
-                    {
-                        removeIndexes.Add(infos.IndexOf(info));
-                    }
-                }
-            }
+        /// <summary>List of infos displayed on the screen.</summary>
+        private static List<ScreenInfo> infos = new List<ScreenInfo>();
 
-            // Remove all the infos needed
-            if (removeIndexes.Count > 0)
-            {
-                for (int i = 0; i < removeIndexes.Count; i++)
-                {
-                    infos.RemoveAt(removeIndexes[i]);
-                    for (int j = 0; j < removeIndexes.Count; j++)
-                    {
-                        removeIndexes[j]--;
-                    }
-                }
-                // Clear list for future use
-                removeIndexes.Clear();
-            }
-        }
-        /// <summary>
-        /// Draw every active screen infos
-        /// </summary>
-        public void DrawScreenInfos()
+        /// <summary></summary>
+        public static void DrawScreenInfos()
         {
+            // Tick center
+            Tick();
+
             // Draw non-permanent infos
             foreach (ScreenInfo info in infos.Where(x => x.Cooldown != -1.0))
             {
@@ -70,7 +27,7 @@ namespace uniray_Project
                     case TextureInfo texture:
                         Raylib.DrawTexture(texture.Texture, (int)texture.X, (int)texture.Y, new Color(255, 255, 255, (int)alpha));
                         break;
-                    case uniray_Project.TextInfo text:
+                    case TextInfo text:
                         Raylib.DrawTextPro(text.Font, text.Text, text.Position, Vector2.Zero, 0, 50, 1, new Color(0, 0, 0, (int)alpha));
                         Raylib.DrawTextPro(text.Font, text.Text, text.Position, Vector2.Zero, 0, 40, 1, new Color(255, 255, 0, (int)alpha));
                         break;
@@ -92,11 +49,27 @@ namespace uniray_Project
                 }
             }
         }
-        /// <summary>
-        /// Add a new info to the list
-        /// </summary>
-        /// <param name="info">The info to add</param>
-        public void AddInfo(ScreenInfo info)
+
+        /// <summary>Ticks the screen center.</summary>
+        private static void Tick()
+        {
+            // Check all the infos time
+            foreach (ScreenInfo info in infos)
+            {
+                if (info.Cooldown != -1.0)
+                {
+                    if (Raylib.GetTime() - info.Start >= info.Cooldown)
+                    {
+                        infos.Remove(info);
+                        break;
+                    }
+                }
+            }
+        }
+
+        /// <summary>Adds a new info to the screen center.</summary>
+        /// <param name="info">The info to add.</param>
+        public static void AddInfo(ScreenInfo info)
         {
             infos.Add(info);
         }

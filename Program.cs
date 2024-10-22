@@ -21,24 +21,13 @@ namespace Lurkers_revamped
         public static Vector2 ScreenSize;
         public  static void Main(string[] args)
         {
-            // Init splash window
-            InitWindow(200, 200, "Lurkers: Revamped");
-            SetWindowState(ConfigFlags.UndecoratedWindow);
+            // Create game
+            Game game = new Game();
+            // Init game
+            game.Init();
 
-            // Load and draw splash
-            Texture2D splash = LoadTexture("src/textures/splash.png");
-            BeginDrawing();
-            DrawTexture(splash, 0, 0, Color.White);
-            EndDrawing();
-
-            // Init the Uniray engine background code 
-            InitEngine();
-
-            // Init Audio Center
-            AudioCenter.Init();
-
-            // Init screen center
-            ScreenCenter screen = new ScreenCenter();
+            // Load game
+            game.Load();
 
             // Init shader center
             ShaderCenter shaders = new ShaderCenter();
@@ -167,12 +156,12 @@ namespace Lurkers_revamped
             for (int i = 800; i >= 460; i -= 85)
             {
                 // Add the 5 inventory cases displayed on the right side of the screen
-                screen.AddInfo(new TextureInfo(new Vector2(ScreenWidth - 120, ScreenHeight - i), UITextures["inventory_case"], GetTime(), -1.0));
+                ScreenCenter.AddInfo(new TextureInfo(new Vector2(ScreenWidth - 120, ScreenHeight - i), UITextures["inventory_case"], GetTime(), -1.0));
             }
 
             // Add current weapon splash
-            screen.AddInfo(new TextureInfo(new Vector2(ScreenWidth - 120, ScreenHeight - 800), UITextures["rifle_gray_splash"], GetTime(), -1.0));
-            screen.AddInfo(new TextureInfo(new Vector2(ScreenWidth - 120, ScreenHeight - (800 - (player.InventorySize) * 85)), UITextures["rifle_green_splash"], GetTime(), -1.0));
+            ScreenCenter.AddInfo(new TextureInfo(new Vector2(ScreenWidth - 120, ScreenHeight - 800), UITextures["rifle_gray_splash"], GetTime(), -1.0));
+            ScreenCenter.AddInfo(new TextureInfo(new Vector2(ScreenWidth - 120, ScreenHeight - (800 - (player.InventorySize) * 85)), UITextures["rifle_green_splash"], GetTime(), -1.0));
 
             // Crosshair color variable
             Color crosshairColor = Color.White;
@@ -337,9 +326,6 @@ namespace Lurkers_revamped
                     }
                 }
 
-                // Update the screen center (info displayer)
-                screen.Tick();
-
                 // Render scene to texture
                 BeginTextureMode(renderTexture);
 
@@ -434,8 +420,13 @@ namespace Lurkers_revamped
                             if (zombie.Frame == 90)
                             {
                                 player.Life -= 10;
-                                DrawRectangle(0, 0, ScreenWidth, ScreenHeight, Color.Red);
                                 TaskManager.UpdateTask(8, 10);
+                                // Launch zombie kill animation
+                                if (player.Life <= 0)
+                                {
+                                    zombie.State = ZombieState.Killing;
+                                    camera.Position.Y -= 0.2f;
+                                }
                             }
                             if (Math.Abs(Vector3Subtract(camera.Position, zombie.Position).Length()) > 5)
                             {
@@ -445,6 +436,9 @@ namespace Lurkers_revamped
                             break;
                         case ZombieState.Idle:
                             zombie.CurrentAnimation = zombieAnims[6];
+                            break;
+                        case ZombieState.Killing:
+                            zombie.CurrentAnimation = zombieAnims[7];
                             break;
                     }
 
@@ -563,7 +557,7 @@ namespace Lurkers_revamped
                 }
 
                 // Draw screen infos
-                screen.DrawScreenInfos();
+                ScreenCenter.DrawScreenInfos();
 
                 // Draw current inventory case
                 DrawTexture(UITextures["inventory_case_selected"], GetScreenWidth() - 121, GetScreenHeight() - (800 - (player.InventoryIndex) * 85) - 1, Color.White);
