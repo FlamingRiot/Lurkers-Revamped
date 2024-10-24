@@ -57,6 +57,14 @@ namespace Lurkers_revamped
         /// The maximum ammos the weapon can hold
         /// </summary>
         public int MaxAmmos { get { return maxAmmos; } set { maxAmmos = value; } }
+
+        public Weapon()
+        {
+            name = "";
+            modelID = "";
+            bullets = new List<Bullet>();
+        }
+
         /// <summary>
         /// Weapon constructor
         /// </summary>

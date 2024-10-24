@@ -96,6 +96,14 @@ namespace Lurkers_revamped
         /// <summary>Inventory size starting from 0</summary>
         public int InventorySize { get { return Inventory.Count - 1; } }
 
+        public Player()
+        {
+            Name = "";
+            Watch = new Stopwatch();
+            Inventory = new List<Weapon>();
+            CurrentWeapon = new Weapon();
+        }
+
         /// <summary>
         /// Player constructor
         /// </summary>

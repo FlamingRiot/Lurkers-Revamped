@@ -2,7 +2,7 @@
 
 namespace Lurkers_revamped
 {
-    public class Ressource
+    public unsafe class Ressource
     {
         public Dictionary<string, Model> Utilities;
         public Dictionary<string, Model> Rigged;
@@ -18,10 +18,18 @@ namespace Lurkers_revamped
 
         public void Load()
         {
+            // Change the current directory so the embedded materials from the models can be loaded successfully
+            sbyte* dir = Raylib.GetApplicationDirectory();
+            string workdir = new string(dir);
+            string newDir = workdir + "src\\textures\\materials\\";
+            Program.SetWorkdir(newDir);
+            // Load
             Utilities = RLoading.LoadUtilities();
             Rigged = RLoading.LoadRigged();
             UITextures = RLoading.LoadUITextures();
             StaticBoxes = RLoading.LoadStaticBoxes();
+            // Set back original app directory
+            Program.SetWorkdir(workdir);
         }
     }
 }

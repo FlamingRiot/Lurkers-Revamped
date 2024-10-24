@@ -18,6 +18,9 @@ namespace Lurkers_revamped
         /// <summary>Shadow map render texture</summary>
         public RenderTexture2D Map;
 
+        /// <summary>Represents an empty instance of <see cref="ShadowMap"/>.</summary>
+        public ShadowMap() { }
+
         /// <summary>Creates a shadow map object</summary>
         /// <param name="shader">Lighting shader to use</param>
         public ShadowMap(Vector3 position, Vector3 target)

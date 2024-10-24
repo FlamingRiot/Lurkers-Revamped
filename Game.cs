@@ -9,56 +9,44 @@ using static Uniray_Engine.UnirayEngine;
 namespace Lurkers_revamped
 {
     /// <summary>Represents an instance of a <see cref="Game"/> object.</summary>
-    public unsafe class Game
+    public static unsafe class Game
     {
-        public ShaderCenter Shaders;
+        public static ShaderCenter Shaders = new ShaderCenter();
 
-        public ShadowMap ShadowMap;
+        public static ShadowMap ShadowMap = new ShadowMap(new Vector3(-50.0f, 25.0f, -50.0f), new Vector3(0.95f, -1.0f, 1.5f));
 
-        public List<Spawner> Spawners;
+        public static List<Spawner> Spawners = new List<Spawner>();
 
-        public Ressource Ressources;
+        public static Ressource Ressources = new Ressource();
 
-        public Player Player;
+        public static Player Player = new Player();
 
-        public Camera3D Camera;
+        public static Camera3D Camera;
 
-        public CameraMotion CameraMotion;
+        public static CameraMotion CameraMotion;
 
-        public Terrain Terrain;
-
-        public Game()
-        {
-            Shaders = new ShaderCenter();
-            ShadowMap = new ShadowMap(new Vector3(-50.0f, 25.0f, -50.0f), new Vector3(0.95f, -1.0f, 1.5f));
-            Spawners = new List<Spawner>();
-            Ressources = new Ressource();
-            AnimationCenter.Init();
-            // Create player and its object dependancies
-            Player = new Player("Anonymous254", new Weapon("Lambert Niv. 1", "rifle", 50, 1), AnimationCenter.PlayerAnimations[1]);
-            // (Debug) Add a second weapon to the inventory of the player
-            Player.AddWeapon(new Weapon("Lambert Niv. 2", "rifle", 50, 2));
-        }
+        public static Terrain Terrain;
 
         /// <summary>Inits the game program and creates the window.</summary>
-        public void Init()
+        public static void Init()
         {
             // Load and draw splash
             Texture2D splash = LoadTexture("src/textures/splash.png");
             BeginDrawing();
             DrawTexture(splash, 0, 0, Color.White);
             EndDrawing();
+
+            // Init game managment centers
+            AnimationCenter.Init();
+            AudioCenter.Init();
+
+            // Init Uniray engine build library
+            InitEngine();
         }
 
         /// <summary>Loads the needed ressources for the game.</summary>
-        public void Load()
+        public static void Load()
         {
-            // Init Uniray Engine
-            InitEngine();
-
-            // Init game managments centers
-            AudioCenter.Init();
-
             // Load shader relative data
             Shaders.LoadLighting(ShadowMap.CameraView.Target, new Color(70, 25, 0, 255));
 
@@ -72,13 +60,8 @@ namespace Lurkers_revamped
             // Additional camera motion data
             CameraMotion = new CameraMotion(0.0006f, 10.0f, 0.1f);
 
-            // Change the current directory so the embedded materials from the models can be loaded successfully
-            sbyte* dir = GetApplicationDirectory();
-            string workdir = new string(dir);
-            string newDir = workdir + "src\\textures\\materials\\";
-            Program.SetWorkdir(newDir);
+            // Load material embedded ressources
             Ressources.Load();
-            Program.SetWorkdir(workdir);
 
             // Load spawners
             Spawners = RLoading.LoadSpawners();
@@ -107,19 +90,24 @@ namespace Lurkers_revamped
                     m.Value.Materials[i].Shader = Shaders.LightingShader;
                 }
             }
+
+            // Create and load player default attributes
+            Player = new Player("Anonymous254", new Weapon("Lambert Niv. 1", "rifle", 50, 1), AnimationCenter.PlayerAnimations[1]);
+            // (Debug) Add a second weapon to the inventory of the player
+            Player.AddWeapon(new Weapon("Lambert Niv. 2", "rifle", 50, 2));
         }
 
-        public void Start()
+        public static void Start()
         {
 
         }
 
-        public void Update()
+        public static void Update()
         {
 
         }
 
-        public void Close()
+        public static void Close()
         {
 
         }
