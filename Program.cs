@@ -47,11 +47,6 @@ namespace Lurkers_revamped
             };
             List<string> _freeZombies = new List<string>();
 
-            // Load UI Fonts
-            Font damageFont = LoadFont("src/fonts/damage.ttf");
-            Font chronoFont = LoadFont("src/fonts/Kanit-Bold.ttf");
-            SetTextureFilter(chronoFont.Texture, TextureFilter.Trilinear);
-
             // Crosshair color variable
             Color crosshairColor = Color.White;
 
@@ -502,6 +497,8 @@ namespace Lurkers_revamped
             }
             // Unload shaders
             Game.Shaders.UnloadShaderCenter();
+
+            Game.Close();
         }
         /// <summary>
         /// Update camera movement

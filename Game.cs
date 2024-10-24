@@ -101,6 +101,7 @@ namespace Lurkers_revamped
             Player.AddWeapon(new Weapon("Lambert Niv. 2", "rifle", 50, 2));
         }
 
+        /// <summary>Starts the game by launching the menu.</summary>
         public static void Start()
         {
             // Set Window state when loading is done
@@ -127,12 +128,25 @@ namespace Lurkers_revamped
 
         public static void Update()
         {
+            Vector3 radioPosition = Vector3.Zero;
 
+            // Create list of zombies
+            List<Zombie> zombies = new List<Zombie>()
+            {
+                new Zombie(new Vector3(-10, 0, 2), "cop", AnimationCenter.ZombieAnimations[8]),
+                new Zombie(new Vector3(10, 0, 2), "cop2", AnimationCenter.ZombieAnimations[8]),
+                new Zombie(new Vector3(2, 0, -10), "cop3", AnimationCenter.ZombieAnimations[8]),
+                new Zombie(new Vector3(2, 0, -5), "cop4", AnimationCenter.ZombieAnimations[8])
+            };
+            List<string> _freeZombies = new List<string>();
+
+            // Crosshair color variable
+            Color crosshairColor = Color.White;
         }
 
         public static void Close()
         {
-
+            AnimationCenter.Close();
         }
     }
 }

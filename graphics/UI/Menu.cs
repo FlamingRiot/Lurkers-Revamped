@@ -99,7 +99,11 @@ namespace Lurkers_revamped
                         _quitButton.X = 40;
                         break;
                     }
-                    if (Hover(_quitButton)) Environment.Exit(0);
+                    if (Hover(_quitButton))
+                    {
+                        Game.Close();
+                        Environment.Exit(0);
+                    }
                 }
                 DrawRectangleRoundedLines(_playButton, 0.2f, 20, 3, new Color(158, 158, 158, 240));
                 DrawRectangleRoundedLines(_quitButton, 0.2f, 20, 3, new Color(158, 158, 158, 240));
