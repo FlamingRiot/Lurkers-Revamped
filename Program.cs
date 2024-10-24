@@ -32,33 +32,8 @@ namespace Lurkers_revamped
             // Load game
             game.Load();
 
-            // Assign shader to every object of the scene
-            foreach (UModel go in CurrentScene.GameObjects.Where(x => x is UModel))
-            {
-                go.SetShader(game.Shaders.LightingShader);
-            }
-
-            game.Terrain.Material.Shader = game.Shaders.LightingShader;
-
-            for (int i = 0; i < game.Ressources.Utilities["rifle"].MaterialCount; i++)
-            {
-                game.Ressources.Utilities["rifle"].Materials[i].Shader = game.Shaders.LightingShader;    
-            }
-
-            foreach (KeyValuePair<string, Model> m in game.Ressources.Rigged)
-            {
-                for (int i = 0; i < m.Value.MaterialCount; i++)
-                {
-                    m.Value.Materials[i].Shader = game.Shaders.LightingShader;
-                }
-            }
-
-            // Load animation lists
-            List<ModelAnimation> rifleAnims = RLoading.LoadAnimationList("src/animations/rifle.m3d");
-            List<ModelAnimation> zombieAnims = RLoading.LoadAnimationList("src/animations/walker.m3d");
-
             // Create player and its object dependancies
-            Player player = new Player("Anonymous254", new Weapon("Lambert Niv. 1", "rifle", 50, 1), rifleAnims[1]);
+            Player player = new Player("Anonymous254", new Weapon("Lambert Niv. 1", "rifle", 50, 1), AnimationCenter.PlayerAnimations[1]);
             // (Debug) Add a second weapon to the inventory of the player
             player.AddWeapon(new Weapon("Lambert Niv. 2", "rifle", 50, 2));
             Vector3 radioPosition = Vector3.Zero;
@@ -70,10 +45,10 @@ namespace Lurkers_revamped
             // Create list of zombies
             List<Zombie> zombies = new List<Zombie>()
             {
-                new Zombie(new Vector3(-10, 0, 2), "cop", zombieAnims[8]),
-                new Zombie(new Vector3(10, 0, 2), "cop2", zombieAnims[8]),
-                new Zombie(new Vector3(2, 0, -10), "cop3", zombieAnims[8]),
-                new Zombie(new Vector3(2, 0, -5), "cop4", zombieAnims[8])
+                new Zombie(new Vector3(-10, 0, 2), "cop", AnimationCenter.ZombieAnimations[8]),
+                new Zombie(new Vector3(10, 0, 2), "cop2", AnimationCenter.ZombieAnimations[8]),
+                new Zombie(new Vector3(2, 0, -10), "cop3", AnimationCenter.ZombieAnimations[8]),
+                new Zombie(new Vector3(2, 0, -5), "cop4", AnimationCenter.ZombieAnimations[8])
             };
             List<string> _freeZombies = new List<string>();
 
@@ -178,10 +153,10 @@ namespace Lurkers_revamped
                 switch (player.WeaponState)
                 {
                     case PlayerWeaponState.Idle:
-                        player.CurrentAnimation = rifleAnims[1];
+                        player.CurrentAnimation = AnimationCenter.PlayerAnimations[1];
                         break;
                     case PlayerWeaponState.Shooting:
-                        player.CurrentAnimation = rifleAnims[3];
+                        player.CurrentAnimation = AnimationCenter.PlayerAnimations[3];
                         // Check everytime a bullet is shot
                         if (player.Frame == 1)
                         {
@@ -212,7 +187,7 @@ namespace Lurkers_revamped
                                     AudioCenter.PlaySound("crystal_hit");
                                     if (zombies.Count < 4 && _freeZombies.Count != 0)
                                     {
-                                        zombies.Add(spawner.CreateZombie(zombieAnims[8], game.Camera.Position, _freeZombies.First()));
+                                        zombies.Add(spawner.CreateZombie(AnimationCenter.ZombieAnimations[8], game.Camera.Position, _freeZombies.First()));
                                         _freeZombies.RemoveAt(0);
                                     }
                                     if (spawner.Destroyed)
@@ -244,11 +219,11 @@ namespace Lurkers_revamped
                         else if (player.Frame > 7) crosshairColor = Color.White;
                         break;
                     case PlayerWeaponState.Reloading:
-                        player.CurrentAnimation = rifleAnims[2];
+                        player.CurrentAnimation = AnimationCenter.PlayerAnimations[2];
                         if (player.Frame == player.CurrentAnimation.FrameCount - 1) player.WeaponState = PlayerWeaponState.Idle;
                         break;
                     case PlayerWeaponState.Taking:
-                        player.CurrentAnimation = rifleAnims[4];
+                        player.CurrentAnimation = AnimationCenter.PlayerAnimations[4];
                         if (player.Frame == player.CurrentAnimation.FrameCount - 1)
                         {
                             player.WeaponState = PlayerWeaponState.Idle;
@@ -260,7 +235,7 @@ namespace Lurkers_revamped
                 UpdateModelAnimation(game.Ressources.Utilities[player.CurrentWeapon.ModelID], player.CurrentAnimation, player.UpdateFrame());
 
                 // Update the player event handler
-                if (!TaskManager.Active) TickPlayer(player, rifleAnims, ref crosshairColor, game.Shaders, ref game.CameraMotion);
+                if (!TaskManager.Active) TickPlayer(player, AnimationCenter.PlayerAnimations, ref crosshairColor, game.Shaders, ref game.CameraMotion);
 
                 if (IsKeyPressed(KeyboardKey.Tab))
                 {
@@ -341,10 +316,10 @@ namespace Lurkers_revamped
                     switch (zombie.State)
                     {
                         case ZombieState.Running:
-                            zombie.CurrentAnimation = zombieAnims[8];
+                            zombie.CurrentAnimation = AnimationCenter.ZombieAnimations[8];
                             break;
                         case ZombieState.Dying1:
-                            zombie.CurrentAnimation = zombieAnims[5];
+                            zombie.CurrentAnimation = AnimationCenter.ZombieAnimations[5];
                             // Check if the zombie is done dying
                             if (zombie.Frame == zombie.CurrentAnimation.FrameCount - 1)
                             {
@@ -355,7 +330,7 @@ namespace Lurkers_revamped
                             }
                             break;
                         case ZombieState.Dying2:
-                            zombie.CurrentAnimation = zombieAnims[4];
+                            zombie.CurrentAnimation = AnimationCenter.ZombieAnimations[4];
                             // Check if the zombie is done dying
                             if (zombie.Frame == zombie.CurrentAnimation.FrameCount - 1)
                             {
@@ -366,7 +341,7 @@ namespace Lurkers_revamped
                             }
                             break;
                         case ZombieState.Attacking:
-                            zombie.CurrentAnimation = zombieAnims[2];
+                            zombie.CurrentAnimation = AnimationCenter.ZombieAnimations[2];
                             zombie.UpdateFrame();
                             if (zombie.Frame == 90)
                             {
@@ -386,10 +361,10 @@ namespace Lurkers_revamped
                             }
                             break;
                         case ZombieState.Idle:
-                            zombie.CurrentAnimation = zombieAnims[6];
+                            zombie.CurrentAnimation = AnimationCenter.ZombieAnimations[6];
                             break;
                         case ZombieState.Killing:
-                            zombie.CurrentAnimation = zombieAnims[7];
+                            zombie.CurrentAnimation = AnimationCenter.ZombieAnimations[7];
                             break;
                     }
 

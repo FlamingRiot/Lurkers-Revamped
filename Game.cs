@@ -81,6 +81,25 @@ namespace Lurkers_revamped
 
             // Load A* Grid
             AStar.Load(new Grid(Vector3.Zero, new Vector2(120), 0.5f, Ressources.StaticBoxes));
+
+            // Load shader on model materials
+            foreach (UModel go in CurrentScene.GameObjects.Where(x => x is UModel))
+            {
+                go.SetShader(Shaders.LightingShader);
+            }
+            Terrain.Material.Shader = Shaders.LightingShader;
+            for (int i = 0; i < Ressources.Utilities["rifle"].MaterialCount; i++)
+            {
+                Ressources.Utilities["rifle"].Materials[i].Shader = Shaders.LightingShader;
+            }
+
+            foreach (KeyValuePair<string, Model> m in Ressources.Rigged)
+            {
+                for (int i = 0; i < m.Value.MaterialCount; i++)
+                {
+                    m.Value.Materials[i].Shader = Shaders.LightingShader;
+                }
+            }
         }
 
         public void Start()
