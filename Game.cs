@@ -42,6 +42,10 @@ namespace Lurkers_revamped
 
             // Init Uniray engine build library
             InitEngine();
+
+            // Init task manager
+            TaskManager.LoadTasks();
+            TaskManager.Active = false;
         }
 
         /// <summary>Loads the needed ressources for the game.</summary>
@@ -99,7 +103,26 @@ namespace Lurkers_revamped
 
         public static void Start()
         {
+            // Set Window state when loading is done
+            SetWindowState(ConfigFlags.ResizableWindow);
+            SetWindowState(ConfigFlags.MaximizedWindow);
 
+            // Get window size
+            Program.ScreenWidth = GetScreenWidth();
+            Program.ScreenHeight = GetScreenHeight();
+            Program.ScreenSize = new Vector2(GetScreenWidth(), GetScreenHeight());
+
+            // Get screen attributes and objects
+            Program.RenderTexture = LoadRenderTexture(Program.ScreenWidth, Program.ScreenHeight);
+            Program.PreviousRenderTexture = LoadRenderTexture(Program.ScreenWidth, Program.ScreenHeight);
+            Program.ScreenRectangle = new Rectangle(0, 0, Program.ScreenWidth, Program.ScreenHeight);
+            Program.ScreenInverseRectangle = new Rectangle(0, 0, Program.ScreenWidth, -Program.ScreenHeight);
+
+            // Start Menu
+            Menu.Init();
+            Menu.Show(Shaders.Skybox, Shaders, Terrain);
+            // Set target FPS
+            SetTargetFPS(60);
         }
 
         public static void Update()

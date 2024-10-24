@@ -18,6 +18,11 @@ namespace Lurkers_revamped
         public static int ScreenWidth;
         public static int ScreenHeight;
         public static Vector2 ScreenSize;
+        // Screen global attributes and objects
+        public static RenderTexture2D RenderTexture;
+        public static RenderTexture2D PreviousRenderTexture;
+        public static Rectangle ScreenRectangle;
+        public static Rectangle ScreenInverseRectangle;
         public  static void Main(string[] args)
         {
             // Init splash window
@@ -31,10 +36,6 @@ namespace Lurkers_revamped
             Game.Load();
 
             Vector3 radioPosition = Vector3.Zero;
-
-            // Init task manager
-            TaskManager.LoadTasks();
-            TaskManager.Active = false;
 
             // Create list of zombies
             List<Zombie> zombies = new List<Zombie>()
@@ -51,46 +52,11 @@ namespace Lurkers_revamped
             Font chronoFont = LoadFont("src/fonts/Kanit-Bold.ttf");
             SetTextureFilter(chronoFont.Texture, TextureFilter.Trilinear);
 
-            // Set Window state when loading is done
-            SetWindowState(ConfigFlags.ResizableWindow);
-            SetWindowState(ConfigFlags.MaximizedWindow);
-
-            // Get window size
-            ScreenWidth = GetScreenWidth();
-            ScreenHeight = GetScreenHeight(); 
-            ScreenSize = new Vector2(GetScreenWidth(), GetScreenHeight());
-
-            // Scene render texture
-            RenderTexture2D renderTexture = LoadRenderTexture(ScreenWidth, ScreenHeight);
-
-            // Previous frame render texture
-            RenderTexture2D prevTexture = LoadRenderTexture(ScreenWidth, ScreenHeight);
-
-            // Inverse scene render texture rectangle
-            Rectangle inverseSceneRectangle = new Rectangle(0, 0, ScreenWidth, -ScreenHeight);
-
-            // Scene rectangle
-            Rectangle sceneRectangle = new Rectangle(0, 0, ScreenWidth, ScreenHeight);
-
-            // Set permanent informations of the screen according to the final screen size
-            for (int i = 800; i >= 460; i -= 85)
-            {
-                // Add the 5 inventory cases displayed on the right side of the screen
-                ScreenCenter.AddInfo(new TextureInfo(new Vector2(ScreenWidth - 120, ScreenHeight - i), Game.Ressources.UITextures["inventory_case"], GetTime(), -1.0));
-            }
-
-            // Add current weapon splash
-            ScreenCenter.AddInfo(new TextureInfo(new Vector2(ScreenWidth - 120, ScreenHeight - 800), Game.Ressources.UITextures["rifle_gray_splash"], GetTime(), -1.0));
-            ScreenCenter.AddInfo(new TextureInfo(new Vector2(ScreenWidth - 120, ScreenHeight - (800 - (Game.Player.InventorySize) * 85)), Game.Ressources.UITextures["rifle_green_splash"], GetTime(), -1.0));
-
             // Crosshair color variable
             Color crosshairColor = Color.White;
 
-            // Set target FPS
-			SetTargetFPS(60);
-            // Start Menu
-            Menu.Init();
-            Menu.Show(Game.Shaders.Skybox, Game.Shaders, Game.Terrain);
+            Game.Start();
+
             // Get starting time
             GameStartTime = GetTime();
 			DisableCursor();
@@ -247,7 +213,7 @@ namespace Lurkers_revamped
                 }
 
                 // Render scene to texture
-                BeginTextureMode(renderTexture);
+                BeginTextureMode(RenderTexture);
 
                 // Clear background every frame using white color
                 ClearBackground(Color.Gray);
@@ -445,13 +411,13 @@ namespace Lurkers_revamped
                 BeginShaderMode(Game.Shaders.MotionBlurShader);
 
                 // Set previous frame render texture
-                Game.Shaders.SetBlurTexture(prevTexture);
+                Game.Shaders.SetBlurTexture(PreviousRenderTexture);
 
                 // Set current time
                 Game.Shaders.UpdateTime((float)GetTime());
 
                 // Draw render texture to the screen
-                DrawTexturePro(renderTexture.Texture, inverseSceneRectangle, sceneRectangle, Vector2.Zero, 0, Color.White);
+                DrawTexturePro(RenderTexture.Texture, ScreenInverseRectangle, ScreenRectangle, Vector2.Zero, 0, Color.White);
 
                 EndShaderMode();
 
@@ -512,9 +478,9 @@ namespace Lurkers_revamped
                 EndDrawing();
 
                 // Draw to previous frame render texture
-                BeginTextureMode(prevTexture);
+                BeginTextureMode(PreviousRenderTexture);
 
-                DrawTexturePro(renderTexture.Texture, inverseSceneRectangle, sceneRectangle, Vector2.Zero, 0, Color.White);
+                DrawTexturePro(RenderTexture.Texture, ScreenInverseRectangle, ScreenRectangle, Vector2.Zero, 0, Color.White);
 
                 EndTextureMode();
 
