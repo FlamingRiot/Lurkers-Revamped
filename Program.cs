@@ -32,10 +32,6 @@ namespace Lurkers_revamped
             // Load game
             game.Load();
 
-            // Create player and its object dependancies
-            Player player = new Player("Anonymous254", new Weapon("Lambert Niv. 1", "rifle", 50, 1), AnimationCenter.PlayerAnimations[1]);
-            // (Debug) Add a second weapon to the inventory of the player
-            player.AddWeapon(new Weapon("Lambert Niv. 2", "rifle", 50, 2));
             Vector3 radioPosition = Vector3.Zero;
 
             // Init task manager
@@ -87,7 +83,7 @@ namespace Lurkers_revamped
 
             // Add current weapon splash
             ScreenCenter.AddInfo(new TextureInfo(new Vector2(ScreenWidth - 120, ScreenHeight - 800), game.Ressources.UITextures["rifle_gray_splash"], GetTime(), -1.0));
-            ScreenCenter.AddInfo(new TextureInfo(new Vector2(ScreenWidth - 120, ScreenHeight - (800 - (player.InventorySize) * 85)), game.Ressources.UITextures["rifle_green_splash"], GetTime(), -1.0));
+            ScreenCenter.AddInfo(new TextureInfo(new Vector2(ScreenWidth - 120, ScreenHeight - (800 - (game.Player.InventorySize) * 85)), game.Ressources.UITextures["rifle_green_splash"], GetTime(), -1.0));
 
             // Crosshair color variable
             Color crosshairColor = Color.White;
@@ -106,11 +102,11 @@ namespace Lurkers_revamped
                 // Update the camera
                 if (!TaskManager.Active)
                 {
-                    UpdateCamera(ref game.Camera, ref game.CameraMotion, player, ref radioPosition, zombies);
+                    UpdateCamera(ref game.Camera, ref game.CameraMotion, game.Player, ref radioPosition, zombies);
                 }
                 // Update the camera shake motion
                 game.CameraMotion.ShakeStart = game.Camera.Position;
-                game.Camera.Position = game.CameraMotion.Update(game.Camera.Position, player.SPEED);
+                game.Camera.Position = game.CameraMotion.Update(game.Camera.Position, game.Player.SPEED);
                
                 Matrix4x4 lightView = new Matrix4x4();
                 Matrix4x4 lightProj = new Matrix4x4();
@@ -150,17 +146,17 @@ namespace Lurkers_revamped
                 );
 
                 // Update the current animation of the player
-                switch (player.WeaponState)
+                switch (game.Player.WeaponState)
                 {
                     case PlayerWeaponState.Idle:
-                        player.CurrentAnimation = AnimationCenter.PlayerAnimations[1];
+                        game.Player.CurrentAnimation = AnimationCenter.PlayerAnimations[1];
                         break;
                     case PlayerWeaponState.Shooting:
-                        player.CurrentAnimation = AnimationCenter.PlayerAnimations[3];
+                        game.Player.CurrentAnimation = AnimationCenter.PlayerAnimations[3];
                         // Check everytime a bullet is shot
-                        if (player.Frame == 1)
+                        if (game.Player.Frame == 1)
                         {
-                            player.CurrentWeapon.ShootBullet(new Vector3(game.Camera.Position.X, game.Camera.Position.Y - 0.045f, game.Camera.Position.Z) + GetCameraRight(ref game.Camera) / 12, GetCameraForward(ref game.Camera)); ;
+                            game.Player.CurrentWeapon.ShootBullet(new Vector3(game.Camera.Position.X, game.Camera.Position.Y - 0.045f, game.Camera.Position.Z) + GetCameraRight(ref game.Camera) / 12, GetCameraForward(ref game.Camera)); ;
                             // Play shooting sound
                             AudioCenter.PlaySound("rifleShoot");
                             // Set crosshair color
@@ -168,7 +164,7 @@ namespace Lurkers_revamped
                             // Check collision with zombies
                             foreach (Zombie zombie in zombies)
                             {
-                                if (zombie.Shoot(player.CurrentWeapon.bullets.Last().Ray, game.Ressources.Rigged[zombie.Type].Meshes[0]))
+                                if (zombie.Shoot(game.Player.CurrentWeapon.bullets.Last().Ray, game.Ressources.Rigged[zombie.Type].Meshes[0]))
                                 {
                                     if (TaskManager.IsActive(1)) TaskManager.UpdateTask(1, 1);
                                     if (TaskManager.IsActive(3)) TaskManager.UpdateTask(3, 1);
@@ -179,7 +175,7 @@ namespace Lurkers_revamped
                             // Check spawners
                             foreach (Spawner spawner in game.Spawners)
                             {
-                                if (spawner.Shoot(player.CurrentWeapon.bullets.Last().Ray, UnirayEngine.Ressource.GetModel("crystal").Meshes[0]))
+                                if (spawner.Shoot(game.Player.CurrentWeapon.bullets.Last().Ray, UnirayEngine.Ressource.GetModel("crystal").Meshes[0]))
                                 {
                                     // Play randomly pitched hit sound
                                     AudioCenter.SetSoundVolume("crystal_hit", 12);
@@ -214,28 +210,28 @@ namespace Lurkers_revamped
                                 }
                             }
                             
-                            player.CurrentWeapon.bullets.RemoveAt(0);
+                            game.Player.CurrentWeapon.bullets.RemoveAt(0);
                         }
-                        else if (player.Frame > 7) crosshairColor = Color.White;
+                        else if (game.Player.Frame > 7) crosshairColor = Color.White;
                         break;
                     case PlayerWeaponState.Reloading:
-                        player.CurrentAnimation = AnimationCenter.PlayerAnimations[2];
-                        if (player.Frame == player.CurrentAnimation.FrameCount - 1) player.WeaponState = PlayerWeaponState.Idle;
+                        game.Player.CurrentAnimation = AnimationCenter.PlayerAnimations[2];
+                        if (game.Player.Frame == game.Player.CurrentAnimation.FrameCount - 1) game.Player.WeaponState = PlayerWeaponState.Idle;
                         break;
                     case PlayerWeaponState.Taking:
-                        player.CurrentAnimation = AnimationCenter.PlayerAnimations[4];
-                        if (player.Frame == player.CurrentAnimation.FrameCount - 1)
+                        game.Player.CurrentAnimation = AnimationCenter.PlayerAnimations[4];
+                        if (game.Player.Frame == game.Player.CurrentAnimation.FrameCount - 1)
                         {
-                            player.WeaponState = PlayerWeaponState.Idle;
+                            game.Player.WeaponState = PlayerWeaponState.Idle;
                         }
                         break;
                 }
 
                 // Update model animation
-                UpdateModelAnimation(game.Ressources.Utilities[player.CurrentWeapon.ModelID], player.CurrentAnimation, player.UpdateFrame());
+                UpdateModelAnimation(game.Ressources.Utilities[game.Player.CurrentWeapon.ModelID], game.Player.CurrentAnimation, game.Player.UpdateFrame());
 
                 // Update the player event handler
-                if (!TaskManager.Active) TickPlayer(player, AnimationCenter.PlayerAnimations, ref crosshairColor, game.Shaders, ref game.CameraMotion);
+                if (!TaskManager.Active) TickPlayer(game.Player, AnimationCenter.PlayerAnimations, ref crosshairColor, game.Shaders, ref game.CameraMotion);
 
                 if (IsKeyPressed(KeyboardKey.Tab))
                 {
@@ -281,12 +277,12 @@ namespace Lurkers_revamped
 
                 // Check collisions between the player and the static objects
                 // Add current position
-                player.Box.Min += game.Camera.Position;
-                player.Box.Max += game.Camera.Position;
-                CheckCollisionPlayer(player.Box, game.Ressources.StaticBoxes, player, game.Camera);
+                game.Player.Box.Min += game.Camera.Position;
+                game.Player.Box.Max += game.Camera.Position;
+                CheckCollisionPlayer(game.Player.Box, game.Ressources.StaticBoxes, game.Player, game.Camera);
 #if DEBUG
                 // Draw player's bounding box
-                DrawBoundingBox(player.Box, Color.Red);
+                DrawBoundingBox(game.Player.Box, Color.Red);
 
                 // Draw node map
                 AStar.Grid.DrawNodeMap();
@@ -299,10 +295,10 @@ namespace Lurkers_revamped
                 Matrix4x4 mTransform = TransformPlayer(game.CameraMotion.Yaw, game.CameraMotion.Pitch, game.CameraMotion.SideShake);
 
                 // Assign new rotation matrix to the model
-                game.Ressources.Utilities[player.CurrentWeapon.ModelID] = SetModelTransform(game.Ressources.Utilities[player.CurrentWeapon.ModelID], mTransform);
+                game.Ressources.Utilities[game.Player.CurrentWeapon.ModelID] = SetModelTransform(game.Ressources.Utilities[game.Player.CurrentWeapon.ModelID], mTransform);
                     
                 // Draw player's current model
-                DrawModel(game.Ressources.Utilities[player.CurrentWeapon.ModelID], new Vector3(game.Camera.Position.X - GetCameraForward(ref game.Camera).X / 3, game.Camera.Position.Y - 0.2f, game.Camera.Position.Z - GetCameraForward(ref game.Camera).Z / 3), 3.5f, Color.White);
+                DrawModel(game.Ressources.Utilities[game.Player.CurrentWeapon.ModelID], new Vector3(game.Camera.Position.X - GetCameraForward(ref game.Camera).X / 3, game.Camera.Position.Y - 0.2f, game.Camera.Position.Z - GetCameraForward(ref game.Camera).Z / 3), 3.5f, Color.White);
 
                 // Draw and tick the current zombies of the scene
                 int killIndex = -1;
@@ -345,10 +341,10 @@ namespace Lurkers_revamped
                             zombie.UpdateFrame();
                             if (zombie.Frame == 90)
                             {
-                                player.Life -= 10;
+                                game.Player.Life -= 10;
                                 TaskManager.UpdateTask(8, 10);
                                 // Launch zombie kill animation
-                                if (player.Life <= 0)
+                                if (game.Player.Life <= 0)
                                 {
                                     zombie.State = ZombieState.Killing;
                                     game.Camera.Position.Y -= 0.2f;
@@ -462,14 +458,14 @@ namespace Lurkers_revamped
                 EndShaderMode();
 
                 // Manage blood screen
-                if (player.BLOODY)
+                if (game.Player.BLOODY)
                 {
-                    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), new Color(112, 1, 9, (int)Clamp((float)player.Watch.Elapsed.TotalSeconds * 100, 0, 90)));
+                    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), new Color(112, 1, 9, (int)Clamp((float)game.Player.Watch.Elapsed.TotalSeconds * 100, 0, 90)));
                     // Check if time's up
-                    if (player.Watch.Elapsed.TotalSeconds > 10)
+                    if (game.Player.Watch.Elapsed.TotalSeconds > 10)
                     {
-                        player.Watch.Restart();
-                        player.BLOODY = false;
+                        game.Player.Watch.Restart();
+                        game.Player.BLOODY = false;
                         AudioCenter.PlaySound("blood");
                         zombies.ForEach(x => 
                         {
@@ -477,22 +473,22 @@ namespace Lurkers_revamped
                         });
                     }
                 }
-                else if (!player.BLOODY && player.Watch.IsRunning)
+                else if (!game.Player.BLOODY && game.Player.Watch.IsRunning)
                 {
-                    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), new Color(112, 1, 9, (int)Clamp(90 / ((float)player.Watch.Elapsed.TotalSeconds * 100), 0, 90)));
+                    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), new Color(112, 1, 9, (int)Clamp(90 / ((float)game.Player.Watch.Elapsed.TotalSeconds * 100), 0, 90)));
                 }
 
                 // Draw screen infos
                 ScreenCenter.DrawScreenInfos();
 
                 // Draw current inventory case
-                DrawTexture(game.Ressources.UITextures["inventory_case_selected"], GetScreenWidth() - 121, GetScreenHeight() - (800 - (player.InventoryIndex) * 85) - 1, Color.White);
+                DrawTexture(game.Ressources.UITextures["inventory_case_selected"], GetScreenWidth() - 121, GetScreenHeight() - (800 - (game.Player.InventoryIndex) * 85) - 1, Color.White);
 
                 // Draw crosshair
                 DrawTexture(game.Ressources.UITextures["crosshair"], GetScreenWidth() / 2 - game.Ressources.UITextures["crosshair"].Width / 2, GetScreenHeight() / 2 - game.Ressources.UITextures["crosshair"].Height / 2, crosshairColor);
 
                 // Draw lifebar
-                DrawRectangleGradientH(180, ScreenHeight - 140, (int)(2.4f * player.Life), 15, Color.Lime, Color.Green);
+                DrawRectangleGradientH(180, ScreenHeight - 140, (int)(2.4f * game.Player.Life), 15, Color.Lime, Color.Green);
                 DrawTexture(game.Ressources.UITextures["lifebar"], 50, ScreenHeight - 250, Color.White);
 
                 // Draw tasks manager
@@ -504,12 +500,12 @@ namespace Lurkers_revamped
 
                 // Debug positions
                 DrawText("Position: " + game.Camera.Position.ToString() +
-                    "\nJump Force: " + player.VJump +
-                    "\nInventory Index: " + player.InventoryIndex +
-                    "\nWeapon Level: " + player.CurrentWeapon.Level +
+                    "\nJump Force: " + game.Player.VJump +
+                    "\nInventory Index: " + game.Player.InventoryIndex +
+                    "\nWeapon Level: " + game.Player.CurrentWeapon.Level +
                     "\nCamera Target:" + game.Camera.Target.ToString() +
-                    "\nMotion Constraint: " + player.MotionConstraint.Value +
-                    "\nConstraint: " + player.MotionConstraint.Constraint
+                    "\nMotion Constraint: " + game.Player.MotionConstraint.Value +
+                    "\nConstraint: " + game.Player.MotionConstraint.Constraint
                     , 200, 200, 20, Color.Red);
 
                 DrawFPS(0, 0);
@@ -525,7 +521,7 @@ namespace Lurkers_revamped
                 EndTextureMode();
 
                 // Reset the player's box
-                player.ResetBox();
+                game.Player.ResetBox();
             }
             CloseWindow();            // Unload all ressources that ARE NOT from Uniray
             foreach (KeyValuePair<string, Model> utilitesList in game.Ressources.Utilities)

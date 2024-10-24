@@ -19,6 +19,8 @@ namespace Lurkers_revamped
 
         public Ressource Ressources;
 
+        public Player Player;
+
         public Camera3D Camera;
 
         public CameraMotion CameraMotion;
@@ -31,6 +33,11 @@ namespace Lurkers_revamped
             ShadowMap = new ShadowMap(new Vector3(-50.0f, 25.0f, -50.0f), new Vector3(0.95f, -1.0f, 1.5f));
             Spawners = new List<Spawner>();
             Ressources = new Ressource();
+            AnimationCenter.Init();
+            // Create player and its object dependancies
+            Player = new Player("Anonymous254", new Weapon("Lambert Niv. 1", "rifle", 50, 1), AnimationCenter.PlayerAnimations[1]);
+            // (Debug) Add a second weapon to the inventory of the player
+            Player.AddWeapon(new Weapon("Lambert Niv. 2", "rifle", 50, 2));
         }
 
         /// <summary>Inits the game program and creates the window.</summary>
