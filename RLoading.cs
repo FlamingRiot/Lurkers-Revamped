@@ -118,7 +118,7 @@ namespace Lurkers_revamped
         {
             Dictionary<string, Music> musics = new()
             {
-                {"lerob", LoadMusicStream("src/sounds/musics/lerob.mp3") } 
+                {"Linkin", LoadMusicStream("src/sounds/musics/Linkin-Park-Numb.mp3") }
             };
             return musics;
         }

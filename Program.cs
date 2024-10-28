@@ -556,8 +556,8 @@ namespace Lurkers_revamped
                 {
                     radioPosition = radio.Position;
                     if (Vector3Distance(radioPosition, camera.Position) <= 3){
-                        AudioCenter.PlayMusic("lerob");
-                        AudioCenter.SetMusicVolume("lerob", 8);
+                        AudioCenter.PlayMusic("Linkin");
+                        AudioCenter.SetMusicVolume("Linkin", 8);
                         AudioCenter.PlaySound("radio");
                         AudioCenter.SetSoundVolume("radio", 10);
                         if (TaskManager.IsActive(4)) TaskManager.UpdateTask(4, 1);
@@ -595,12 +595,12 @@ namespace Lurkers_revamped
                     }
                 }
             }
-            if (AudioCenter.IsMusicPlaying("lerob"))
+            if (AudioCenter.IsMusicPlaying("Linkin"))
             {
-                AudioCenter.UpdateMusic("lerob");
+                AudioCenter.UpdateMusic("Linkin");
                 float volume = 20 - Vector3Distance(radioPosition, camera.Position);
                 volume = Clamp(volume, 0f, 8f);
-                AudioCenter.SetMusicVolume("lerob", volume);
+                AudioCenter.SetMusicVolume("Linkin", volume);
             }
 
             // Final movement transformations
