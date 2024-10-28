@@ -110,6 +110,41 @@ namespace Lurkers_revamped
             return left.Value != right.Value || left.Constraint != right.Constraint;
         }
 
+        /// <summary>Computes the constraint relative to a movement direction.</summary>
+        /// <param name="movement">Incoming movement</param>
+        /// <param name="constraint">Constraint to apply</param>
+        public static void ComputeMovement(ref Vector3 movement, Vector3 constraint)
+        {
+            if (constraint.Z == 1 && constraint.X == 0)
+            {
+                if (movement.X > 0)
+                {
+                    movement *= new Vector3(Math.Abs(constraint.X), 0, Math.Abs(constraint.Z));
+                }
+            }
+            else if (constraint.Z == -1 && constraint.X == 0)
+            {
+                if (movement.X < 0)
+                {
+                    movement *= new Vector3(Math.Abs(constraint.X), 0, Math.Abs(constraint.Z));
+                }
+            }
+            else if (constraint.X == 1 && constraint.Z == 0)
+            {
+                if (movement.Z > 0)
+                {
+                    movement *= new Vector3(Math.Abs(constraint.X), 0, Math.Abs(constraint.Z));
+                }
+            }
+            else if (constraint.X == -1 && constraint.Z == 0)
+            {
+                if (movement.Z < 0)
+                {
+                    movement *= new Vector3(Math.Abs(constraint.X), 0, Math.Abs(constraint.Z));
+                }
+            }
+        }
+
         /// <summary>Returns the hash code for this instance.</summary>
         /// <returns>The hash code.</returns>
         public override int GetHashCode()
