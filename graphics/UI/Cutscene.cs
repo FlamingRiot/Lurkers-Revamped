@@ -6,6 +6,8 @@ namespace Lurkers_revamped
 {
     public class Cutscene
     {
+        public static Color EndgameGradient = new Color(255, 255, 255, 0);
+
         public const double GRADIENT_TIME = 1.2;
         public const double LENGTH = 15;
         private static double _start;
@@ -31,7 +33,10 @@ namespace Lurkers_revamped
                 Gradient(Color.Black);
                 EndDrawing();
 
-                if (_gradientStart == 0.001f) break;
+                if (_gradientStart == 0.001f)
+                {
+                    break;
+                }
             }
         }
 
@@ -87,6 +92,13 @@ namespace Lurkers_revamped
             DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), color);
             Vector2 textSize = MeasureTextEx(Menu.SecondaryFont, "Tip: Press TAB to see your tasks", TipFontSize, 1);
             DrawTextPro(Menu.SecondaryFont, "Tip: Press TAB to see your tasks", Program.ScreenSize / 2 - textSize / 2 + Vector2.UnitY * 400, Vector2.Zero, 0, TipFontSize, 1, new Color(255, 255, 255, alpha));
+        }
+
+        public static void Reset()
+        {
+            _gradientStart = 0.0;
+            _gradientEnd = 0.0;
+            _start = GetTime();
         }
 
         private static float ClampZero(float value, float min, float max)

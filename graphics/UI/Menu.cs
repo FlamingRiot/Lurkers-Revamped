@@ -120,6 +120,7 @@ namespace Lurkers_revamped
 
             // Show Cutscene
             Cutscene.Show(_renderTexture.Texture, sceneRectangle, inverseSceneRectangle);
+            DisableCursor();
         }
         
         public static void ShowPause()
@@ -133,6 +134,11 @@ namespace Lurkers_revamped
             DrawRectangleRoundedLines(_quitButton, 0.2f, 20, 3, new Color(158, 158, 158, 240));
             Vector2 textSize = MeasureTextEx(Font, "Play", 30, 1);
             DrawTextPro(Font, "Quit", _quitButton.Position + _quitButton.Size / 2 - textSize / 2, Vector2.Zero, 0, 30, 1, Color.White);
+        }
+
+        public static void Reset()
+        {
+            _quitButton.X = Width / 2 - 200;
         }
 
         public static bool Hover(Rectangle rectangle)

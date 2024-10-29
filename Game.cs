@@ -137,13 +137,15 @@ namespace Lurkers_revamped
             Program.ScreenRectangle = new Rectangle(0, 0, Program.ScreenWidth, Program.ScreenHeight);
             Program.ScreenInverseRectangle = new Rectangle(0, 0, Program.ScreenWidth, -Program.ScreenHeight);
 
+            // Set static screen infos
+            ScreenCenter.AddInfo(new TextureInfo(new Vector2(Program.ScreenWidth - 300, 20), Ressources.UITextures["crystal"], GetTime(), -1));
+
             // Start Menu
             Menu.Init();
             Menu.Show(Shaders.Skybox, Shaders, Terrain);
             // Set target FPS
             SetTargetFPS(60);
             StartTime = GetTime();
-            DisableCursor();
         }
 
         /// <summary>Enters the game loop and updates the game every frame.</summary>
@@ -270,6 +272,14 @@ namespace Lurkers_revamped
                                 }
                                 if (spawner.Destroyed)
                                 {
+                                    // Update spawner count
+                                    Player.CrystalCounter++;
+                                    if (Player.CrystalCounter == 3)
+                                    {
+                                        Cutscene.Reset();
+                                        Cutscene.EndgameGradient = new Color(255, 255, 255, 0);
+                                    }
+
                                     // Play destruction sound
                                     AudioCenter.SetSoundVolume("crystal_destroyed", 12);
                                     AudioCenter.PlaySound("crystal_destroyed");
@@ -327,6 +337,15 @@ namespace Lurkers_revamped
                 {
                     TaskManager.Active = false;
                     DisableCursor();
+                }
+            }
+
+            if (Player.CrystalCounter == 3 && TaskManager.OpenTasks.Count == 0)
+            {
+                if (Cutscene.EndgameGradient.A < 255) Cutscene.EndgameGradient.A++;
+                else
+                {
+                    ResetGame();
                 }
             }
         }
@@ -576,8 +595,8 @@ namespace Lurkers_revamped
             // Draw screen infos
             ScreenCenter.DrawScreenInfos();
 
-            // Draw current inventory case
-            DrawTexture(Ressources.UITextures["inventory_case_selected"], GetScreenWidth() - 121, GetScreenHeight() - (800 - (Player.InventoryIndex) * 85) - 1, Color.White);
+            // Draw crystal counter
+            DrawTextPro(Menu.Font, Player.CrystalCounter.ToString() + "/3", new Vector2(Program.ScreenWidth - 200, 40), Vector2.Zero, 0, 30, 1, Color.White);
 
             // Draw crosshair
             DrawTexture(Ressources.UITextures["crosshair"], GetScreenWidth() / 2 - Ressources.UITextures["crosshair"].Width / 2, GetScreenHeight() / 2 - Ressources.UITextures["crosshair"].Height / 2, CrosshairColor);
@@ -588,6 +607,15 @@ namespace Lurkers_revamped
 
             // Draw tasks manager
             TaskManager.Update();
+
+            // End gradient
+            DrawRectangle(0, 0, Program.ScreenWidth, Program.ScreenHeight, Cutscene.EndgameGradient);
+            Vector2 txtLength = MeasureTextEx(Menu.Font, "Thanks for playing", 30, 1);
+            DrawTextPro(
+                Menu.Font, 
+                "Thanks for playing", 
+                new Vector2(Program.ScreenWidth / 2 - txtLength.X / 2, Program.ScreenHeight / 2 - txtLength.Y / 2), 
+                Vector2.Zero, 0, 30, 1, new Color(0, 0, 0, (int)Cutscene.EndgameGradient.A)); 
 
             // Draw Gradient at the start
             if (StartTime + Cutscene.GRADIENT_TIME > GetTime()) Cutscene.Gradient(Color.Black);
@@ -780,10 +808,50 @@ namespace Lurkers_revamped
         // Secondary functions
         // -------------------------------------------------------------
 
+        /// <summary>Resets the game</summary>
+        private static void ResetGame()
+        {
+            EnableCursor();
+            // Player reset
+            Player.Life = 100;
+            Player.CrystalCounter = 0;
+            Camera.Position = new Vector3(-52.0f, 3.0f, -16.0f);
+            Camera.Target = new Vector3(3.0f, 3.0f, 0.0f);
+            Player.MoveState = PlayerMoveState.Running;
+            // Zombies reset
+            Zombies.Clear();
+            Zombies = new List<Zombie>()
+            {
+                new Zombie(new Vector3(-10, 0, 2), "cop", AnimationCenter.ZombieAnimations[8]),
+                new Zombie(new Vector3(10, 0, 2), "cop2", AnimationCenter.ZombieAnimations[8]),
+                new Zombie(new Vector3(2, 0, -10), "cop3", AnimationCenter.ZombieAnimations[8]),
+                new Zombie(new Vector3(2, 0, -5), "cop4", AnimationCenter.ZombieAnimations[8])
+            };
+            // Reset zombie security perimeter
+            foreach (Zombie zombie in Zombies)
+            {
+                Node currentNode = AStar.Grid.GetWorldToNode(zombie.Position);
+                List<Node> neighbours = AStar.Grid.GetNeighbours(currentNode);
+                if (zombie.PreviousNodes[0].Position != neighbours[0].Position)
+                {
+                    zombie.PreviousNodes.ForEach(x =>
+                    {
+                        if (!x.HARD_NODE) x.Walkable = true;
+                    });
+                    zombie.PreviousNodes = neighbours;
+                }
+            }
+            // Task reset
+            TaskManager.ResetTasks();
+            Cutscene.EndgameGradient.A = 0;
+            Menu.Reset();
+            // Go back to menu
+            Menu.Show(Shaders.Skybox, Shaders, Terrain);
+        }
+
         /// <summary>Ticks the player events based on its state.</summary>
         private static void TickPlayer()
         {
-            // Manager input events
             // Reload event
             if (IsKeyPressed(KeyboardKey.R))
             {
@@ -857,6 +925,15 @@ namespace Lurkers_revamped
 
                 // Set player state
                 Player.WeaponState = PlayerWeaponState.Taking;
+            }
+
+            if (Player.MoveState == PlayerMoveState.Dying)
+            {
+                if (Cutscene.EndgameGradient.A < 255) Cutscene.EndgameGradient.A++;
+                else
+                {
+                    ResetGame();
+                }
             }
         }
 

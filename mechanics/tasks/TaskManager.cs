@@ -121,6 +121,43 @@ namespace Lurkers_revamped
             }
         }
 
+        public static void ResetTasks()
+        {
+            // Load active tasks
+            do
+            {
+                Task task;
+                try
+                {
+                    task = _closedTasks[Random.Shared.Next(0, _closedTasks.Count)];
+                }
+                catch
+                {
+                    task = _tasks[Random.Shared.Next(0, _tasks.Count)];
+                }
+                if (!OpenTasks.Contains(task))
+                {
+                    OpenTasks.Add(task);
+                }
+            } while (OpenTasks.Count < 3);
+
+            OpenTasks.ForEach(task => _closedTasks.Remove(task));
+
+            // Load inactive 
+            if (_closedTasks.Count != 0) 
+            {
+                for (int i = 0; i < _closedTasks.Count; i++)
+                {
+                    _tasks.Add(_closedTasks[i]);
+                }
+            }
+            _closedTasks.Clear();
+
+            // Reset tasks
+            _tasks.ForEach(x => x.Progression = 0);
+            OpenTasks.ForEach(x => x.Progression = 0);
+        }
+
         public static void UpdateTask(int id, int amount)
         {
             foreach (Task task in OpenTasks)

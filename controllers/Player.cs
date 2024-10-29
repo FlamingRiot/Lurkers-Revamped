@@ -27,7 +27,7 @@ namespace Lurkers_revamped
         public static readonly float JUMP_FORCE = 0.3f;
 
         /// <summary>Player's base movement speed</summary>
-        public float SPEED = 0.1f;
+        public float SPEED = 0.07f;
 
         /// <summary>Player amount of life</summary>
         private int life;
@@ -44,8 +44,13 @@ namespace Lurkers_revamped
         /// <summary>Y position of the player.</summary>
         public float YPos;
 
+        /// <summary>Counter of destroyed crystals.</summary>
+        public int CrystalCounter;
+
+        /// <summary>Bloody state</summary>
         public bool BLOODY;
 
+        /// <summary>Player watch</summary>
         public Stopwatch Watch;
         
         /// <summary>Ray of the player.</summary>
@@ -155,6 +160,7 @@ namespace Lurkers_revamped
         /// <summary>Starts the dying animation of the player</summary>
         public void Kill()
         {
+            if (MoveState != PlayerMoveState.Dying) Cutscene.EndgameGradient = new Color(0, 0, 0, 0);
             MoveState = PlayerMoveState.Dying;
         }
 

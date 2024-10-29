@@ -30,15 +30,9 @@ namespace Lurkers_revamped
         {
             Dictionary<string, Texture2D> textures = new Dictionary<string, Texture2D>()
             {
-                {"rifle_gray_splash", LoadTexture("../weapon_splashes/rifle_gray.png") },
-                {"rifle_green_splash", LoadTexture("../weapon_splashes/rifle_green.png") },
-                {"rifle_blue_splash", LoadTexture("../weapon_splashes/rifle_blue.png") },
-                {"rifle_purple_splash", LoadTexture("../weapon_splashes/rifle_purple.png") },
-                {"rifle_gold_splash", LoadTexture("../weapon_splashes/rifle_gold.png") },
-                {"inventory_case", LoadTexture("../inventory_case.png") },
                 {"crosshair", LoadTexture("../crosshair.png") },
-                {"inventory_case_selected", LoadTexture("../inventory_case_selected.png") },
-                {"lifebar", LoadTexture("../lifebar.png") }
+                {"lifebar", LoadTexture("../lifebar.png") },
+                {"crystal", LoadTexture("../crystal.png") },
             };
             // Return the dictionary
             return textures;
